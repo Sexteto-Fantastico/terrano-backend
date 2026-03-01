@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm migration:generate -- src/migrations/CreateTables -d src/config/data-source.ts",
+    "migration:run": "npm run typeorm migration:run -- -d src/config/data-source.ts",
+    "migration:revert": "npm run typeorm migration:revert -- -d src/config/data-source.ts",
+    "schema:sync": "npm run typeorm schema:sync -- -d src/config/data-source.ts",
+    "db:create": "tsx src/config/ensure-database.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,14 +25,15 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mysql2": "^3.18.0",
-    "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.28"
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
+    "typeorm": "^0.3.28",
     "typescript": "^5.9.3"
   },
   "overrides": {

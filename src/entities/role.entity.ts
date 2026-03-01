@@ -2,32 +2,36 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
+    ManyToMany,
+    JoinTable,
     OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { StockMovement } from "./stock-movement.entity";
-import { StockLocationProduct } from "./stock-location-product.entity";
+import { Policy } from "./policy.entity";
+import { User } from "./user.entity";
 
-@Entity("stock_locations")
-export class StockLocation {
+@Entity("roles")
+export class Role {
     @PrimaryGeneratedColumn("uuid")
     id!: string;
 
-    @Column({ length: 100 })
+    @Column({ length: 50, unique: true })
     name!: string;
 
     @Column({ type: "text", nullable: true })
     description!: string;
 
-    @Column({ name: "is_active", default: true })
-    is_active!: boolean;
+    @ManyToMany(() => Policy)
+    @JoinTable({
+        name: "role_policies",
+        joinColumn: { name: "role_id" },
+        inverseJoinColumn: { name: "policy_id" }
+    })
+    policies!: Policy[];
 
-    @OneToMany(() => StockLocationProduct, (slp) => slp.location)
-    stock_location_products!: StockLocationProduct[];
-
-    @OneToMany(() => StockMovement, (movement) => movement.location)
-    stock_movements!: StockMovement[];
+    @OneToMany(() => User, (user) => user.role)
+    users!: User[];
 
     @CreateDateColumn({ name: "created_at" })
     created_at!: Date;

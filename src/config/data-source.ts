@@ -6,6 +6,12 @@ import { PurchaseOrderItem } from "../entities/purchase-order-item.entity";
 import { StockMovement } from "../entities/stock-movement.entity";
 import { StockRequisition } from "../entities/stock-requisition.entity";
 import { StockLocation } from "../entities/stock-location.entity";
+import { User } from "../entities/user.entity";
+import { Role } from "../entities/role.entity";
+import { Policy } from "../entities/policy.entity";
+import { StockLocationProduct } from "../entities/stock-location-product.entity";
+import { StockRequisitionItem } from "../entities/stock-requisition-item.entity";
+import { Department } from "../entities/department.entity";
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -24,6 +30,12 @@ export const AppDataSource = new DataSource({
         StockMovement,
         StockRequisition,
         StockLocation,
+        Department,
+        User,
+        Role,
+        Policy,
+        StockLocationProduct,
+        StockRequisitionItem,
     ],
     migrations: [],
     subscribers: [],
