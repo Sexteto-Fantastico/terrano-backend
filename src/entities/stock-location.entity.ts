@@ -5,36 +5,48 @@ import {
     OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
+    BaseEntity,
 } from "typeorm";
 import { StockMovement } from "./stock-movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
 
-@Entity("stock_locations")
-export class StockLocation {
+export interface IStockLocation {
+    name: string;
+    description?: string;
+    is_active: boolean;
+    updated_by: string;
+}
+@Entity("stock_location")
+export class StockLocation extends BaseEntity implements IStockLocation {
     @PrimaryGeneratedColumn("uuid")
-    id!: string;
+    id: string;
 
     @Column({ length: 100 })
-    name!: string;
+    name: string;
 
     @Column({ type: "text", nullable: true })
-    description!: string;
+    description?: string;
 
     @Column({ name: "is_active", default: true })
-    is_active!: boolean;
+    is_active: boolean;
 
     @OneToMany(() => StockLocationProduct, (slp) => slp.location)
-    stock_location_products!: StockLocationProduct[];
+    stock_location_products: StockLocationProduct[];
 
     @OneToMany(() => StockMovement, (movement) => movement.location)
-    stock_movements!: StockMovement[];
+    stock_movements: StockMovement[];
 
     @CreateDateColumn({ name: "created_at" })
-    created_at!: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ name: "last_updated" })
-    last_updated!: Date;
+    @UpdateDateColumn({ name: "updated_at" })
+    updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by!: string;
+    updated_by: string;
+
+    constructor(location: IStockLocation) {
+        super();
+        Object.assign(this, location);
+    }
 }

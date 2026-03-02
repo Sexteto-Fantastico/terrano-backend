@@ -18,8 +18,8 @@ export interface IStockBalance {
     updated_by: string;
 }
 
-@Entity("stock_location_product")
-export class StockLocationProduct extends BaseEntity implements IStockBalance {
+@Entity("stock_balance")
+export class StockBalance extends BaseEntity implements IStockBalance {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

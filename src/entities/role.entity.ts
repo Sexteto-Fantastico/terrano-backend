@@ -7,20 +7,28 @@ import {
     OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
+    BaseEntity,
 } from "typeorm";
 import { Policy } from "./policy.entity";
 import { User } from "./user.entity";
 
-@Entity("roles")
-export class Role {
+export interface IRole {
+    name: string;
+    description?: string;
+    policies: Policy[];
+    users?: User[];
+    updated_by: string;
+}
+@Entity("role")
+export class Role extends BaseEntity implements IRole {
     @PrimaryGeneratedColumn("uuid")
-    id!: string;
+    id: string;
 
     @Column({ length: 50, unique: true })
-    name!: string;
+    name: string;
 
     @Column({ type: "text", nullable: true })
-    description!: string;
+    description?: string;
 
     @ManyToMany(() => Policy)
     @JoinTable({
@@ -28,17 +36,22 @@ export class Role {
         joinColumn: { name: "role_id" },
         inverseJoinColumn: { name: "policy_id" }
     })
-    policies!: Policy[];
+    policies: Policy[];
 
     @OneToMany(() => User, (user) => user.role)
-    users!: User[];
+    users?: User[];
 
     @CreateDateColumn({ name: "created_at" })
-    created_at!: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ name: "last_updated" })
-    last_updated!: Date;
+    @UpdateDateColumn({ name: "updated_at" })
+    updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by!: string;
+    updated_by: string;
+
+    constructor(role: IRole) {
+        super();
+        Object.assign(this, role);
+    }
 }
