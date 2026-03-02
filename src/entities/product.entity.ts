@@ -5,56 +5,78 @@ import {
     OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
+    ManyToOne,
+    JoinColumn,
+    BaseEntity,
 } from "typeorm";
 import { StockMovement } from "./stock-movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
 import { StockRequisitionItem } from "./stock-requisition-item.entity";
-import { PurchaseOrderItem } from "./purchase-order-item.entity"; // ADICIONE ESTA LINHA
+import { PurchaseOrderItem } from "./purchase-order-item.entity";
+import { ProductCategory } from "./product-category.entity";
 
-@Entity("products")
-export class Product {
+
+export interface IProduct {
+    name: string;
+    code: string;
+    description?: string;
+    category: ProductCategory;
+    min_stock?: number;
+    is_active: boolean;
+    stock_movements?: StockMovement[];
+    stock_location_products?: StockLocationProduct[];
+    requisition_items?: StockRequisitionItem[];
+    purchase_order_items?: PurchaseOrderItem[];
+    updated_by: string;
+}
+
+@Entity("product")
+export class Product extends BaseEntity implements IProduct {
     @PrimaryGeneratedColumn("uuid")
-    id!: string;
+    id: string;
 
     @Column({ length: 200 })
-    name!: string;
+    name: string;
 
     @Column({ length: 50, unique: true })
-    code!: string;
+    code: string;
 
     @Column({ type: "text", nullable: true })
-    description!: string;
+    description?: string;
 
-    @Column({ name: "unit_price", type: "decimal", precision: 10, scale: 2, default: 0 })
-    unit_price!: number;
+    @ManyToOne(() => ProductCategory)
+    @JoinColumn({ name: "category_id" })
+    category: ProductCategory;
 
     @Column({ name: "min_stock", type: "int", default: 0 })
-    min_stock!: number;
-
-    @Column({ name: "max_stock", type: "int", default: 0 })
-    max_stock!: number;
+    min_stock?: number;
 
     @Column({ name: "is_active", default: true })
-    is_active!: boolean;
+    is_active: boolean;
 
     @OneToMany(() => StockMovement, (movement) => movement.product)
-    stock_movements!: StockMovement[];
+    stock_movements?: StockMovement[];
 
     @OneToMany(() => StockLocationProduct, (slp) => slp.product)
-    stock_location_products!: StockLocationProduct[];
+    stock_location_products?: StockLocationProduct[];
 
     @OneToMany(() => StockRequisitionItem, (item) => item.product)
-    requisition_items!: StockRequisitionItem[];
+    requisition_items?: StockRequisitionItem[];
 
     @OneToMany(() => PurchaseOrderItem, (item) => item.product)
-    purchase_order_items!: PurchaseOrderItem[];
+    purchase_order_items?: PurchaseOrderItem[];
 
     @CreateDateColumn({ name: "created_at" })
-    created_at!: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ name: "last_updated" })
-    last_updated!: Date;
+    @UpdateDateColumn({ name: "updated_at" })
+    updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by!: string;
+    updated_by: string;
+
+    constructor(product: IProduct) {
+        super();
+        Object.assign(this, product);
+    }
 }

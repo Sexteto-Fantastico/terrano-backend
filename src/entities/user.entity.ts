@@ -7,43 +7,54 @@ import {
     JoinColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    BaseEntity,
 } from "typeorm";
 import { Role } from "./role.entity";
 import { Department } from "./department.entity";
 
-@Entity("users")
-export class User {
+export interface IUser {
+    name: string;
+    phone?: string;
+    username: string;
+    password: string;
+    role: Role;
+    updated_by: string;
+}
+@Entity("user")
+export class User extends BaseEntity implements IUser {
     @PrimaryGeneratedColumn("uuid")
-    id!: string;
+    id: string;
 
     @Column({ length: 100 })
-    name!: string;
+    name: string;
 
     @Column({ length: 20, nullable: true })
-    phone!: string;
+    phone?: string;
 
     @Column({ length: 50, unique: true })
-    username!: string;
+    username: string;
 
     @Column()
-    password!: string;
+    password: string;
 
     @ManyToOne(() => Role)
     @JoinColumn({ name: "role_id" })
-    role!: Role;
-
-    @Column({ name: "role_id" })
-    role_id!: string;
+    role: Role;
 
     @OneToMany(() => Department, (dept) => dept.manager)
-    managed_departments!: Department[];
+    managed_departments: Department[];
 
     @CreateDateColumn({ name: "created_at" })
-    created_at!: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ name: "last_updated" })
-    last_updated!: Date;
+    @UpdateDateColumn({ name: "updated_at" })
+    updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by!: string;
+    updated_by: string;
+
+    constructor(user: IUser) {
+        super();
+        Object.assign(this, user);
+    }
 }

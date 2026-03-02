@@ -7,6 +7,7 @@ import {
     JoinColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    BaseEntity,
 } from "typeorm";
 import { StockRequisitionItem } from "./stock-requisition-item.entity";
 import { Department } from "./department.entity";
@@ -20,8 +21,18 @@ export enum RequisitionStatus {
     CANCELLED = "CANCELLED",
 }
 
-@Entity("stock_requisitions")
-export class StockRequisition {
+export interface IStockRequisition {
+    company_name: string;
+    status: RequisitionStatus;
+    declared_at: Date;
+    total_value: number;
+    department: Department;
+    items: StockRequisitionItem[];
+    stock_movements: StockMovement[];
+    updated_by: string;
+}
+@Entity("stock_requisition")
+export class StockRequisition extends BaseEntity implements IStockRequisition {
     @PrimaryGeneratedColumn("uuid")
     id!: string;
 
@@ -33,33 +44,35 @@ export class StockRequisition {
         enum: RequisitionStatus,
         default: RequisitionStatus.PENDING
     })
-    status!: RequisitionStatus;
+    status: RequisitionStatus;
 
     @Column({ name: "declared_at", type: "date" })
-    declared_at!: Date;
+    declared_at: Date;
 
     @Column({ name: "total_value", type: "decimal", precision: 10, scale: 2, default: 0 })
-    total_value!: number;
+    total_value: number;
 
     @ManyToOne(() => Department)
     @JoinColumn({ name: "department_id" })
-    department!: Department;
-
-    @Column({ name: "department_id" })
-    department_id!: string;
+    department: Department;
 
     @OneToMany(() => StockRequisitionItem, (item) => item.requisition)
-    items!: StockRequisitionItem[];
+    items: StockRequisitionItem[];
 
     @OneToMany(() => StockMovement, (movement) => movement.requisition)
-    stock_movements!: StockMovement[];
+    stock_movements: StockMovement[];
 
     @CreateDateColumn({ name: "created_at" })
-    created_at!: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ name: "last_updated" })
-    last_updated!: Date;
+    @UpdateDateColumn({ name: "updated_at" })
+    updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by!: string;
+    updated_by: string;
+
+    constructor(requisition: IStockRequisition) {
+        super();
+        Object.assign(this, requisition);
+    }
 }

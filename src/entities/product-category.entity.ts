@@ -2,39 +2,31 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    ManyToMany,
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
 } from "typeorm";
-import { Role } from "./role.entity";
 
-export interface IPolicy {
+export interface IProductCategory {
     name: string;
     description?: string;
-    resource: string;
-    action: string;
+    is_active: boolean;
     updated_by: string;
 }
-@Entity("policy")
-export class Policy extends BaseEntity implements IPolicy {
+
+@Entity("product_category")
+export class ProductCategory extends BaseEntity implements IProductCategory {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 100, unique: true })
+    @Column({ length: 200 })
     name: string;
 
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ length: 50 })
-    resource: string;
-
-    @Column({ length: 50 })
-    action: string;
-
-    @ManyToMany(() => Role, (role) => role.policies)
-    roles: Role[];
+    @Column({ name: "is_active", default: true })
+    is_active: boolean;
 
     @CreateDateColumn({ name: "created_at" })
     created_at: Date;
@@ -45,8 +37,8 @@ export class Policy extends BaseEntity implements IPolicy {
     @Column({ name: "updated_by", type: "uuid", nullable: true })
     updated_by: string;
 
-    constructor(policy: IPolicy) {
+    constructor(category: IProductCategory) {
         super();
-        Object.assign(this, policy);
+        Object.assign(this, category);
     }
 }

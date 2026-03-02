@@ -7,37 +7,48 @@ import {
     JoinColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    BaseEntity,
 } from "typeorm";
 import { StockRequisition } from "./stock-requisition.entity";
 import { User } from "./user.entity";
 
-@Entity("departments")
-export class Department {
+export interface IDepartment {
+    name: string;
+    cost_center_code: string;
+    manager: User;
+    updated_by: string;
+}
+
+@Entity("department")
+export class Department extends BaseEntity implements IDepartment {
     @PrimaryGeneratedColumn("uuid")
-    id!: string;
+    id: string;
 
     @Column({ length: 100 })
-    name!: string;
+    name: string;
 
     @Column({ name: "cost_center_code", length: 50 })
-    cost_center_code!: string;
+    cost_center_code: string;
 
     @ManyToOne(() => User)
     @JoinColumn({ name: "manager_id" })
-    manager!: User;
-
-    @Column({ name: "manager_id", nullable: true })
-    manager_id!: string;
+    manager: User;
 
     @OneToMany(() => StockRequisition, (req) => req.department)
-    requisitions!: StockRequisition[];
+    requisitions: StockRequisition[];
 
     @CreateDateColumn({ name: "created_at" })
-    created_at!: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ name: "last_updated" })
-    last_updated!: Date;
+    @UpdateDateColumn({ name: "updated_at" })
+    updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by!: string;
+    updated_by: string;
+
+    constructor(department: IDepartment) {
+        super();
+        Object.assign(this, department);
+    }
+
 }
