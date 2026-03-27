@@ -34,10 +34,10 @@ export interface IStockRequisition {
 @Entity("stock_requisition")
 export class StockRequisition extends BaseEntity implements IStockRequisition {
     @PrimaryGeneratedColumn("uuid")
-    id!: string;
+    id: string;
 
-    @Column({ length: 200 })
-    company_name!: string;
+    @Column({ type: "varchar", length: 200 })
+    company_name: string;
 
     @Column({
         type: "enum",

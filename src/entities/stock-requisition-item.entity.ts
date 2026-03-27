@@ -25,7 +25,7 @@ export class StockRequisitionItem extends BaseEntity implements IStockRequisitio
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 200 })
+    @Column({ type: "varchar", length: 200 })
     item: string;
 
     @Column({ name: "declared_at", type: "date" })

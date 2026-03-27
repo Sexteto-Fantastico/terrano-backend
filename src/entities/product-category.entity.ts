@@ -19,13 +19,13 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 200 })
+    @Column({ type: "varchar", length: 200 })
     name: string;
 
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ name: "is_active", default: true })
+    @Column({ type: "boolean", name: "is_active", default: true })
     is_active: boolean;
 
     @CreateDateColumn({ name: "created_at" })
