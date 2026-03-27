@@ -24,7 +24,7 @@ export class Role extends BaseEntity implements IRole {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 50, unique: true })
+    @Column({ type: "varchar", length: 50, unique: true })
     name: string;
 
     @Column({ type: "text", nullable: true })

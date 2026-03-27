@@ -25,16 +25,16 @@ export class User extends BaseEntity implements IUser {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 100 })
+    @Column({ type: "varchar", length: 100 })
     name: string;
 
-    @Column({ length: 20, nullable: true })
+    @Column({ type: "varchar", length: 20, nullable: true })
     phone?: string;
 
-    @Column({ length: 50, unique: true })
+    @Column({ type: "varchar", length: 50, unique: true })
     username: string;
 
-    @Column()
+    @Column({ type: "varchar", length: 100 })
     password: string;
 
     @ManyToOne(() => Role)

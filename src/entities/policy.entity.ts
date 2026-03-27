@@ -21,16 +21,16 @@ export class Policy extends BaseEntity implements IPolicy {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 100, unique: true })
+    @Column({ type: "varchar", length: 100, unique: true })
     name: string;
 
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ length: 50 })
+    @Column({ type: "varchar", length: 50 })
     resource: string;
 
-    @Column({ length: 50 })
+    @Column({ type: "varchar", length: 50 })
     action: string;
 
     @ManyToMany(() => Role, (role) => role.policies)

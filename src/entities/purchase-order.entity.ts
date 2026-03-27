@@ -36,7 +36,7 @@ export class PurchaseOrder extends BaseEntity implements IPurchaseOrder {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 50, unique: true })
+    @Column({ type: "varchar", length: 50, unique: true })
     order_number: string;
 
     @Column({ type: "date", name: "order_date" })

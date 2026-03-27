@@ -24,10 +24,10 @@ export class Department extends BaseEntity implements IDepartment {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 100 })
+    @Column({ type: "varchar", length: 100 })
     name: string;
 
-    @Column({ name: "cost_center_code", length: 50 })
+    @Column({ type: "varchar", name: "cost_center_code", length: 50 })
     cost_center_code: string;
 
     @ManyToOne(() => User)

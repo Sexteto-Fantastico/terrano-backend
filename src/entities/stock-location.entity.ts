@@ -21,13 +21,13 @@ export class StockLocation extends BaseEntity implements IStockLocation {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 100 })
+    @Column({ type: "varchar", length: 100 })
     name: string;
 
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ name: "is_active", default: true })
+    @Column({ type: "boolean", name: "is_active", default: true })
     is_active: boolean;
 
     @OneToMany(() => StockLocationProduct, (slp) => slp.location)

@@ -35,10 +35,10 @@ export class Product extends BaseEntity implements IProduct {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ length: 200 })
+    @Column({ type: "varchar", length: 200 })
     name: string;
 
-    @Column({ length: 50, unique: true })
+    @Column({ type: "varchar", length: 50, unique: true })
     code: string;
 
     @Column({ type: "text", nullable: true })
@@ -51,7 +51,7 @@ export class Product extends BaseEntity implements IProduct {
     @Column({ name: "min_stock", type: "int", default: 0 })
     min_stock?: number;
 
-    @Column({ name: "is_active", default: true })
+    @Column({ type: "boolean", name: "is_active", default: true })
     is_active: boolean;
 
     @OneToMany(() => StockMovement, (movement) => movement.product)
