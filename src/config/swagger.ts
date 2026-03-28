@@ -31,7 +31,14 @@ const options: swaggerJSDoc.Options = {
             },
         ],
     },
-    apis: ["./src/routes/*.ts", "./src/controllers/*.ts", "./src/entities/*.ts"], // Path to the API specs
+    apis: [
+        "./src/routes/*.{ts,js}",
+        "./src/controllers/*.{ts,js}",
+        "./src/entities/*.{ts,js}",
+        "./dist/routes/*.{ts,js}",
+        "./dist/controllers/*.{ts,js}",
+        "./dist/entities/*.{ts,js}"
+    ], // Path to the API specs
 };
 
 const swaggerSpec = swaggerJSDoc(options);
@@ -43,7 +50,7 @@ export const setupSwagger = (app: Application) => {
         customCss: '.swagger-ui .topbar { display: none }',
         customSiteTitle: "Terrano API Documentation"
     }));
-    
+
     // Serve swagger spec as JSON
     app.get("/api-docs.json", (_req, res) => {
         res.setHeader("Content-Type", "application/json");
