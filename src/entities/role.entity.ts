@@ -19,6 +19,7 @@ export interface IRole {
     users?: User[];
     updated_by: string;
 }
+
 @Entity("role")
 export class Role extends BaseEntity implements IRole {
     @PrimaryGeneratedColumn("uuid")

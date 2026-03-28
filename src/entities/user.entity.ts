@@ -20,6 +20,7 @@ export interface IUser {
     role: Role;
     updated_by: string;
 }
+
 @Entity("user")
 export class User extends BaseEntity implements IUser {
     @PrimaryGeneratedColumn("uuid")

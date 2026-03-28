@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity, DeleteDateColumn } from "typeorm";
 import { PurchaseOrder } from "./purchase-order.entity";
 
 export interface ISupplier {
@@ -7,8 +7,9 @@ export interface ISupplier {
     cnpj: string;
     email: string;
     phone: string;
-    is_active: boolean;
+    deleted_at?: Date;
 }
+
 @Entity("supplier")
 export class Supplier extends BaseEntity implements ISupplier {
     @PrimaryGeneratedColumn("uuid")
@@ -29,8 +30,8 @@ export class Supplier extends BaseEntity implements ISupplier {
     @Column({ type: "varchar", length: 20 })
     phone: string;
 
-    @Column({ type: "boolean", default: true })
-    is_active: boolean;
+    @DeleteDateColumn({ name: "deleted_at" })
+    deleted_at: Date;
 
     @OneToMany(() => PurchaseOrder, (po) => po.supplier)
     purchase_orders: PurchaseOrder[];

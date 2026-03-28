@@ -8,6 +8,7 @@ import {
     ManyToOne,
     JoinColumn,
     BaseEntity,
+    DeleteDateColumn,
 } from "typeorm";
 import { StockMovement } from "./stock-movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
@@ -22,7 +23,7 @@ export interface IProduct {
     description?: string;
     category: ProductCategory;
     min_stock?: number;
-    is_active: boolean;
+    deleted_at?: Date;
     stock_movements?: StockMovement[];
     stock_location_products?: StockLocationProduct[];
     requisition_items?: StockRequisitionItem[];
@@ -51,8 +52,8 @@ export class Product extends BaseEntity implements IProduct {
     @Column({ name: "min_stock", type: "int", default: 0 })
     min_stock?: number;
 
-    @Column({ type: "boolean", name: "is_active", default: true })
-    is_active: boolean;
+    @DeleteDateColumn({ name: "deleted_at" })
+    deleted_at: Date;
 
     @OneToMany(() => StockMovement, (movement) => movement.product)
     stock_movements?: StockMovement[];

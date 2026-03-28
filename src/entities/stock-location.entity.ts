@@ -6,6 +6,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    DeleteDateColumn,
 } from "typeorm";
 import { StockMovement } from "./stock-movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
@@ -13,9 +14,10 @@ import { StockLocationProduct } from "./stock-location-product.entity";
 export interface IStockLocation {
     name: string;
     description?: string;
-    is_active: boolean;
+    deleted_at?: Date;
     updated_by: string;
 }
+
 @Entity("stock_location")
 export class StockLocation extends BaseEntity implements IStockLocation {
     @PrimaryGeneratedColumn("uuid")
@@ -27,8 +29,8 @@ export class StockLocation extends BaseEntity implements IStockLocation {
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ type: "boolean", name: "is_active", default: true })
-    is_active: boolean;
+    @DeleteDateColumn({ name: "deleted_at" })
+    deleted_at: Date;
 
     @OneToMany(() => StockLocationProduct, (slp) => slp.location)
     stock_location_products: StockLocationProduct[];
