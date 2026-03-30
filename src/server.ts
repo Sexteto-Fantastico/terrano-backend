@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import { AppDataSource } from "./config/data-source";
 import { ensureDatabaseExists } from "./config/ensure-database";
+import { setupSwagger } from "./config/swagger";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -14,9 +15,8 @@ import { Endpoints } from "./utils/constants/endpoints";
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (_req, res) => {
-    res.json({ status: "ok", message: "Terrano API is running" });
-});
+// Set up Swagger API documentation
+setupSwagger(app);
 
 app.use(Endpoints.PRODUCT_CATEGORIES.BASE, productCategoryRoutes);
 
@@ -27,6 +27,7 @@ ensureDatabaseExists()
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
+            console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
         });
     })
     .catch((error) => {
