@@ -18,7 +18,8 @@ export interface IUser {
     username: string;
     password: string;
     role: Role;
-    updated_by: string;
+    updated_by?: string;
+    isActive?: boolean;
 }
 @Entity("user")
 export class User extends BaseEntity implements IUser {
@@ -51,7 +52,10 @@ export class User extends BaseEntity implements IUser {
     updated_at: Date;
 
     @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    updated_by?: string;
+
+    @Column({ name: "is_active", type: "boolean", default: true })
+    isActive: boolean = true;
 
     constructor(user: IUser) {
         super();
