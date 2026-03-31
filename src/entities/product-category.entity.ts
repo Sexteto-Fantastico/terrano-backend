@@ -11,13 +11,13 @@ export interface IProductCategory {
     name: string;
     description?: string;
     is_active: boolean;
-    updated_by: string;
+    updated_by?: number;
 }
 
 @Entity("product_category")
 export class ProductCategory extends BaseEntity implements IProductCategory {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 200 })
     name: string;
@@ -34,11 +34,13 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(category: IProductCategory) {
         super();
         Object.assign(this, category);
     }
 }
+
+

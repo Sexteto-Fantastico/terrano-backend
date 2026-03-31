@@ -18,13 +18,13 @@ export interface IUser {
     username: string;
     password: string;
     role: Role;
-    updated_by?: string;
-    isActive?: boolean;
+    updated_by?: number;
+    is_active?: boolean;
 }
 @Entity("user")
 export class User extends BaseEntity implements IUser {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 100 })
     name: string;
@@ -51,14 +51,16 @@ export class User extends BaseEntity implements IUser {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by?: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     @Column({ name: "is_active", type: "boolean", default: true })
-    isActive: boolean = true;
+    is_active: boolean = true;
 
     constructor(user: IUser) {
         super();
         Object.assign(this, user);
     }
 }
+
+

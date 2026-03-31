@@ -28,7 +28,11 @@ export class UserController {
 
     static async getUsers(req: Request, res: Response) {
         try {
-            const users = await UserService.getUsers();
+            const users = await UserService.getUsers({
+                name: req.query.name ? String(req.query.name) : undefined,
+                only_active: req.query.only_active ? Boolean(req.query
+                    .only_active) : undefined
+            });
             return res.json(users);
         } catch (error) {
             return errorResponse(error, res);

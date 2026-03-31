@@ -16,13 +16,13 @@ export interface IDepartment {
     name: string;
     cost_center_code: string;
     manager: User;
-    updated_by: string;
+    updated_by?: number;
 }
 
 @Entity("department")
 export class Department extends BaseEntity implements IDepartment {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 100 })
     name: string;
@@ -43,8 +43,8 @@ export class Department extends BaseEntity implements IDepartment {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(department: IDepartment) {
         super();
@@ -52,3 +52,5 @@ export class Department extends BaseEntity implements IDepartment {
     }
 
 }
+
+

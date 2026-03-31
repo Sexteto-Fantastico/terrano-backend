@@ -15,13 +15,13 @@ export interface IStockBalance {
     product: Product;
     location: StockLocation;
     quantity: number;
-    updated_by: string;
+    updated_by?: number;
 }
 
 @Entity("stock_location_product")
 export class StockLocationProduct extends BaseEntity implements IStockBalance {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @ManyToOne(() => Product)
     @JoinColumn({ name: "product_id" })
@@ -40,11 +40,13 @@ export class StockLocationProduct extends BaseEntity implements IStockBalance {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(balance: IStockBalance) {
         super();
         Object.assign(this, balance);
     }
 }
+
+

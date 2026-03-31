@@ -1,3 +1,4 @@
+import { FindOptionsWhere, ILike, Like } from "typeorm";
 import { AppDataSource } from "../config/data-source";
 import { Role } from "../entities/role.entity";
 import { User } from "../entities/user.entity";
@@ -25,8 +26,21 @@ export interface UpdateUserPayload {
 }
 
 function sanitizeUser(user: User): Omit<User, "password"> {
-    const { password, ...rest } = user;
-    return rest as Omit<User, "password">;
+    return {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        username: user.username,
+        role: user.role && {
+            id: user.role.id,
+            name: user.role.name
+        },
+        managed_departments: (user.managed_departments ?? []).map((dept) => ({
+            id: dept.id,
+            name: dept.name
+        })),
+        is_active: user.is_active,
+    } as Omit<User, "password">;
 }
 
 export class UserService {
@@ -48,25 +62,31 @@ export class UserService {
             password: hashPassword(payload.password),
             role,
             updated_by: payload.updatedBy,
-            isActive: true,
+            is_active: true,
         });
 
         await user.save();
         return sanitizeUser(user);
     }
 
-    static async getUsers(): Promise<Array<Omit<User, "password">>> {
+    static async getUsers(filters: { name?: string; only_active?: boolean }): Promise<Array<Omit<User, "password">>> {
+        const where: FindOptionsWhere<User> = {};
+        
+        if (filters.only_active) where.is_active = true;
+        if (filters.name) where.name = ILike(`%${filters.name}%`);
+        
         const users = await userRepository.find({
-            where: { isActive: true },
+            where,
             relations: ["role"],
-            order: { created_at: "ASC" }
+            order: { name: "ASC" }
         });
+        
         return users.map(sanitizeUser);
     }
 
     static async getUserById(id: string): Promise<Omit<User, "password">> {
         const user = await userRepository.findOne({
-            where: { id, isActive: true },
+            where: { id, is_active: true },
             relations: ["role"]
         });
 
@@ -78,7 +98,7 @@ export class UserService {
     }
 
     static async updateUser(id: string, payload: UpdateUserPayload): Promise<Omit<User, "password">> {
-        const user = await userRepository.findOne({ where: { id, isActive: true }, relations: ["role"] });
+        const user = await userRepository.findOne({ where: { id, is_active: true }, relations: ["role"] });
         if (!user) {
             throw new Error("User not found.");
         }
@@ -120,12 +140,12 @@ export class UserService {
     }
 
     static async deleteUser(id: string, updatedBy?: string): Promise<Omit<User, "password">> {
-        const user = await userRepository.findOne({ where: { id, isActive: true }, relations: ["role"] });
+        const user = await userRepository.findOne({ where: { id, is_active: true }, relations: ["role"] });
         if (!user) {
             throw new Error("User not found.");
         }
 
-        user.isActive = false;
+        user.is_active = false;
         if (updatedBy !== undefined) {
             user.updated_by = updatedBy;
         }
