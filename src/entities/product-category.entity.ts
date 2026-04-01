@@ -6,11 +6,15 @@ import {
     UpdateDateColumn,
     BaseEntity,
     DeleteDateColumn,
+    ManyToOne,
+    OneToMany,
+    JoinColumn,
 } from "typeorm";
 
 export interface IProductCategory {
     name: string;
     description?: string;
+    parent_id?: string;
     deleted_at?: Date;
     updated_by: string;
 }
@@ -25,6 +29,16 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
 
     @Column({ type: "text", nullable: true })
     description?: string;
+
+    @Column({ name: "parent_id", type: "uuid", nullable: true })
+    parent_id?: string;
+
+    @ManyToOne(() => ProductCategory, (category) => category.children, { nullable: true })
+    @JoinColumn({ name: "parent_id" })
+    parent?: ProductCategory;
+
+    @OneToMany(() => ProductCategory, (category) => category.parent)
+    children?: ProductCategory[];
 
     @DeleteDateColumn({ name: "deleted_at" })
     deleted_at: Date;

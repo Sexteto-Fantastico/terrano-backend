@@ -6,5 +6,6 @@ export const Endpoints = {
         CREATE: "/",
         UPDATE: "/:id",
         DELETE: "/:id",
+        RESTORE: "/:id/restore",
     }
 };
