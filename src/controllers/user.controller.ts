@@ -19,7 +19,13 @@ function errorResponse(error: unknown, res: Response) {
 export class UserController {
     static async createUser(req: Request, res: Response) {
         try {
-            const user = await UserService.createUser(req.body);
+            const payload = {
+                ...req.body,
+                roleId: Number(req.body.roleId ?? req.body.role?.id),
+                departmentId: Number(req.body.departmentId ?? req.body.department?.id),
+            };
+
+            const user = await UserService.createUser(payload);
             return res.status(201).json(user);
         } catch (error) {
             return errorResponse(error, res);
@@ -41,7 +47,8 @@ export class UserController {
 
     static async getUserById(req: Request, res: Response) {
         try {
-            const user = await UserService.getUserById(String(req.params.id));
+            const id = Number(req.params.id);
+            const user = await UserService.getUserById(id);
             return res.json(user);
         } catch (error) {
             return errorResponse(error, res);
@@ -50,7 +57,23 @@ export class UserController {
 
     static async updateUser(req: Request, res: Response) {
         try {
-            const user = await UserService.updateUser(String(req.params.id), req.body);
+            const id = Number(req.params.id);
+            const payload = {
+                ...req.body,
+                roleId: req.body.roleId !== undefined ? Number(req.body.roleId) : req.body.role?.id !== undefined ? Number(req.body.role.id) : undefined,
+                departmentId: req.body.departmentId !== undefined ? Number(req.body.departmentId) : req.body.department?.id !== undefined ? Number(req.body.department.id) : undefined,
+            };
+            const user = await UserService.updateUser(id, payload);
+            return res.json(user);
+        } catch (error) {
+            return errorResponse(error, res);
+        }
+    }
+
+    static async changePassword(req: Request, res: Response) {
+        try {
+            const id = Number(req.params.id);
+            const user = await UserService.changePassword(id, req.body);
             return res.json(user);
         } catch (error) {
             return errorResponse(error, res);
@@ -59,7 +82,8 @@ export class UserController {
 
     static async deleteUser(req: Request, res: Response) {
         try {
-            await UserService.deleteUser(String(req.params.id), req.body.updatedBy as string | undefined);
+            const id = Number(req.params.id);
+            await UserService.deleteUser(id, req.body.updatedBy as number | undefined);
             return res.status(204).send();
         } catch (error) {
             return errorResponse(error, res);

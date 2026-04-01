@@ -8,6 +8,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    OneToOne,
 } from "typeorm";
 import { Role } from "./role.entity";
 import { Department } from "./department.entity";
@@ -15,9 +16,12 @@ import { Department } from "./department.entity";
 export interface IUser {
     name: string;
     phone?: string;
+    cpf?: string;
+    email: string;
     username: string;
     password: string;
     role: Role;
+    department: Department;
     updated_by?: number;
     is_active?: boolean;
 }
@@ -32,6 +36,12 @@ export class User extends BaseEntity implements IUser {
     @Column({ type: "varchar", length: 20, nullable: true })
     phone?: string;
 
+    @Column({ type: "varchar", length: 14, nullable: true })
+    cpf?: string;
+
+    @Column({ type: "varchar", length: 300, unique: true })
+    email: string;
+
     @Column({ type: "varchar", length: 50, unique: true })
     username: string;
 
@@ -41,6 +51,10 @@ export class User extends BaseEntity implements IUser {
     @ManyToOne(() => Role)
     @JoinColumn({ name: "role_id" })
     role: Role;
+
+    @ManyToOne(() => Department)
+    @JoinColumn({ name: "department_id" })
+    department: Department;
 
     @OneToMany(() => Department, (dept) => dept.manager)
     managed_departments: Department[];
