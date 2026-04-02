@@ -2,6 +2,7 @@ import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import userRoutes from "./routes/user.routes";
 import { AppDataSource } from "./config/data-source";
 import { ensureDatabaseExists } from "./config/ensure-database";
 import { setupSwagger } from "./config/swagger";
@@ -14,6 +15,7 @@ import { Endpoints } from "./utils/constants/endpoints";
 
 app.use(cors());
 app.use(express.json());
+app.use("/users", userRoutes);
 
 // Set up Swagger API documentation
 setupSwagger(app);

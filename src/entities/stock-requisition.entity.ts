@@ -29,12 +29,12 @@ export interface IStockRequisition {
     department: Department;
     items: StockRequisitionItem[];
     stock_movements: StockMovement[];
-    updated_by: string;
+    updated_by?: number;
 }
 @Entity("stock_requisition")
 export class StockRequisition extends BaseEntity implements IStockRequisition {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 200 })
     company_name: string;
@@ -68,11 +68,13 @@ export class StockRequisition extends BaseEntity implements IStockRequisition {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(requisition: IStockRequisition) {
         super();
         Object.assign(this, requisition);
     }
 }
+
+

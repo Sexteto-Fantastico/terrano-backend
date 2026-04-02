@@ -28,13 +28,13 @@ export interface IProduct {
     stock_location_products?: StockLocationProduct[];
     requisition_items?: StockRequisitionItem[];
     purchase_order_items?: PurchaseOrderItem[];
-    updated_by: string;
+    updated_by?: number;
 }
 
 @Entity("product")
 export class Product extends BaseEntity implements IProduct {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 200 })
     name: string;
@@ -73,11 +73,13 @@ export class Product extends BaseEntity implements IProduct {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(product: IProduct) {
         super();
         Object.assign(this, product);
     }
 }
+
+

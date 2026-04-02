@@ -20,8 +20,8 @@ export interface IStockLocation {
 
 @Entity("stock_location")
 export class StockLocation extends BaseEntity implements IStockLocation {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 100 })
     name: string;
@@ -44,11 +44,13 @@ export class StockLocation extends BaseEntity implements IStockLocation {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(location: IStockLocation) {
         super();
         Object.assign(this, location);
     }
 }
+
+
