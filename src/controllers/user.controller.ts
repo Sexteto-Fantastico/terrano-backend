@@ -1,5 +1,13 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
+import {
+    ChangePasswordRequestDto,
+    CreateUserRequestDto,
+    DeleteUserRequestDto,
+    GetUsersQueryDto,
+    UpdateUserRequestDto,
+    UserResponseDto,
+} from "../dtos/user.dto";
 
 function errorResponse(error: unknown, res: Response) {
     const message = error instanceof Error ? error.message : "Internal server error.";
@@ -17,7 +25,7 @@ function errorResponse(error: unknown, res: Response) {
 }
 
 export class UserController {
-    static async createUser(req: Request, res: Response) {
+    static async createUser(req: Request<{}, UserResponseDto, CreateUserRequestDto>, res: Response<UserResponseDto>) {
         try {
             const payload = {
                 ...req.body,
@@ -32,7 +40,7 @@ export class UserController {
         }
     }
 
-    static async getUsers(req: Request, res: Response) {
+    static async getUsers(req: Request<{}, UserResponseDto[], {}, GetUsersQueryDto>, res: Response<UserResponseDto[]>) {
         try {
             const users = await UserService.getUsers({
                 name: req.query.name ? String(req.query.name) : undefined,
@@ -45,7 +53,7 @@ export class UserController {
         }
     }
 
-    static async getUserById(req: Request, res: Response) {
+    static async getUserById(req: Request<{ id: string }, UserResponseDto>, res: Response<UserResponseDto>) {
         try {
             const id = Number(req.params.id);
             const user = await UserService.getUserById(id);
@@ -55,7 +63,7 @@ export class UserController {
         }
     }
 
-    static async updateUser(req: Request, res: Response) {
+    static async updateUser(req: Request<{ id: string }, UserResponseDto, UpdateUserRequestDto>, res: Response<UserResponseDto>) {
         try {
             const id = Number(req.params.id);
             const payload = {
@@ -70,7 +78,7 @@ export class UserController {
         }
     }
 
-    static async changePassword(req: Request, res: Response) {
+    static async changePassword(req: Request<{ id: string }, UserResponseDto, ChangePasswordRequestDto>, res: Response<UserResponseDto>) {
         try {
             const id = Number(req.params.id);
             const user = await UserService.changePassword(id, req.body);
@@ -80,10 +88,10 @@ export class UserController {
         }
     }
 
-    static async deleteUser(req: Request, res: Response) {
+    static async deleteUser(req: Request<{ id: string }, void, DeleteUserRequestDto>, res: Response<void>) {
         try {
             const id = Number(req.params.id);
-            await UserService.deleteUser(id, req.body.updatedBy as number | undefined);
+            await UserService.deleteUser(id, req.body.updatedBy);
             return res.status(204).send();
         } catch (error) {
             return errorResponse(error, res);
