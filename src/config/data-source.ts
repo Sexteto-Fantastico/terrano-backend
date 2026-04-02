@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { DataSource } from "typeorm";
 import { Supplier } from "../entities/supplier.entity";
 import { Product } from "../entities/product.entity";
@@ -41,6 +42,6 @@ export const AppDataSource = new DataSource({
         StockLocationProduct,
         StockRequisitionItem,
     ],
-    migrations: [],
+    migrations: ["src/migrations/*.ts"],
     subscribers: [],
 });

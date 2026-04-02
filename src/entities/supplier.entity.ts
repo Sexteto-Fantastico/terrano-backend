@@ -11,8 +11,8 @@ export interface ISupplier {
 }
 @Entity("supplier")
 export class Supplier extends BaseEntity implements ISupplier {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 255 })
     corporate_name: string;
@@ -40,3 +40,6 @@ export class Supplier extends BaseEntity implements ISupplier {
         Object.assign(this, supplier);
     }
 }
+
+
+

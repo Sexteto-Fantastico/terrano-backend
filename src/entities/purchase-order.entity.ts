@@ -29,12 +29,12 @@ export interface IPurchaseOrder {
     total: number;
     items: PurchaseOrderItem[];
     stock_movements?: StockMovement[];
-    updated_by: string;
+    updated_by?: number;
 }
 @Entity("purchase_order")
 export class PurchaseOrder extends BaseEntity implements IPurchaseOrder {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 50, unique: true })
     order_number: string;
@@ -68,11 +68,13 @@ export class PurchaseOrder extends BaseEntity implements IPurchaseOrder {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(order: IPurchaseOrder) {
         super();
         Object.assign(this, order);
     }
 }
+
+

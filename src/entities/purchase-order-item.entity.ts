@@ -17,8 +17,8 @@ export interface IPurchaseOrderItem {
 
 @Entity("purchase_order_item")
 export class PurchaseOrderItem extends BaseEntity implements IPurchaseOrderItem {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @ManyToOne(() => PurchaseOrder, (po) => po.items, { onDelete: "CASCADE" })
     purchase_order: PurchaseOrder;
@@ -40,3 +40,6 @@ export class PurchaseOrderItem extends BaseEntity implements IPurchaseOrderItem 
         Object.assign(this, item);
     }
 }
+
+
+

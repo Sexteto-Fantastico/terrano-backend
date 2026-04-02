@@ -14,12 +14,12 @@ export interface IPolicy {
     description?: string;
     resource: string;
     action: string;
-    updated_by: string;
+    updated_by?: number;
 }
 @Entity("policy")
 export class Policy extends BaseEntity implements IPolicy {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 100, unique: true })
     name: string;
@@ -42,11 +42,13 @@ export class Policy extends BaseEntity implements IPolicy {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(policy: IPolicy) {
         super();
         Object.assign(this, policy);
     }
 }
+
+

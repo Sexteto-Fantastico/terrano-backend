@@ -16,12 +16,110 @@ const options: swaggerJSDoc.Options = {
                 description: "Local Development Server",
             },
         ],
+        tags: [
+            {
+                name: "Users",
+                description: "User management endpoints",
+            },
+        ],
         components: {
             securitySchemes: {
                 bearerAuth: {
                     type: "http",
                     scheme: "bearer",
                     bearerFormat: "JWT",
+                },
+            },
+            schemas: {
+                RoleDto: {
+                    type: "object",
+                    properties: {
+                        id: { type: "number" },
+                        name: { type: "string" },
+                    },
+                },
+                DepartmentDto: {
+                    type: "object",
+                    properties: {
+                        id: { type: "number" },
+                        name: { type: "string" },
+                    },
+                },
+                UserResponseDto: {
+                    type: "object",
+                    properties: {
+                        id: { type: "number" },
+                        name: { type: "string" },
+                        phone: { type: "string" },
+                        cpf: { type: "string" },
+                        email: { type: "string" },
+                        username: { type: "string" },
+                        role: { $ref: "#/components/schemas/RoleDto" },
+                        department: { $ref: "#/components/schemas/DepartmentDto" },
+                        managed_departments: {
+                            type: "array",
+                            items: { $ref: "#/components/schemas/DepartmentDto" },
+                        },
+                        is_active: { type: "boolean" },
+                    },
+                },
+                CreateUserRequestDto: {
+                    type: "object",
+                    required: ["name", "email", "username", "password"],
+                    properties: {
+                        name: { type: "string" },
+                        phone: { type: "string" },
+                        cpf: { type: "string" },
+                        email: { type: "string" },
+                        username: { type: "string" },
+                        password: { type: "string" },
+                        roleId: { type: "number" },
+                        departmentId: { type: "number" },
+                        role: {
+                            type: "object",
+                            properties: { id: { type: "number" } },
+                        },
+                        department: {
+                            type: "object",
+                            properties: { id: { type: "number" } },
+                        },
+                        updatedBy: { type: "number" },
+                    },
+                },
+                UpdateUserRequestDto: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string" },
+                        phone: { type: "string" },
+                        cpf: { type: "string" },
+                        email: { type: "string" },
+                        username: { type: "string" },
+                        roleId: { type: "number" },
+                        departmentId: { type: "number" },
+                        role: {
+                            type: "object",
+                            properties: { id: { type: "number" } },
+                        },
+                        department: {
+                            type: "object",
+                            properties: { id: { type: "number" } },
+                        },
+                        updatedBy: { type: "number" },
+                    },
+                },
+                ChangePasswordRequestDto: {
+                    type: "object",
+                    required: ["password"],
+                    properties: {
+                        password: { type: "string" },
+                        updatedBy: { type: "number" },
+                    },
+                },
+                DeleteUserRequestDto: {
+                    type: "object",
+                    properties: {
+                        updatedBy: { type: "number" },
+                    },
                 },
             },
         },

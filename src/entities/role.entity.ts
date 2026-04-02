@@ -17,12 +17,12 @@ export interface IRole {
     description?: string;
     policies: Policy[];
     users?: User[];
-    updated_by: string;
+    updated_by?: number;
 }
 @Entity("role")
 export class Role extends BaseEntity implements IRole {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ type: "varchar", length: 50, unique: true })
     name: string;
@@ -47,11 +47,13 @@ export class Role extends BaseEntity implements IRole {
     @UpdateDateColumn({ name: "updated_at" })
     updated_at: Date;
 
-    @Column({ name: "updated_by", type: "uuid", nullable: true })
-    updated_by: string;
+    @Column({ name: "updated_by", type: "int", nullable: true })
+    updated_by?: number;
 
     constructor(role: IRole) {
         super();
         Object.assign(this, role);
     }
 }
+
+

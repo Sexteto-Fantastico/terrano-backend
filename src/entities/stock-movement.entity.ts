@@ -28,8 +28,8 @@ export interface IStockMovement {
 
 @Entity("stock_movement")
 export class StockMovement extends BaseEntity implements IStockMovement {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @ManyToOne(() => Product, (product) => product.stock_movements)
     product: Product;
@@ -60,3 +60,6 @@ export class StockMovement extends BaseEntity implements IStockMovement {
         Object.assign(this, movement);
     }
 }
+
+
+
