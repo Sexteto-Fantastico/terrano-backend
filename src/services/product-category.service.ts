@@ -48,7 +48,6 @@ export class ProductCategoryService {
         Object.assign(category, data);
         await productCategoryRepository.save(category);
 
-        // O `save()` vazio não preenche o `category.parent` recém setado por um `parent_id`, então recarregamos:
         const loaded = await productCategoryRepository.findOne({
             where: { id },
             withDeleted: true,
