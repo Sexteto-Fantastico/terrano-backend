@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ProductCategoryController } from "../controllers/product-category.controller";
 import { Endpoints } from "../utils/constants/endpoints";
+import { asyncHandler } from "../utils/async-handler";
 
 const router = Router();
 
@@ -12,8 +13,7 @@ const router = Router();
  *       type: object
  *       properties:
  *         id:
- *           type: string
- *           format: uuid
+ *           type: integer
  *           description: The id of the parent category
  *         name:
  *           type: string
@@ -31,8 +31,7 @@ const router = Router();
  *       type: object
  *       properties:
  *         id:
- *           type: string
- *           format: uuid
+ *           type: integer
  *           description: The auto-generated id of the product category
  *         name:
  *           type: string
@@ -63,8 +62,7 @@ const router = Router();
  *           type: string
  *           description: Detailed description of the product category
  *         parent_id:
- *           type: string
- *           format: uuid
+ *           type: integer
  *           description: The id of the parent category (optional)
  *     UpdateProductCategoryDto:
  *       type: object
@@ -76,8 +74,7 @@ const router = Router();
  *           type: string
  *           description: Detailed description of the product category
  *         parent_id:
- *           type: string
- *           format: uuid
+ *           type: integer
  *           nullable: true
  *           description: The id of the parent category (null to remove parent)
  *     DeleteSuccessResponse:
@@ -90,9 +87,19 @@ const router = Router();
  *     ErrorResponse:
  *       type: object
  *       properties:
- *         error:
+ *         statusCode:
+ *           type: integer
+ *           description: HTTP status code
+ *         message:
  *           type: string
  *           description: Error message
+ *         timestamp:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of the error
+ *         path:
+ *           type: string
+ *           description: Request path that caused the error
  */
 
 /**
@@ -128,7 +135,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, ProductCategoryController.create);
+router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, asyncHandler(ProductCategoryController.create));
 
 /**
  * @swagger
@@ -159,7 +166,7 @@ router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, ProductCategoryController.creat
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, ProductCategoryController.getAll);
+router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, asyncHandler(ProductCategoryController.getAll));
 
 /**
  * @swagger
@@ -171,8 +178,7 @@ router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, ProductCategoryController.getAl
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
  *         required: true
  *         description: The product category id
  *     responses:
@@ -195,7 +201,7 @@ router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, ProductCategoryController.getAl
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, ProductCategoryController.getById);
+router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, asyncHandler(ProductCategoryController.getById));
 
 /**
  * @swagger
@@ -207,8 +213,7 @@ router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, ProductCategoryController.get
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
  *         required: true
  *         description: The product category id
  *     requestBody:
@@ -237,7 +242,7 @@ router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, ProductCategoryController.get
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, ProductCategoryController.update);
+router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, asyncHandler(ProductCategoryController.update));
 
 /**
  * @swagger
@@ -249,8 +254,7 @@ router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, ProductCategoryController.update
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
  *         required: true
  *         description: The product category id
  *     responses:
@@ -273,7 +277,7 @@ router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, ProductCategoryController.update
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, ProductCategoryController.delete);
+router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, asyncHandler(ProductCategoryController.delete));
 
 /**
  * @swagger
@@ -285,8 +289,7 @@ router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, ProductCategoryController.del
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
- *           format: uuid
+ *           type: integer
  *         required: true
  *         description: The product category id
  *     responses:
@@ -309,6 +312,6 @@ router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, ProductCategoryController.del
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch(Endpoints.PRODUCT_CATEGORIES.RESTORE, ProductCategoryController.restore);
+router.patch(Endpoints.PRODUCT_CATEGORIES.RESTORE, asyncHandler(ProductCategoryController.restore));
 
 export default router;

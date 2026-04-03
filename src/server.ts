@@ -12,20 +12,26 @@ const PORT = Number(process.env.PORT) || 3000;
 
 import productCategoryRoutes from "./routes/product-category.routes";
 import { Endpoints } from "./utils/constants/endpoints";
+import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
 
 app.use(cors());
 app.use(express.json());
-app.use("/users", userRoutes);
 
-// Set up Swagger API documentation
 setupSwagger(app);
 
+app.use(Endpoints.USERS.BASE, userRoutes);
 app.use(Endpoints.PRODUCT_CATEGORIES.BASE, productCategoryRoutes);
+
+app.use(globalErrorMiddleware);
 
 ensureDatabaseExists()
     .then(() => AppDataSource.initialize())
-    .then(() => {
+    .then(async () => {
         console.log("Database connected successfully");
+
+        console.log("Running migrations...");
+        await AppDataSource.runMigrations();
+        console.log("Migrations executed successfully");
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

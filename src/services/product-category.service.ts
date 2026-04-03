@@ -1,59 +1,82 @@
+import { AppDataSource } from "../config/data-source";
 import { ProductCategory, IProductCategory } from "../entities/product-category.entity";
-import { ProductCategoryResponseDto } from "../dtos/product-category";
-import { CreateProductCategoryDto } from "../dtos/product-category";
-import { UpdateProductCategoryDto } from "../dtos/product-category";
-import { ProductCategoryMapper } from "../mappers/product-category.mapper";
+import {
+    ProductCategoryResponseDto,
+    CreateProductCategoryDto,
+    UpdateProductCategoryDto,
+    toProductCategoryResponseDto,
+    toProductCategoryResponseDtoList,
+} from "../dtos/product-category.dto";
+
+const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
 
 export class ProductCategoryService {
     static async createCategory(data: CreateProductCategoryDto): Promise<ProductCategoryResponseDto> {
-        const category = new ProductCategory(data as IProductCategory);
-        const saved = await category.save();
-        return ProductCategoryMapper.toResponseDto(saved);
+        const category = productCategoryRepository.create(data as IProductCategory);
+        const saved = await productCategoryRepository.save(category);
+
+        const loaded = await productCategoryRepository.findOne({
+            where: { id: saved.id },
+            relations: ["parent"]
+        });
+
+        return toProductCategoryResponseDto(loaded!);
     }
 
     static async getAllCategories(activeOnly: boolean = false): Promise<ProductCategoryResponseDto[]> {
-        const categories = await ProductCategory.find({
+        const categories = await productCategoryRepository.find({
             withDeleted: !activeOnly,
             relations: ["parent"],
         });
-        return ProductCategoryMapper.toResponseDtoList(categories);
+        return toProductCategoryResponseDtoList(categories);
     }
 
-    static async getCategoryById(id: string): Promise<ProductCategoryResponseDto | null> {
-        const category = await ProductCategory.findOne({
+    static async getCategoryById(id: number): Promise<ProductCategoryResponseDto | null> {
+        const category = await productCategoryRepository.findOne({
             where: { id },
             withDeleted: true,
             relations: ["parent"],
         });
         if (!category) return null;
-        return ProductCategoryMapper.toResponseDto(category);
+        return toProductCategoryResponseDto(category);
     }
 
-    static async updateCategory(id: string, data: UpdateProductCategoryDto): Promise<ProductCategoryResponseDto | null> {
-        const category = await ProductCategory.findOne({ where: { id }, withDeleted: true });
+    static async updateCategory(id: number, data: UpdateProductCategoryDto): Promise<ProductCategoryResponseDto | null> {
+        const category = await productCategoryRepository.findOne({ where: { id }, withDeleted: true });
         if (!category) return null;
+
         Object.assign(category, data);
-        await category.save();
-        return ProductCategoryMapper.toResponseDto(category);
+        await productCategoryRepository.save(category);
+
+        // O `save()` vazio não preenche o `category.parent` recém setado por um `parent_id`, então recarregamos:
+        const loaded = await productCategoryRepository.findOne({
+            where: { id },
+            withDeleted: true,
+            relations: ["parent"]
+        });
+
+        return toProductCategoryResponseDto(loaded!);
     }
 
-    static async deleteCategory(id: string): Promise<boolean> {
-        const category = await ProductCategory.findOne({ where: { id } });
+    static async deleteCategory(id: number): Promise<boolean> {
+        const category = await productCategoryRepository.findOne({ where: { id } });
         if (!category) return false;
 
-        await category.softRemove();
+        await productCategoryRepository.softRemove(category);
         return true;
     }
 
-    static async restoreCategory(id: string): Promise<ProductCategoryResponseDto | null> {
-        const category = await ProductCategory.findOne({
+    static async restoreCategory(id: number): Promise<ProductCategoryResponseDto | null> {
+        const category = await productCategoryRepository.findOne({
             where: { id },
             withDeleted: true,
+            relations: ["parent"],
         });
+
         if (!category) return null;
         if (!category.deleted_at) return null;
 
-        await category.recover();
-        return ProductCategoryMapper.toResponseDto(category);
+        await productCategoryRepository.recover(category);
+        return toProductCategoryResponseDto(category);
     }
 }

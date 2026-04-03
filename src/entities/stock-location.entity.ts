@@ -15,7 +15,7 @@ export interface IStockLocation {
     name: string;
     description?: string;
     deleted_at?: Date;
-    updated_by: string;
+    updated_by?: number;
 }
 
 @Entity("stock_location")

@@ -14,9 +14,9 @@ import {
 export interface IProductCategory {
     name: string;
     description?: string;
-    parent_id?: string;
+    parent_id?: number;
     deleted_at?: Date;
-    updated_by: string;
+    updated_by?: number;
 }
 
 @Entity("product_category")
@@ -30,8 +30,8 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ name: "parent_id", type: "uuid", nullable: true })
-    parent_id?: string;
+    @Column({ name: "parent_id", type: "int", nullable: true })
+    parent_id?: number;
 
     @ManyToOne(() => ProductCategory, (category) => category.children, { nullable: true })
     @JoinColumn({ name: "parent_id" })
@@ -41,7 +41,7 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     children?: ProductCategory[];
 
     @DeleteDateColumn({ name: "deleted_at" })
-    deleted_at: Date;
+    deleted_at?: Date;
 
     @CreateDateColumn({ name: "created_at" })
     created_at: Date;

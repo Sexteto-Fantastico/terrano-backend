@@ -12,6 +12,7 @@ import {
     UpdateUserRequestDto,
     UserResponseDto,
 } from "../dtos/user.dto";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 
 const userRepository = AppDataSource.getRepository(User);
 const roleRepository = AppDataSource.getRepository(Role);
@@ -45,29 +46,29 @@ export class UserService {
     static async createUser(request: CreateUserRequestDto): Promise<UserResponseDto> {
         const existingUser = await userRepository.findOne({ where: { username: request.username } });
         if (existingUser) {
-            throw new Error("Username already exists.");
+            throw new ConflictError("Username already exists.");
         }
 
         const existingEmail = await userRepository.findOne({ where: { email: request.email } });
         if (existingEmail) {
-            throw new Error("Email already exists.");
+            throw new ConflictError("Email already exists.");
         }
 
         const role = await roleRepository.findOne({ where: { id: request.roleId } });
         if (!role) {
-            throw new Error("Role not found.");
+            throw new NotFoundError("Role not found.");
         }
 
         const department = await departmentRepository.findOne({ where: { id: request.departmentId } });
         if (!department) {
-            throw new Error("Department not found.");
+            throw new NotFoundError("Department not found.");
         }
 
         let cpfValue: string | undefined;
         if (request.cpf !== undefined && request.cpf !== null && request.cpf !== "") {
             const cleanedCpf = cleanCpf(request.cpf);
             if (!isValidCpf(cleanedCpf)) {
-                throw new Error("Invalid CPF.");
+                throw new BadRequestError("Invalid CPF.");
             }
             cpfValue = formatCpf(cleanedCpf);
         }
@@ -111,7 +112,7 @@ export class UserService {
         });
 
         if (!user) {
-            throw new Error("User not found.");
+            throw new NotFoundError("User not found.");
         }
 
         return sanitizeUser(user);
@@ -120,13 +121,13 @@ export class UserService {
     static async updateUser(id: number, request: UpdateUserRequestDto): Promise<UserResponseDto> {
         const user = await userRepository.findOne({ where: { id, is_active: true }, relations: ["role"] });
         if (!user) {
-            throw new Error("User not found.");
+            throw new NotFoundError("User not found.");
         }
 
         if (request.username && request.username !== user.username) {
             const existingUser = await userRepository.findOne({ where: { username: request.username } });
             if (existingUser && existingUser.id !== user.id) {
-                throw new Error("Username already exists.");
+                throw new ConflictError("Username already exists.");
             }
             user.username = request.username;
         }
@@ -145,7 +146,7 @@ export class UserService {
             } else {
                 const cleanedCpf = cleanCpf(request.cpf);
                 if (!isValidCpf(cleanedCpf)) {
-                    throw new Error("Invalid CPF.");
+                    throw new BadRequestError("Invalid CPF.");
                 }
                 user.cpf = formatCpf(cleanedCpf);
             }
@@ -155,20 +156,20 @@ export class UserService {
             if (request.email !== user.email) {
                 const existingEmail = await userRepository.findOne({ where: { email: request.email } });
                 if (existingEmail && existingEmail.id !== user.id) {
-                    throw new Error("Email already exists.");
+                    throw new ConflictError("Email already exists.");
                 }
             }
             user.email = request.email;
         }
  
         if ("password" in request) {
-            throw new Error("Use the dedicated password route to update the password.");
+            throw new BadRequestError("Use the dedicated password route to update the password.");
         }
 
         if (request.roleId !== undefined) {
             const role = await roleRepository.findOne({ where: { id: request.roleId } });
             if (!role) {
-                throw new Error("Role not found.");
+                throw new NotFoundError("Role not found.");
             }
             user.role = role;
         }
@@ -176,7 +177,7 @@ export class UserService {
         if (request.departmentId !== undefined) {
             const department = await departmentRepository.findOne({ where: { id: request.departmentId } });
             if (!department) {
-                throw new Error("Department not found.");
+                throw new NotFoundError("Department not found.");
             }
             user.department = department;
         }
@@ -192,11 +193,11 @@ export class UserService {
     static async changePassword(id: number, request: ChangePasswordRequestDto): Promise<UserResponseDto> {
         const user = await userRepository.findOne({ where: { id, is_active: true }, relations: ["role", "department"] });
         if (!user) {
-            throw new Error("User not found.");
+            throw new NotFoundError("User not found.");
         }
 
         if (!request.password) {
-            throw new Error("Password is required.");
+            throw new BadRequestError("Password is required.");
         }
 
         user.password = hashPassword(request.password);
@@ -211,7 +212,7 @@ export class UserService {
     static async deleteUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
         const user = await userRepository.findOne({ where: { id, is_active: true }, relations: ["role", "department"] });
         if (!user) {
-            throw new Error("User not found.");
+            throw new NotFoundError("User not found.");
         }
 
         user.is_active = false;

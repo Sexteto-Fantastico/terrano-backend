@@ -13,6 +13,8 @@ export const AppDataSource = new DataSource({
     entities: [
         __dirname + "/../**/*.entity{.ts,.js}"
     ],
-    migrations: ["src/migrations/*.ts"],
+    migrations: [
+        __dirname + "/../migrations/*{.ts,.js}"
+    ],
     subscribers: [],
 });

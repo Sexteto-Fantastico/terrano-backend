@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../controllers/user.controller";
+import { asyncHandler } from "../utils/async-handler";
+import { Endpoints } from "../utils/constants/endpoints";
 
 const router = Router();
 
@@ -8,7 +10,11 @@ const router = Router();
  * tags:
  *   - name: Users
  *     description: User management endpoints
- * /users:
+ */
+
+/**
+ * @openapi
+ * /api/users:
  *   post:
  *     tags:
  *       - Users
@@ -28,6 +34,14 @@ const router = Router();
  *               $ref: '#/components/schemas/UserResponseDto'
  *       400:
  *         description: Validation or request error
+ *       409:
+ *         description: Username or email already exists
+ */
+router.post(Endpoints.USERS.CREATE, asyncHandler(UserController.createUser));
+
+/**
+ * @openapi
+ * /api/users:
  *   get:
  *     tags:
  *       - Users
@@ -52,7 +66,12 @@ const router = Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/UserResponseDto'
- * /users/{id}:
+ */
+router.get(Endpoints.USERS.GET_ALL, asyncHandler(UserController.getUsers));
+
+/**
+ * @openapi
+ * /api/users/{id}:
  *   get:
  *     tags:
  *       - Users
@@ -72,53 +91,12 @@ const router = Router();
  *               $ref: '#/components/schemas/UserResponseDto'
  *       404:
  *         description: User not found
- *   put:
- *     tags:
- *       - Users
- *     summary: Update user details
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateUserRequestDto'
- *     responses:
- *       200:
- *         description: Updated user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponseDto'
- *       404:
- *         description: User not found
- *   delete:
- *     tags:
- *       - Users
- *     summary: Delete a user
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DeleteUserRequestDto'
- *     responses:
- *       204:
- *         description: User deleted successfully
- *       404:
- *         description: User not found
- * /users/{id}/password:
+ */
+router.get(Endpoints.USERS.GET_BY_ID, asyncHandler(UserController.getUserById));
+
+/**
+ * @openapi
+ * /api/users/{id}/password:
  *   put:
  *     tags:
  *       - Users
@@ -145,12 +123,66 @@ const router = Router();
  *       404:
  *         description: User not found
  */
+router.put(Endpoints.USERS.CHANGE_PASSWORD, asyncHandler(UserController.changePassword));
 
-router.post("/", UserController.createUser);
-router.get("/", UserController.getUsers);
-router.get("/:id", UserController.getUserById);
-router.put("/:id/password", UserController.changePassword);
-router.put("/:id", UserController.updateUser);
-router.delete("/:id", UserController.deleteUser);
+/**
+ * @openapi
+ * /api/users/{id}:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Update user details
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateUserRequestDto'
+ *     responses:
+ *       200:
+ *         description: Updated user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponseDto'
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: Username or email already exists
+ */
+router.put(Endpoints.USERS.UPDATE, asyncHandler(UserController.updateUser));
+
+/**
+ * @openapi
+ * /api/users/{id}:
+ *   delete:
+ *     tags:
+ *       - Users
+ *     summary: Delete a user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/DeleteUserRequestDto'
+ *     responses:
+ *       204:
+ *         description: User deleted successfully
+ *       404:
+ *         description: User not found
+ */
+router.delete(Endpoints.USERS.DELETE, asyncHandler(UserController.deleteUser));
 
 export default router;

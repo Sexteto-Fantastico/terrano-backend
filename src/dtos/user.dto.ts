@@ -30,8 +30,6 @@ export class CreateUserRequestDto {
     password!: string;
     roleId?: number;
     departmentId?: number;
-    role?: { id?: number };
-    department?: { id?: number };
     updatedBy?: number;
 }
 
@@ -43,8 +41,6 @@ export class UpdateUserRequestDto {
     username?: string;
     roleId?: number;
     departmentId?: number;
-    role?: { id?: number };
-    department?: { id?: number };
     updatedBy?: number;
 }
 

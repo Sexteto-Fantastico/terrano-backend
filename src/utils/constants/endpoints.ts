@@ -1,11 +1,34 @@
+/**
+ * Standard CRUD sub-routes reused across every resource.
+ * Kept DRY so adding a new resource only requires a BASE path.
+ */
+const CRUD_ROUTES = {
+    CREATE: "/",
+    GET_ALL: "/",
+    GET_BY_ID: "/:id",
+    UPDATE: "/:id",
+    DELETE: "/:id",
+} as const;
+
+/**
+ * Centralised endpoint registry.
+ *
+ * • Every resource lives under a common `/api` prefix defined once.
+ * • CRUD routes are spread from CRUD_ROUTES; resource-specific routes
+ *   are declared inline.
+ * • `as const` gives full literal-type safety to every path string.
+ */
+export const API_PREFIX = "/api" as const;
+
 export const Endpoints = {
+    USERS: {
+        BASE: `${API_PREFIX}/users`,
+        ...CRUD_ROUTES,
+        CHANGE_PASSWORD: "/:id/password",
+    },
     PRODUCT_CATEGORIES: {
-        BASE: "/api/product-categories",
-        GET_ALL: "/",
-        GET_BY_ID: "/:id",
-        CREATE: "/",
-        UPDATE: "/:id",
-        DELETE: "/:id",
+        BASE: `${API_PREFIX}/product-categories`,
+        ...CRUD_ROUTES,
         RESTORE: "/:id/restore",
-    }
-};
+    },
+} as const;
