@@ -5,12 +5,17 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    DeleteDateColumn,
+    ManyToOne,
+    OneToMany,
+    JoinColumn,
 } from "typeorm";
 
 export interface IProductCategory {
     name: string;
     description?: string;
-    is_active: boolean;
+    parent_id?: number;
+    deleted_at?: Date;
     updated_by?: number;
 }
 
@@ -25,8 +30,18 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @Column({ type: "boolean", name: "is_active", default: true })
-    is_active: boolean;
+    @Column({ name: "parent_id", type: "int", nullable: true })
+    parent_id?: number;
+
+    @ManyToOne(() => ProductCategory, (category) => category.children, { nullable: true })
+    @JoinColumn({ name: "parent_id" })
+    parent?: ProductCategory;
+
+    @OneToMany(() => ProductCategory, (category) => category.parent)
+    children?: ProductCategory[];
+
+    @DeleteDateColumn({ name: "deleted_at" })
+    deleted_at?: Date;
 
     @CreateDateColumn({ name: "created_at" })
     created_at: Date;
@@ -37,10 +52,13 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     @Column({ name: "updated_by", type: "int", nullable: true })
     updated_by?: number;
 
-    constructor(category: IProductCategory) {
+    constructor(category?: IProductCategory) {
         super();
-        Object.assign(this, category);
+        if (category) {
+            Object.assign(this, category);
+        }
     }
+
 }
 
 

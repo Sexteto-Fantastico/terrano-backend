@@ -16,6 +16,7 @@ export interface IPolicy {
     action: string;
     updated_by?: number;
 }
+
 @Entity("policy")
 export class Policy extends BaseEntity implements IPolicy {
     @PrimaryGeneratedColumn()

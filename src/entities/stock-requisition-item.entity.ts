@@ -20,6 +20,7 @@ export interface IStockRequisitionItem {
     requisition: StockRequisition;
     updated_by?: number;
 }
+
 @Entity("stock_requisition_item")
 export class StockRequisitionItem extends BaseEntity implements IStockRequisitionItem {
     @PrimaryGeneratedColumn()

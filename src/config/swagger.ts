@@ -75,14 +75,6 @@ const options: swaggerJSDoc.Options = {
                         password: { type: "string" },
                         roleId: { type: "number" },
                         departmentId: { type: "number" },
-                        role: {
-                            type: "object",
-                            properties: { id: { type: "number" } },
-                        },
-                        department: {
-                            type: "object",
-                            properties: { id: { type: "number" } },
-                        },
                         updatedBy: { type: "number" },
                     },
                 },
@@ -96,14 +88,6 @@ const options: swaggerJSDoc.Options = {
                         username: { type: "string" },
                         roleId: { type: "number" },
                         departmentId: { type: "number" },
-                        role: {
-                            type: "object",
-                            properties: { id: { type: "number" } },
-                        },
-                        department: {
-                            type: "object",
-                            properties: { id: { type: "number" } },
-                        },
                         updatedBy: { type: "number" },
                     },
                 },

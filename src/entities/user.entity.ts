@@ -25,6 +25,7 @@ export interface IUser {
     updated_by?: number;
     is_active?: boolean;
 }
+
 @Entity("user")
 export class User extends BaseEntity implements IUser {
     @PrimaryGeneratedColumn()
