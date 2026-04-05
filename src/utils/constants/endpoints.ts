@@ -31,4 +31,8 @@ export const Endpoints = {
         ...CRUD_ROUTES,
         RESTORE: "/:id/restore",
     },
+    PRODUCTS: {
+        BASE: `${API_PREFIX}/products`,
+        ...CRUD_ROUTES,
+    },
 } as const;
