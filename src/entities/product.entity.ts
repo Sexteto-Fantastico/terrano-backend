@@ -15,6 +15,7 @@ import { StockLocationProduct } from "./stock-location-product.entity";
 import { StockRequisitionItem } from "./stock-requisition-item.entity";
 import { PurchaseOrderItem } from "./purchase-order-item.entity";
 import { ProductCategory } from "./product-category.entity";
+import { ProductBrand } from "./product-brand.entity";
 
 
 export interface IProduct {
@@ -48,6 +49,13 @@ export class Product extends BaseEntity implements IProduct {
     @ManyToOne(() => ProductCategory)
     @JoinColumn({ name: "category_id" })
     category: ProductCategory;
+
+    @ManyToOne(() => ProductBrand, (brand) => brand.products)
+    @JoinColumn({ name: "brand_id" })
+    brand: ProductBrand;
+
+    @Column({ name: "brand_id", type: "int", nullable: true })
+    brand_id: number;
 
     @Column({ name: "min_stock", type: "int", default: 0 })
     min_stock?: number;

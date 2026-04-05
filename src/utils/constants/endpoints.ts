@@ -35,4 +35,9 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/products`,
         ...CRUD_ROUTES,
     },
+    PRODUCT_BRANDS: {
+        BASE: `${API_PREFIX}/product-brands`,
+        ...CRUD_ROUTES,
+        RESTORE: "/:id/restore",
+    },
 } as const;
