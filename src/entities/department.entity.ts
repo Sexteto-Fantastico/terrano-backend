@@ -8,6 +8,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    DeleteDateColumn,
 } from "typeorm";
 import { StockRequisition } from "./stock-requisition.entity";
 import { User } from "./user.entity";
@@ -37,6 +38,9 @@ export class Department extends BaseEntity implements IDepartment {
     @OneToMany(() => StockRequisition, (req) => req.department)
     requisitions: StockRequisition[];
 
+    @DeleteDateColumn({ name: "deleted_at" })
+    deleted_at: Date;
+
     @CreateDateColumn({ name: "created_at" })
     created_at: Date;
 
@@ -50,7 +54,6 @@ export class Department extends BaseEntity implements IDepartment {
         super();
         Object.assign(this, department);
     }
-
 }
 
 
