@@ -8,7 +8,6 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
-    OneToOne,
 } from "typeorm";
 import { Role } from "./role.entity";
 import { Department } from "./department.entity";
