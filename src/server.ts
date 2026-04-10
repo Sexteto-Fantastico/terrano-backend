@@ -3,8 +3,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/user.routes";
-import { AppDataSource } from "./infra/config/data-source";
-import { ensureDatabaseExists } from "./infra/config/ensure-database";
+import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 
 const app = express();
@@ -27,15 +26,8 @@ app.use(Endpoints.PRODUCTS.BASE, setupProductRoutes());
 
 app.use(globalErrorMiddleware);
 
-ensureDatabaseExists()
-    .then(() => AppDataSource.initialize())
-    .then(async () => {
-        console.log("Database connected successfully");
-
-        console.log("Running migrations...");
-        await AppDataSource.runMigrations();
-        console.log("Migrations executed successfully");
-
+migrateDatabase()
+    .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
