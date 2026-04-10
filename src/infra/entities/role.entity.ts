@@ -1,18 +1,15 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     ManyToMany,
     JoinTable,
     OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
 } from "typeorm";
 import { Policy } from "./policy.entity";
 import { User } from "./user.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-export interface IRole {
+export interface IRole extends ITerranoBaseEntity {
     name: string;
     description?: string;
     policies: Policy[];
@@ -21,9 +18,7 @@ export interface IRole {
 }
 
 @Entity("role")
-export class Role extends BaseEntity implements IRole {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class Role extends TerranoBaseEntity implements IRole {
 
     @Column({ type: "varchar", length: 50, unique: true })
     name: string;
@@ -42,17 +37,8 @@ export class Role extends BaseEntity implements IRole {
     @OneToMany(() => User, (user) => user.role)
     users?: User[];
 
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
     constructor(role: IRole) {
-        super();
+        super(role);
         Object.assign(this, role);
     }
 }

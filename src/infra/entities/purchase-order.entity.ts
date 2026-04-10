@@ -1,17 +1,14 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     OneToMany,
     ManyToOne,
     JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
 } from "typeorm";
 import { PurchaseOrderItem } from "./purchase-order-item.entity";
 import { Supplier } from "./supplier.entity";
 import { StockMovement } from "./stock-movement.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
 export enum PurchaseOrderStatus {
     DRAFT = "DRAFT",
@@ -21,7 +18,7 @@ export enum PurchaseOrderStatus {
     CANCELLED = "CANCELLED",
 }
 
-export interface IPurchaseOrder {
+export interface IPurchaseOrder extends ITerranoBaseEntity {
     order_number: string;
     order_date: Date;
     status: PurchaseOrderStatus;
@@ -32,9 +29,7 @@ export interface IPurchaseOrder {
     updated_by?: number;
 }
 @Entity("purchase_order")
-export class PurchaseOrder extends BaseEntity implements IPurchaseOrder {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class PurchaseOrder extends TerranoBaseEntity implements IPurchaseOrder {
 
     @Column({ type: "varchar", length: 50, unique: true })
     order_number: string;
@@ -62,17 +57,8 @@ export class PurchaseOrder extends BaseEntity implements IPurchaseOrder {
     @OneToMany(() => StockMovement, (movement) => movement.purchase_order)
     stock_movements: StockMovement[];
 
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
     constructor(order: IPurchaseOrder) {
-        super();
+        super(order);
         Object.assign(this, order);
     }
 }

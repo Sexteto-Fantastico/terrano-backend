@@ -8,11 +8,11 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm migration:generate -- -d src/config/data-source.ts",
-    "migration:run": "npm run typeorm migration:run -- -d src/config/data-source.ts",
-    "migration:revert": "npm run typeorm migration:revert -- -d src/config/data-source.ts",
-    "schema:sync": "npm run typeorm schema:sync -- -d src/config/data-source.ts",
-    "db:create": "tsx src/config/ensure-database.ts"
+    "migration:generate": "npm run typeorm migration:generate -- -d src/infra/config/data-source.ts",
+    "migration:run": "npm run typeorm migration:run -- -d src/infra/config/data-source.ts",
+    "migration:revert": "npm run typeorm migration:revert -- -d src/infra/config/data-source.ts",
+    "schema:sync": "npm run typeorm schema:sync -- -d src/infra/config/data-source.ts",
+    "db:create": "tsx src/infra/config/ensure-database.ts"
   },
   "keywords": [],
   "author": "",

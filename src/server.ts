@@ -3,9 +3,9 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/user.routes";
-import { AppDataSource } from "./config/data-source";
-import { ensureDatabaseExists } from "./config/ensure-database";
-import { setupSwagger } from "./config/swagger";
+import { AppDataSource } from "./infra/config/data-source";
+import { ensureDatabaseExists } from "./infra/config/ensure-database";
+import { setupSwagger } from "./infra/config/swagger";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;

@@ -16,9 +16,9 @@ import { StockRequisitionItem } from "./stock-requisition-item.entity";
 import { PurchaseOrderItem } from "./purchase-order-item.entity";
 import { ProductCategory } from "./product-category.entity";
 import { ProductBrand } from "./product-brand.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-
-export interface IProduct {
+export interface IProduct extends ITerranoBaseEntity {
     name: string;
     code: string;
     description?: string;
@@ -33,10 +33,7 @@ export interface IProduct {
 }
 
 @Entity("product")
-export class Product extends BaseEntity implements IProduct {
-    @PrimaryGeneratedColumn()
-    id: number;
-
+export class Product extends TerranoBaseEntity implements IProduct {
     @Column({ type: "varchar", length: 200 })
     name: string;
 
@@ -60,9 +57,6 @@ export class Product extends BaseEntity implements IProduct {
     @Column({ name: "min_stock", type: "int", default: 0 })
     min_stock?: number;
 
-    @DeleteDateColumn({ name: "deleted_at" })
-    deleted_at: Date;
-
     @OneToMany(() => StockMovement, (movement) => movement.product)
     stock_movements?: StockMovement[];
 
@@ -75,17 +69,8 @@ export class Product extends BaseEntity implements IProduct {
     @OneToMany(() => PurchaseOrderItem, (item) => item.product)
     purchase_order_items?: PurchaseOrderItem[];
 
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
     constructor(product: IProduct) {
-        super();
+        super(product);
         Object.assign(this, product);
     }
 }

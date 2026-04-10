@@ -1,14 +1,13 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    BaseEntity,
 } from "typeorm";
 import { PurchaseOrder } from "./purchase-order.entity";
 import { Product } from "./product.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-export interface IPurchaseOrderItem {
+export interface IPurchaseOrderItem extends ITerranoBaseEntity {
     purchase_order: PurchaseOrder;
     product: Product;
     quantity: number;
@@ -16,9 +15,7 @@ export interface IPurchaseOrderItem {
 }
 
 @Entity("purchase_order_item")
-export class PurchaseOrderItem extends BaseEntity implements IPurchaseOrderItem {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class PurchaseOrderItem extends TerranoBaseEntity implements IPurchaseOrderItem {
 
     @ManyToOne(() => PurchaseOrder, (po) => po.items, { onDelete: "CASCADE" })
     purchase_order: PurchaseOrder;
@@ -36,10 +33,7 @@ export class PurchaseOrderItem extends BaseEntity implements IPurchaseOrderItem 
     subtotal: number;
 
     constructor(item: IPurchaseOrderItem) {
-        super();
+        super(item);
         Object.assign(this, item);
     }
 }
-
-
-
