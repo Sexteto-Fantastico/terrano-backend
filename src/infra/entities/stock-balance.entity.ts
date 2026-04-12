@@ -7,11 +7,13 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    DeleteDateColumn,
 } from "typeorm";
 import { Product } from "./product.entity";
 import { StockLocation } from "./stock-location.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-export interface IStockBalance {
+export interface IStockBalance extends ITerranoBaseEntity {
     product: Product;
     location: StockLocation;
     quantity: number;
@@ -19,9 +21,7 @@ export interface IStockBalance {
 }
 
 @Entity("stock_balance")
-export class StockBalance extends BaseEntity implements IStockBalance {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class StockBalance extends TerranoBaseEntity implements IStockBalance {
 
     @ManyToOne(() => Product)
     @JoinColumn({ name: "product_id" })
@@ -33,18 +33,9 @@ export class StockBalance extends BaseEntity implements IStockBalance {
 
     @Column({ type: "int", default: 0 })
     quantity: number;
-
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
+    
     constructor(balance: IStockBalance) {
-        super();
+        super(balance);
         Object.assign(this, balance);
     }
 }

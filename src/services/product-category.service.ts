@@ -1,5 +1,5 @@
-import { AppDataSource } from "../config/data-source";
-import { ProductCategory, IProductCategory } from "../entities/product-category.entity";
+import { AppDataSource } from "../infra/config/data-source";
+import { ProductCategory, IProductCategory } from "../infra/entities/product-category.entity";
 import {
     ProductCategoryResponseDto,
     CreateProductCategoryDto,

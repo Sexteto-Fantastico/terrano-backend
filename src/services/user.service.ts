@@ -1,8 +1,8 @@
 import { FindOptionsWhere, ILike } from "typeorm";
-import { AppDataSource } from "../config/data-source";
-import { Role } from "../entities/role.entity";
-import { Department } from "../entities/department.entity";
-import { User } from "../entities/user.entity";
+import { AppDataSource } from "../infra/config/data-source";
+import { Role } from "../infra/entities/role.entity";
+import { Department } from "../infra/entities/department.entity";
+import { User } from "../infra/entities/user.entity";
 import { hashPassword } from "../utils/password.util";
 import { formatCpf, isValidCpf, cleanCpf } from "../utils/cpf.util";
 import {

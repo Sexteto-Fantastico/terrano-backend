@@ -8,10 +8,12 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    DeleteDateColumn,
 } from "typeorm";
 import { StockRequisitionItem } from "./stock-requisition-item.entity";
 import { Department } from "./department.entity";
 import { StockMovement } from "./stock-movement.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
 export enum RequisitionStatus {
     PENDING = "PENDING",
@@ -21,7 +23,7 @@ export enum RequisitionStatus {
     CANCELLED = "CANCELLED",
 }
 
-export interface IStockRequisition {
+export interface IStockRequisition extends ITerranoBaseEntity {
     company_name: string;
     status: RequisitionStatus;
     declared_at: Date;
@@ -32,9 +34,7 @@ export interface IStockRequisition {
     updated_by?: number;
 }
 @Entity("stock_requisition")
-export class StockRequisition extends BaseEntity implements IStockRequisition {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class StockRequisition extends TerranoBaseEntity implements IStockRequisition {
 
     @Column({ type: "varchar", length: 200 })
     company_name: string;
@@ -62,17 +62,8 @@ export class StockRequisition extends BaseEntity implements IStockRequisition {
     @OneToMany(() => StockMovement, (movement) => movement.requisition)
     stock_movements: StockMovement[];
 
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
     constructor(requisition: IStockRequisition) {
-        super();
+        super(requisition);
         Object.assign(this, requisition);
     }
 }
