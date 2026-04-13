@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 
 export interface ITerranoBaseEntity {
-    id: number;
+    id?: number;
     created_at?: Date;
     updated_at?: Date;
     deleted_at?: Date;
