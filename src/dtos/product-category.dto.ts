@@ -1,33 +1,33 @@
 import { ProductCategory } from "../infra/entities/product-category.entity";
 
-export class ProductCategoryParentDto {
+export class ProductCategoryParentDTO {
     id!: number;
     name!: string;
     description?: string;
     deleted_at?: Date | null;
 }
 
-export class ProductCategoryResponseDto {
+export class ProductCategoryResponseDTO {
     id!: number;
     name!: string;
     description?: string;
     deleted_at?: Date | null;
-    parent?: ProductCategoryParentDto | null;
+    parent?: ProductCategoryParentDTO | null;
 }
 
-export class CreateProductCategoryDto {
+export class CreateProductCategoryDTO {
     name!: string;
     description?: string;
     parent_id?: number;
 }
 
-export class UpdateProductCategoryDto {
+export class UpdateProductCategoryDTO {
     name?: string;
     description?: string;
     parent_id?: number | null;
 }
 
-export function toProductCategoryResponseDto(entity: ProductCategory): ProductCategoryResponseDto {
+export function toProductCategoryResponseDTO(entity: ProductCategory): ProductCategoryResponseDTO {
     return {
         id: entity.id,
         name: entity.name,
@@ -42,6 +42,6 @@ export function toProductCategoryResponseDto(entity: ProductCategory): ProductCa
     };
 }
 
-export function toProductCategoryResponseDtoList(entities: ProductCategory[]): ProductCategoryResponseDto[] {
-    return entities.map(toProductCategoryResponseDto);
+export function toProductCategoryResponseDTOList(entities: ProductCategory[]): ProductCategoryResponseDTO[] {
+    return entities.map(toProductCategoryResponseDTO);
 }

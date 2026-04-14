@@ -1,79 +1,56 @@
-import { AppDataSource } from "../infra/config/data-source";
 import { ProductCategory, IProductCategory } from "../infra/entities/product-category.entity";
 import {
-    ProductCategoryResponseDto,
-    CreateProductCategoryDto,
-    UpdateProductCategoryDto,
-    toProductCategoryResponseDto,
-    toProductCategoryResponseDtoList,
+    ProductCategoryResponseDTO,
+    CreateProductCategoryDTO,
+    UpdateProductCategoryDTO,
+    toProductCategoryResponseDTO,
+    toProductCategoryResponseDTOList,
 } from "../dtos/product-category.dto";
+import { createCategory as repoCreateCategory, getAllCategories as repoGetAllCategories, getCategoryById as repoGetCategoryById, updateCategory as repoUpdateCategory, deleteCategory as repoDeleteCategory, restoreCategory as repoRestoreCategory } from "../repositories/product-category.repository";
 
-const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
-
-export async function createCategory(data: CreateProductCategoryDto): Promise<ProductCategoryResponseDto> {
-    const category = productCategoryRepository.create(data as IProductCategory);
-    const saved = await productCategoryRepository.save(category);
-
-    const loaded = await productCategoryRepository.findOne({
-        where: { id: saved.id },
-        relations: ["parent"]
-    });
-
-    return toProductCategoryResponseDto(loaded!);
+async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCategoryResponseDTO> {
+    const category = await repoCreateCategory(data as IProductCategory);
+    const loaded = await repoGetCategoryById(category.id);
+    return toProductCategoryResponseDTO(loaded!);
 }
 
-export async function getAllCategories(activeOnly: boolean = false): Promise<ProductCategoryResponseDto[]> {
-    const categories = await productCategoryRepository.find({
-        withDeleted: !activeOnly,
-        relations: ["parent"],
-    });
-    return toProductCategoryResponseDtoList(categories);
+async function getAllCategories(activeOnly: boolean = false): Promise<ProductCategoryResponseDTO[]> {
+    const categories = await repoGetAllCategories(activeOnly);
+    return toProductCategoryResponseDTOList(categories);
 }
 
-export async function getCategoryById(id: number): Promise<ProductCategoryResponseDto | null> {
-    const category = await productCategoryRepository.findOne({
-        where: { id },
-        withDeleted: true,
-        relations: ["parent"],
-    });
+async function getCategoryById(id: number): Promise<ProductCategoryResponseDTO | null> {
+    const category = await repoGetCategoryById(id, true);
     if (!category) return null;
-    return toProductCategoryResponseDto(category);
+    return toProductCategoryResponseDTO(category);
 }
 
-export async function updateCategory(id: number, data: UpdateProductCategoryDto): Promise<ProductCategoryResponseDto | null> {
-    const category = await productCategoryRepository.findOne({ where: { id }, withDeleted: true });
+async function updateCategory(id: number, data: UpdateProductCategoryDTO): Promise<ProductCategoryResponseDTO | null> {
+    const category = await repoGetCategoryById(id, true);
     if (!category) return null;
 
     Object.assign(category, data);
-    await productCategoryRepository.save(category);
+    await repoUpdateCategory(category);
 
-    const loaded = await productCategoryRepository.findOne({
-        where: { id },
-        withDeleted: true,
-        relations: ["parent"]
-    });
-
-    return toProductCategoryResponseDto(loaded!);
+    const loaded = await repoGetCategoryById(id, true);
+    return toProductCategoryResponseDTO(loaded!);
 }
 
-export async function deleteCategory(id: number): Promise<boolean> {
-    const category = await productCategoryRepository.findOne({ where: { id } });
+async function deleteCategory(id: number): Promise<boolean> {
+    const category = await repoGetCategoryById(id, false);
     if (!category) return false;
-
-    await productCategoryRepository.softRemove(category);
+    await repoDeleteCategory(category);
     return true;
 }
 
-export async function restoreCategory(id: number): Promise<ProductCategoryResponseDto | null> {
-    const category = await productCategoryRepository.findOne({
-        where: { id },
-        withDeleted: true,
-        relations: ["parent"],
-    });
+async function restoreCategory(id: number): Promise<ProductCategoryResponseDTO | null> {
+    const category = await repoGetCategoryById(id, true);
 
     if (!category) return null;
     if (!category.deleted_at) return null;
 
-    await productCategoryRepository.recover(category);
-    return toProductCategoryResponseDto(category);
+    await repoRestoreCategory(category);
+    return toProductCategoryResponseDTO(category);
 }
+
+export { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory, restoreCategory };

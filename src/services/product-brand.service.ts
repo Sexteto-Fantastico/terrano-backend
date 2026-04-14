@@ -1,78 +1,69 @@
-import { AppDataSource } from "../infra/config/data-source";
 import { ProductBrand } from "../infra/entities/product-brand.entity";
 import {
-    CreateProductBrandDto,
-    UpdateProductBrandDto,
-    ProductBrandResponseDto,
-    toProductBrandResponseDto,
-    toProductBrandResponseDtoList,
+    CreateProductBrandDTO,
+    UpdateProductBrandDTO,
+    ProductBrandResponseDTO,
+    toProductBrandResponseDTO,
+    toProductBrandResponseDTOList,
 } from "../dtos/product-brand.dto";
+import { createBrand as repoCreateBrand, getAllBrands as repoGetAllBrands, getBrandById as repoGetBrandById, updateBrand as repoUpdateBrand, deleteBrand as repoDeleteBrand, restoreBrand as repoRestoreBrand } from "../repositories/product-brand.repository";
 
-const repository = AppDataSource.getRepository(ProductBrand);
-
-export class ProductBrandService {
-
-    static async createBrand(data: CreateProductBrandDto): Promise<ProductBrandResponseDto> {
-        const brand = repository.create(data);
-        const saved = await repository.save(brand);
-        return toProductBrandResponseDto(saved);
-    }
-
-    static async getAllBrands(activeOnly: boolean = false): Promise<ProductBrandResponseDto[]> {
-        const brands = await repository.find({
-            withDeleted: !activeOnly,
-        });
-
-        return toProductBrandResponseDtoList(brands);
-    }
-
-    static async getBrandById(id: number): Promise<ProductBrandResponseDto | null> {
-        const brand = await repository.findOne({
-            where: { id },
-            withDeleted: true,
-        });
-
-        if (!brand) return null;
-
-        return toProductBrandResponseDto(brand);
-    }
-
-    static async updateBrand(
-        id: number,
-        data: UpdateProductBrandDto
-    ): Promise<ProductBrandResponseDto | null> {
-
-        const brand = await repository.findOne({
-            where: { id },
-            withDeleted: true,
-        });
-
-        if (!brand) return null;
-
-        Object.assign(brand, data);
-        await repository.save(brand);
-
-        return toProductBrandResponseDto(brand);
-    }
-
-    static async deleteBrand(id: number): Promise<boolean> {
-        const brand = await repository.findOne({ where: { id } });
-        if (!brand) return false;
-
-        await repository.softRemove(brand);
-        return true;
-    }
-
-    static async restoreBrand(id: number): Promise<ProductBrandResponseDto | null> {
-        const brand = await repository.findOne({
-            where: { id },
-            withDeleted: true,
-        });
-
-        if (!brand || !brand.deleted_at) return null;
-
-        await repository.recover(brand);
-
-        return toProductBrandResponseDto(brand);
-    }
+async function createBrand(data: CreateProductBrandDTO): Promise<ProductBrandResponseDTO> {
+    const brand = await repoCreateBrand(data as ProductBrand);
+    return toProductBrandResponseDTO(brand);
 }
+
+async function getAllBrands(activeOnly: boolean = false): Promise<ProductBrandResponseDTO[]> {
+    const brands = await repoGetAllBrands(activeOnly);
+    return toProductBrandResponseDTOList(brands);
+}
+
+async function getBrandById(id: number): Promise<ProductBrandResponseDTO | null> {
+    const brand = await repoGetBrandById(id, true);
+
+    if (!brand) return null;
+
+    return toProductBrandResponseDTO(brand);
+}
+
+async function updateBrand(
+    id: number,
+    data: UpdateProductBrandDTO
+): Promise<ProductBrandResponseDTO | null> {
+
+    const brand = await repoGetBrandById(id, true);
+
+    if (!brand) return null;
+
+    Object.assign(brand, data);
+    await repoUpdateBrand(brand);
+
+    return toProductBrandResponseDTO(brand);
+}
+
+async function deleteBrand(id: number): Promise<boolean> {
+    const brand = await repoGetBrandById(id, false);
+    if (!brand) return false;
+
+    await repoDeleteBrand(brand);
+    return true;
+}
+
+async function restoreBrand(id: number): Promise<ProductBrandResponseDTO | null> {
+    const brand = await repoGetBrandById(id, true);
+
+    if (!brand || !brand.deleted_at) return null;
+
+    await repoRestoreBrand(brand);
+
+    return toProductBrandResponseDTO(brand);
+}
+
+export {
+    createBrand,
+    getAllBrands,
+    getBrandById,
+    updateBrand,
+    deleteBrand,
+    restoreBrand,
+};

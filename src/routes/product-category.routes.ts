@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ProductCategoryController } from "../controllers/product-category.controller";
+import { createProductCategory, getAllProductCategories, getProductCategoryById, updateProductCategory, deleteProductCategory, restoreProductCategory } from "../controllers/product-category.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
 
@@ -135,7 +135,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, asyncHandler(ProductCategoryController.create));
+router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, asyncHandler(createProductCategory));
 
 /**
  * @swagger
@@ -166,7 +166,7 @@ router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, asyncHandler(ProductCategoryCon
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, asyncHandler(ProductCategoryController.getAll));
+router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, asyncHandler(getAllProductCategories));
 
 /**
  * @swagger
@@ -201,7 +201,7 @@ router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, asyncHandler(ProductCategoryCon
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, asyncHandler(ProductCategoryController.getById));
+router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, asyncHandler(getProductCategoryById));
 
 /**
  * @swagger
@@ -242,7 +242,7 @@ router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, asyncHandler(ProductCategoryC
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, asyncHandler(ProductCategoryController.update));
+router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, asyncHandler(updateProductCategory));
 
 /**
  * @swagger
@@ -277,7 +277,7 @@ router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, asyncHandler(ProductCategoryCont
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, asyncHandler(ProductCategoryController.delete));
+router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, asyncHandler(deleteProductCategory));
 
 /**
  * @swagger
@@ -312,6 +312,6 @@ router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, asyncHandler(ProductCategoryC
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch(Endpoints.PRODUCT_CATEGORIES.RESTORE, asyncHandler(ProductCategoryController.restore));
+router.patch(Endpoints.PRODUCT_CATEGORIES.RESTORE, asyncHandler(restoreProductCategory));
 
 export default router;

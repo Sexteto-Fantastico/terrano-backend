@@ -1,11 +1,11 @@
-import { ProductCategoryResponseDto } from "./product-category.dto";
+import { ProductCategoryResponseDTO } from "./product-category.dto";
 
 export class ProductResponseDTO {
     id: number;
     name: string;
     code: string;
     description?: string;
-    category: ProductCategoryResponseDto;
+    category: ProductCategoryResponseDTO;
     min_stock?: number;
     created_at?: Date;
 }

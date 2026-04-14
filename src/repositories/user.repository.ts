@@ -1,0 +1,46 @@
+import { FindOptionsWhere, ILike } from "typeorm";
+import { AppDataSource } from "../infra/config/data-source";
+import { User } from "../infra/entities/user.entity";
+
+const userRepository = AppDataSource.getRepository(User);
+
+async function createUser(user: User): Promise<User> {
+    return await userRepository.save(user);
+}
+
+async function getUserByUsername(username: string): Promise<User | null> {
+    return await userRepository.findOne({ where: { username } });
+}
+
+async function getUserByEmail(email: string): Promise<User | null> {
+    return await userRepository.findOne({ where: { email } });
+}
+
+async function getUserById(id: number, activeOnly: boolean = false): Promise<User | null> {
+    const where: FindOptionsWhere<User> = { id };
+    if (activeOnly) where.is_active = true;
+
+    return await userRepository.findOne({
+        where,
+        relations: ["role", "department"],
+    });
+}
+
+async function getAllUsers(filters: { onlyActive?: boolean; name?: string }): Promise<User[]> {
+    const where: FindOptionsWhere<User> = {};
+
+    if (filters.onlyActive) where.is_active = true;
+    if (filters.name) where.name = ILike(`%${filters.name}%`);
+
+    return await userRepository.find({
+        where,
+        relations: ["role", "department"],
+        order: { name: "ASC" },
+    });
+}
+
+async function updateUser(user: User): Promise<User> {
+    return await userRepository.save(user);
+}
+
+export { createUser, getUserByUsername, getUserByEmail, getUserById, getAllUsers, updateUser };
