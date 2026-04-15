@@ -1,4 +1,4 @@
-import { ProductCategory } from "../entities/product-category.entity";
+import { ProductCategory } from "../infra/entities/product-category.entity";
 
 export class ProductCategoryParentDto {
     id!: number;

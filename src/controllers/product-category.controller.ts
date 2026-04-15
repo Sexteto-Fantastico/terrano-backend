@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ProductCategoryService } from "../services/product-category.service";
+import * as ProductCategoryService from "../services/product-category.service";
 import { NotFoundError } from "../errors";
 import {
     CreateProductCategoryDto,

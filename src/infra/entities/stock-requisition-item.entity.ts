@@ -7,11 +7,13 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
+    DeleteDateColumn,
 } from "typeorm";
 import { Product } from "./product.entity";
 import { StockRequisition } from "./stock-requisition.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-export interface IStockRequisitionItem {
+export interface IStockRequisitionItem extends ITerranoBaseEntity {
     item: string;
     declared_at: Date;
     product: Product;
@@ -22,9 +24,7 @@ export interface IStockRequisitionItem {
 }
 
 @Entity("stock_requisition_item")
-export class StockRequisitionItem extends BaseEntity implements IStockRequisitionItem {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class StockRequisitionItem extends TerranoBaseEntity implements IStockRequisitionItem {
 
     @Column({ type: "varchar", length: 200 })
     item: string;
@@ -46,17 +46,8 @@ export class StockRequisitionItem extends BaseEntity implements IStockRequisitio
     @JoinColumn({ name: "requisition_id" })
     requisition: StockRequisition;
 
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
     constructor(item: IStockRequisitionItem) {
-        super();
+        super(item);
         Object.assign(this, item);
     }
 }

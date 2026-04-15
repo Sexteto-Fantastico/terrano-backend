@@ -1,5 +1,5 @@
-import { AppDataSource } from "../config/data-source";
-import { ProductBrand } from "../entities/product-brand.entity";
+import { AppDataSource } from "../infra/config/data-source";
+import { ProductBrand } from "../infra/entities/product-brand.entity";
 import {
     CreateProductBrandDto,
     UpdateProductBrandDto,
