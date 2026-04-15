@@ -1,53 +1,64 @@
 import { Request, Response } from "express";
-import { DepartmentService } from "../services/department.service";
-import { NotFoundError } from "../errors";
+import DepartmentService from "../services/department.service";
+import { CreateDepartmentDto, DepartmentResponseDto, UpdateDepartmentDto } from "../dtos/department.dto";
 
 export class DepartmentController {
+    private readonly departmentService: DepartmentService;
 
-    static async create(req: Request, res: Response) {
-        const dept = await DepartmentService.createDepartment(req.body);
-        res.status(201).json(dept);
+    constructor(departmentService: DepartmentService) {
+        this.departmentService = departmentService;
     }
 
-    static async getAll(req: Request, res: Response) {
-        const activeOnly = req.query.active === "true";
-        const list = await DepartmentService.getAllDepartments(activeOnly);
-        res.status(200).json(list);
+    async getAllDepartments(
+        req: Request<{}, DepartmentResponseDto[], {}>, 
+        res: Response<DepartmentResponseDto[]>
+    ) {
+        const activeOnly = req.query.activeOnly === 'true';
+        const departments = await this.departmentService.getAllDepartments(activeOnly);
+        res.status(200).json(departments);
     }
 
-    static async getById(req: Request, res: Response) {
+    async getDepartmentById(
+        req: Request<{ id: string }, DepartmentResponseDto, {}>, 
+        res: Response<DepartmentResponseDto>
+    ) {
         const id = Number(req.params.id);
-        const dept = await DepartmentService.getDepartmentById(id);
-
-        if (!dept) throw new NotFoundError("Department not found");
-
-        res.status(200).json(dept);
+        const department = await this.departmentService.getDepartmentById(id);
+        res.status(200).json(department);
     }
 
-    static async update(req: Request, res: Response) {
-        const id = Number(req.params.id);
-        const dept = await DepartmentService.updateDepartment(id, req.body);
-
-        if (!dept) throw new NotFoundError("Department not found");
-
-        res.status(200).json(dept);
+    async createDepartment(
+        req: Request<{}, DepartmentResponseDto, CreateDepartmentDto>, 
+        res: Response<DepartmentResponseDto>
+    ) {
+        const newDepartment = await this.departmentService.createDepartment(req.body);
+        res.status(201).json(newDepartment);
     }
 
-    static async delete(req: Request, res: Response) {
+    async updateDepartment(
+        req: Request<{ id: string }, DepartmentResponseDto, UpdateDepartmentDto>, 
+        res: Response<DepartmentResponseDto>
+    ) {
         const id = Number(req.params.id);
-        const success = await DepartmentService.deleteDepartment(id);
+        const updatedDepartment = await this.departmentService.updateDepartment(id, req.body);
+        res.status(200).json(updatedDepartment);
+    }
 
-        if (!success) throw new NotFoundError("Department not found");
-
+    async deleteDepartment(
+        req: Request<{ id: string }, {}, {}>, 
+        res: Response<{ message: string }>
+    ) {
+        const id = Number(req.params.id);
+        await this.departmentService.deleteDepartment(id);
         res.status(200).json({ message: "Department deleted successfully" });
     }
 
-    static async restore(req: Request, res: Response) {
+    async restoreDepartment(
+        req: Request<{ id: string }, DepartmentResponseDto, {}>, 
+        res: Response<DepartmentResponseDto>
+    ) {
         const id = Number(req.params.id);
-        const dept = await DepartmentService.restoreDepartment(id);
-
-        if (!dept) throw new NotFoundError("Department not found or not deleted");
-
-        res.status(200).json(dept);
+        const restoredDepartment = await this.departmentService.restoreDepartment(id);
+        res.status(200).json(restoredDepartment);
     }
 }

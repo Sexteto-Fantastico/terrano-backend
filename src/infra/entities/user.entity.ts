@@ -1,18 +1,15 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     ManyToOne,
     OneToMany,
     JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
 } from "typeorm";
 import { Role } from "./role.entity";
 import { Department } from "./department.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-export interface IUser {
+export interface IUser extends ITerranoBaseEntity {
     name: string;
     phone?: string;
     cpf?: string;
@@ -26,9 +23,7 @@ export interface IUser {
 }
 
 @Entity("user")
-export class User extends BaseEntity implements IUser {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class User extends TerranoBaseEntity implements IUser {
 
     @Column({ type: "varchar", length: 100 })
     name: string;
@@ -59,22 +54,11 @@ export class User extends BaseEntity implements IUser {
     @OneToMany(() => Department, (dept) => dept.manager)
     managed_departments: Department[];
 
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
     @Column({ name: "is_active", type: "boolean", default: true })
     is_active: boolean = true;
 
     constructor(user: IUser) {
-        super();
+        super(user);
         Object.assign(this, user);
     }
 }
-
-

@@ -1,15 +1,13 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
-    ManyToOne,
-    CreateDateColumn,
-    BaseEntity,
+    ManyToOne
 } from "typeorm";
 import { Product } from "./product.entity";
 import { StockLocation } from "./stock-location.entity";
 import { PurchaseOrder } from "./purchase-order.entity";
 import { StockRequisition } from "./stock-requisition.entity";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
 export enum MovementType {
     IN = "IN",
@@ -18,7 +16,7 @@ export enum MovementType {
     ADJUSTMENT = "ADJUSTMENT",
 }
 
-export interface IStockMovement {
+export interface IStockMovement extends ITerranoBaseEntity {
     product: Product;
     location: StockLocation;
     movement_type: MovementType;
@@ -27,9 +25,7 @@ export interface IStockMovement {
 }
 
 @Entity("stock_movement")
-export class StockMovement extends BaseEntity implements IStockMovement {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class StockMovement extends TerranoBaseEntity implements IStockMovement {
 
     @ManyToOne(() => Product, (product) => product.stock_movements)
     product: Product;
@@ -52,14 +48,8 @@ export class StockMovement extends BaseEntity implements IStockMovement {
     @Column({ type: "decimal", precision: 10, scale: 4 })
     unit_cost: number;
 
-    @CreateDateColumn()
-    created_at: Date;
-
     constructor(movement: IStockMovement) {
-        super()
+        super(movement);
         Object.assign(this, movement);
     }
 }
-
-
-

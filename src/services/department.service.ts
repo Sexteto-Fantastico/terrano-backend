@@ -1,6 +1,6 @@
-import { AppDataSource } from "../config/data-source";
-import { Department } from "../entities/department.entity";
-import { User } from "../entities/user.entity";
+import { Department } from "../infra/entities/department.entity";
+import { User } from "../infra/entities/user.entity";
+import { AppDataSource } from "../infra/config/data-source";
 import {
     CreateDepartmentDto,
     UpdateDepartmentDto,
@@ -8,92 +8,99 @@ import {
     toDepartmentResponseDto,
     toDepartmentResponseDtoList,
 } from "../dtos/department.dto";
+import { NotFoundError } from "../errors/app-error";
+import { IDepartmentRepository, DepartmentRepository } from "../repositories/department.repository";
 
-const repository = AppDataSource.getRepository(Department);
 const userRepository = AppDataSource.getRepository(User);
 
-export class DepartmentService {
+interface IDepartmentService {
+    getAllDepartments(activeOnly?: boolean): Promise<DepartmentResponseDto[]>;
+    getDepartmentById(id: number): Promise<DepartmentResponseDto>;
+    createDepartment(data: CreateDepartmentDto): Promise<DepartmentResponseDto>;
+    updateDepartment(id: number, data: UpdateDepartmentDto): Promise<DepartmentResponseDto>;
+    deleteDepartment(id: number): Promise<boolean>;
+    restoreDepartment(id: number): Promise<DepartmentResponseDto>;
+}
 
-    static async createDepartment(data: CreateDepartmentDto): Promise<DepartmentResponseDto> {
-        const manager = await userRepository.findOneBy({ id: data.manager_id });
-        if (!manager) throw new Error("Manager not found");
+class DepartmentService implements IDepartmentService {
+    private readonly departmentRepository: IDepartmentRepository;
 
-        const department = repository.create({
-            ...data,
-            manager,
-        });
-
-        const saved = await repository.save(department);
-
-        return toDepartmentResponseDto(saved);
+    constructor(departmentRepository: IDepartmentRepository) {
+        this.departmentRepository = departmentRepository;
     }
 
-    static async getAllDepartments(activeOnly: boolean = false): Promise<DepartmentResponseDto[]> {
-        const departments = await repository.find({
-            withDeleted: !activeOnly,
-            relations: ["manager"],
-        });
-
-        return toDepartmentResponseDtoList(departments);
+    async getAllDepartments(activeOnly: boolean = false): Promise<DepartmentResponseDto[]> {
+        const allDepartments = await this.departmentRepository.findAllDepartments(activeOnly);
+        return toDepartmentResponseDtoList(allDepartments);
     }
 
-    static async getDepartmentById(id: number): Promise<DepartmentResponseDto | null> {
-        const dept = await repository.findOne({
-            where: { id },
-            withDeleted: true,
-            relations: ["manager"],
-        });
-
-        if (!dept) return null;
-
-        return toDepartmentResponseDto(dept);
+    async getDepartmentById(id: number): Promise<DepartmentResponseDto> {
+        const department = await this.departmentRepository.findDepartmentById(id);
+        if (!department) {
+            throw new NotFoundError("Department not found");
+        }
+        return toDepartmentResponseDto(department);
     }
 
-    static async updateDepartment(
-        id: number,
-        data: UpdateDepartmentDto
-    ): Promise<DepartmentResponseDto | null> {
+    async createDepartment(data: CreateDepartmentDto): Promise<DepartmentResponseDto> {
+        try {
+            const { manager_id, ...rest } = data;
 
-        const dept = await repository.findOne({
-            where: { id },
-            withDeleted: true,
-            relations: ["manager"],
-        });
+            if (!manager_id) {
+                throw new Error("Manager ID is required");
+            }
 
-        if (!dept) return null;
+            const manager = await userRepository.findOneBy({ id: manager_id });
+            
+            if (!manager) {
+                throw new NotFoundError("Manager not found");
+            }
+
+            const departmentData = {
+                ...rest,
+                manager,
+            };
+
+            const saved = await this.departmentRepository.saveDepartment(departmentData);
+            return toDepartmentResponseDto(saved);
+        } catch (error) {
+            console.error("Error creating department:", error);
+            throw error;
+        }
+    }
+
+    async updateDepartment(id: number, data: UpdateDepartmentDto): Promise<DepartmentResponseDto> {
+        const existingDepartment = await this.departmentRepository.findDepartmentById(id);
+
+        if (!existingDepartment) {
+            throw new NotFoundError("Department not found");
+        }
 
         if (data.manager_id) {
             const manager = await userRepository.findOneBy({ id: data.manager_id });
-            if (!manager) throw new Error("Manager not found");
-            dept.manager = manager;
+            if (!manager) {
+                throw new NotFoundError("Manager not found");
+            }
+            existingDepartment.manager = manager;
         }
 
-        Object.assign(dept, data);
-
-        await repository.save(dept);
-
-        return toDepartmentResponseDto(dept);
+        const updatedDepartment = Object.assign(existingDepartment, data);
+        const saved = await this.departmentRepository.saveDepartment(updatedDepartment);
+        
+        return toDepartmentResponseDto(saved);
     }
 
-    static async deleteDepartment(id: number): Promise<boolean> {
-        const dept = await repository.findOne({ where: { id } });
-        if (!dept) return false;
-
-        await repository.softRemove(dept);
-        return true;
+    async deleteDepartment(id: number): Promise<boolean> {
+        return this.departmentRepository.deleteDepartment(id);
     }
 
-    static async restoreDepartment(id: number): Promise<DepartmentResponseDto | null> {
-        const dept = await repository.findOne({
-            where: { id },
-            withDeleted: true,
-            relations: ["manager"],
-        });
-
-        if (!dept || !dept.deleted_at) return null;
-
-        await repository.recover(dept);
-
-        return toDepartmentResponseDto(dept);
+    async restoreDepartment(id: number): Promise<DepartmentResponseDto> {
+        const restored = await this.departmentRepository.restoreDepartment(id);
+        if (!restored) {
+            throw new NotFoundError("Department not found or not deleted");
+        }
+        return toDepartmentResponseDto(restored);
     }
 }
+
+export default DepartmentService;

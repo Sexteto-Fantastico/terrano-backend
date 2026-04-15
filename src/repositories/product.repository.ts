@@ -1,5 +1,5 @@
-import { AppDataSource } from "../config/data-source";
-import { IProduct, Product } from "../entities/product.entity";
+import { AppDataSource } from "../infra/config/data-source";
+import { IProduct, Product } from "../infra/entities/product.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
 

@@ -10,8 +10,9 @@ import {
     OneToMany,
     JoinColumn,
 } from "typeorm";
+import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
-export interface IProductCategory {
+export interface IProductCategory extends ITerranoBaseEntity {
     name: string;
     description?: string;
     parent_id?: number;
@@ -20,9 +21,7 @@ export interface IProductCategory {
 }
 
 @Entity("product_category")
-export class ProductCategory extends BaseEntity implements IProductCategory {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class ProductCategory extends TerranoBaseEntity implements IProductCategory {
 
     @Column({ type: "varchar", length: 200 })
     name: string;
@@ -40,25 +39,10 @@ export class ProductCategory extends BaseEntity implements IProductCategory {
     @OneToMany(() => ProductCategory, (category) => category.parent)
     children?: ProductCategory[];
 
-    @DeleteDateColumn({ name: "deleted_at" })
-    deleted_at?: Date;
-
-    @CreateDateColumn({ name: "created_at" })
-    created_at: Date;
-
-    @UpdateDateColumn({ name: "updated_at" })
-    updated_at: Date;
-
-    @Column({ name: "updated_by", type: "int", nullable: true })
-    updated_by?: number;
-
-    constructor(category?: IProductCategory) {
-        super();
+    constructor(category: IProductCategory) {
+        super(category);
         if (category) {
             Object.assign(this, category);
         }
     }
-
 }
-
-

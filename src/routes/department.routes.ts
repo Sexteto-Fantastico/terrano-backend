@@ -1,14 +1,23 @@
 import { Router } from "express";
-import { DepartmentController } from "../controllers/department.controller";
+import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
+import { DepartmentController } from "../controllers/department.controller";
+import DepartmentService from "../services/department.service";
+import { DepartmentRepository } from "../repositories/department.repository";
 
-const router = Router();
+export function setupDepartmentRoutes() {
+    const router = Router();
 
-router.post(Endpoints.DEPARTMENTS.CREATE, DepartmentController.create);
-router.get(Endpoints.DEPARTMENTS.GET_ALL, DepartmentController.getAll);
-router.get(Endpoints.DEPARTMENTS.GET_BY_ID, DepartmentController.getById);
-router.put(Endpoints.DEPARTMENTS.UPDATE, DepartmentController.update);
-router.delete(Endpoints.DEPARTMENTS.DELETE, DepartmentController.delete);
-router.post(Endpoints.DEPARTMENTS.RESTORE, DepartmentController.restore);
+    const departmentRepository = new DepartmentRepository();
+    const departmentService = new DepartmentService(departmentRepository);
+    const departmentController = new DepartmentController(departmentService);
 
-export default router;
+    router.get(Endpoints.DEPARTMENTS.GET_ALL, asyncHandler(departmentController.getAllDepartments.bind(departmentController)));
+    router.get(Endpoints.DEPARTMENTS.GET_BY_ID, asyncHandler(departmentController.getDepartmentById.bind(departmentController)));
+    router.post(Endpoints.DEPARTMENTS.CREATE, asyncHandler(departmentController.createDepartment.bind(departmentController)));
+    router.put(Endpoints.DEPARTMENTS.UPDATE, asyncHandler(departmentController.updateDepartment.bind(departmentController)));
+    router.delete(Endpoints.DEPARTMENTS.DELETE, asyncHandler(departmentController.deleteDepartment.bind(departmentController)));
+    router.patch(Endpoints.DEPARTMENTS.RESTORE, asyncHandler(departmentController.restoreDepartment.bind(departmentController)));
+
+    return router;
+}
