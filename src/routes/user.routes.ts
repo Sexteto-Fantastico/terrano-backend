@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserController } from "../controllers/user.controller";
+import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser } from "../controllers/user.controller";
 import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
 
@@ -37,7 +37,7 @@ const router = Router();
  *       409:
  *         description: Username or email already exists
  */
-router.post(Endpoints.USERS.CREATE, asyncHandler(UserController.createUser));
+router.post(Endpoints.USERS.CREATE, asyncHandler(createUser));
 
 /**
  * @openapi
@@ -67,7 +67,7 @@ router.post(Endpoints.USERS.CREATE, asyncHandler(UserController.createUser));
  *               items:
  *                 $ref: '#/components/schemas/UserResponseDto'
  */
-router.get(Endpoints.USERS.GET_ALL, asyncHandler(UserController.getUsers));
+router.get(Endpoints.USERS.GET_ALL, asyncHandler(getUsers));
 
 /**
  * @openapi
@@ -92,7 +92,7 @@ router.get(Endpoints.USERS.GET_ALL, asyncHandler(UserController.getUsers));
  *       404:
  *         description: User not found
  */
-router.get(Endpoints.USERS.GET_BY_ID, asyncHandler(UserController.getUserById));
+router.get(Endpoints.USERS.GET_BY_ID, asyncHandler(getUserById));
 
 /**
  * @openapi
@@ -123,7 +123,7 @@ router.get(Endpoints.USERS.GET_BY_ID, asyncHandler(UserController.getUserById));
  *       404:
  *         description: User not found
  */
-router.put(Endpoints.USERS.CHANGE_PASSWORD, asyncHandler(UserController.changePassword));
+router.put(Endpoints.USERS.CHANGE_PASSWORD, asyncHandler(changePassword));
 
 /**
  * @openapi
@@ -156,7 +156,7 @@ router.put(Endpoints.USERS.CHANGE_PASSWORD, asyncHandler(UserController.changePa
  *       409:
  *         description: Username or email already exists
  */
-router.put(Endpoints.USERS.UPDATE, asyncHandler(UserController.updateUser));
+router.put(Endpoints.USERS.UPDATE, asyncHandler(updateUser));
 
 /**
  * @openapi
@@ -183,6 +183,6 @@ router.put(Endpoints.USERS.UPDATE, asyncHandler(UserController.updateUser));
  *       404:
  *         description: User not found
  */
-router.delete(Endpoints.USERS.DELETE, asyncHandler(UserController.deleteUser));
+router.delete(Endpoints.USERS.DELETE, asyncHandler(deleteUser));
 
 export default router;

@@ -1,34 +1,32 @@
 import { Request, Response } from "express";
-import { ProductBrandService } from "../services/product-brand.service";
+import * as ProductBrandService from "../services/product-brand.service";
 import { NotFoundError } from "../errors";
 import {
-    CreateProductBrandDto,
-    UpdateProductBrandDto,
-    ProductBrandResponseDto,
+    CreateProductBrandDTO,
+    UpdateProductBrandDTO,
+    ProductBrandResponseDTO,
 } from "../dtos/product-brand.dto";
 
-export class ProductBrandController {
-
-    static async create(
-        req: Request<{}, ProductBrandResponseDto, CreateProductBrandDto>,
-        res: Response<ProductBrandResponseDto>
+async function createProductBrand(
+        req: Request<{}, ProductBrandResponseDTO, CreateProductBrandDTO>,
+        res: Response<ProductBrandResponseDTO>
     ) {
         const brand = await ProductBrandService.createBrand(req.body);
         res.status(201).json(brand);
     }
 
-    static async getAll(
-        req: Request<{}, ProductBrandResponseDto[], {}, { active?: string }>,
-        res: Response<ProductBrandResponseDto[]>
+async function getAllProductBrands(
+        req: Request<{}, ProductBrandResponseDTO[], {}, { active?: string }>,
+        res: Response<ProductBrandResponseDTO[]>
     ) {
         const activeOnly = req.query.active === "true";
         const brands = await ProductBrandService.getAllBrands(activeOnly);
         res.status(200).json(brands);
     }
 
-    static async getById(
-        req: Request<{ id: string }, ProductBrandResponseDto>,
-        res: Response<ProductBrandResponseDto>
+async function getProductBrandById(
+        req: Request<{ id: string }, ProductBrandResponseDTO>,
+        res: Response<ProductBrandResponseDTO>
     ) {
         const id = Number(req.params.id);
         const brand = await ProductBrandService.getBrandById(id);
@@ -40,9 +38,9 @@ export class ProductBrandController {
         res.status(200).json(brand);
     }
 
-    static async update(
-        req: Request<{ id: string }, ProductBrandResponseDto, UpdateProductBrandDto>,
-        res: Response<ProductBrandResponseDto>
+async function updateProductBrand(
+        req: Request<{ id: string }, ProductBrandResponseDTO, UpdateProductBrandDTO>,
+        res: Response<ProductBrandResponseDTO>
     ) {
         const id = Number(req.params.id);
         const brand = await ProductBrandService.updateBrand(id, req.body);
@@ -54,7 +52,7 @@ export class ProductBrandController {
         res.status(200).json(brand);
     }
 
-    static async delete(
+async function deleteProductBrand(
         req: Request<{ id: string }>,
         res: Response
     ) {
@@ -68,9 +66,9 @@ export class ProductBrandController {
         res.status(200).json({ message: "Product brand deleted successfully" });
     }
 
-    static async restore(
-        req: Request<{ id: string }, ProductBrandResponseDto>,
-        res: Response<ProductBrandResponseDto>
+async function restoreProductBrand(
+        req: Request<{ id: string }, ProductBrandResponseDTO>,
+        res: Response<ProductBrandResponseDTO>
     ) {
         const id = Number(req.params.id);
         const brand = await ProductBrandService.restoreBrand(id);
@@ -81,4 +79,5 @@ export class ProductBrandController {
 
         res.status(200).json(brand);
     }
-}
+
+export { createProductBrand, getAllProductBrands, getProductBrandById, updateProductBrand, deleteProductBrand, restoreProductBrand };

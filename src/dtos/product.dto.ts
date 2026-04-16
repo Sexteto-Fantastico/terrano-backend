@@ -1,25 +1,25 @@
-import { ProductCategoryResponseDto } from "./product-category.dto";
+import { ProductCategoryResponseDTO } from "./product-category.dto";
 
 export class ProductResponseDTO {
     id: number;
     name: string;
     code: string;
     description?: string;
-    category: ProductCategoryResponseDto;
+    category: ProductCategoryResponseDTO;
     min_stock?: number;
     created_at?: Date;
 }
 
 export class CreateProductRequestDTO {
-    name: string;
-    code: string;
+    name!: string;
+    code!: string;
     description?: string;
-    categoryId: number;
+    categoryId!: number;
     min_stock?: number;
 }
 
 export class ProductUpdateRequestDTO {
-    id: number;
+    id!: number;
     name?: string;
     code?: string;
     description?: string;

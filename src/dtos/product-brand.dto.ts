@@ -1,12 +1,12 @@
-export interface CreateProductBrandDto {
+export class CreateProductBrandDTO {
     name: string;
 }
 
-export interface UpdateProductBrandDto {
+export class UpdateProductBrandDTO {
     name?: string;
 }
 
-export interface ProductBrandResponseDto {
+export class ProductBrandResponseDTO {
     id: number;
     name: string;
     is_active?: boolean;
@@ -14,7 +14,7 @@ export interface ProductBrandResponseDto {
     updated_at: Date;
 }
 
-export const toProductBrandResponseDto = (brand: any): ProductBrandResponseDto => ({
+export const toProductBrandResponseDTO = (brand: any): ProductBrandResponseDTO => ({
     id: brand.id,
     name: brand.name,
     is_active: brand.is_active,
@@ -22,5 +22,5 @@ export const toProductBrandResponseDto = (brand: any): ProductBrandResponseDto =
     updated_at: brand.updated_at,
 });
 
-export const toProductBrandResponseDtoList = (brands: any[]): ProductBrandResponseDto[] =>
-    brands.map(toProductBrandResponseDto);
+export const toProductBrandResponseDTOList = (brands: any[]): ProductBrandResponseDTO[] =>
+    brands.map(toProductBrandResponseDTO);

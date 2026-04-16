@@ -1,16 +1,16 @@
-export interface CreateDepartmentDto {
+export class CreateDepartmentDto {
     name: string;
     cost_center_code: string;
     manager_id: number;
 }
 
-export interface UpdateDepartmentDto {
+export class UpdateDepartmentDto {
     name?: string;
     cost_center_code?: string;
     manager_id?: number;
 }
 
-export interface DepartmentResponseDto {
+export class DepartmentResponseDto {
     id: number;
     name: string;
     cost_center_code: string;
