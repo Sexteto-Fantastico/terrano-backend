@@ -5,7 +5,7 @@ import {
     ManyToOne,
     JoinColumn,
 } from "typeorm";
-import { StockRequisition } from "./stock-requisition.entity";
+import { StockRequisition } from "./stock-requisition.entity"
 import { User } from "./user.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 

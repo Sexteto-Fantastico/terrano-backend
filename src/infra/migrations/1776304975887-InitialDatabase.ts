@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitialDatabase1775786703010 implements MigrationInterface {
-    name = 'InitialDatabase1775786703010'
+export class InitialDatabase1776304975887 implements MigrationInterface {
+    name = 'InitialDatabase1776304975887'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`policy\` (\`id\` int NOT NULL AUTO_INCREMENT, \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`created_by\` int NULL, \`updated_by\` int NULL, \`name\` varchar(100) NOT NULL, \`description\` text NULL, \`resource\` varchar(50) NOT NULL, \`action\` varchar(50) NOT NULL, UNIQUE INDEX \`IDX_5ad65e4ff971649343992959bd\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -19,6 +19,7 @@ export class InitialDatabase1775786703010 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`stock_requisition\` (\`id\` int NOT NULL AUTO_INCREMENT, \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`created_by\` int NULL, \`updated_by\` int NULL, \`company_name\` varchar(200) NOT NULL, \`status\` enum ('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'PENDING', \`declared_at\` date NOT NULL, \`total_value\` decimal(10,2) NOT NULL DEFAULT '0.00', \`department_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`department\` (\`id\` int NOT NULL AUTO_INCREMENT, \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`created_by\` int NULL, \`updated_by\` int NULL, \`name\` varchar(100) NOT NULL, \`cost_center_code\` varchar(50) NOT NULL, \`manager_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`user\` (\`id\` int NOT NULL AUTO_INCREMENT, \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`created_by\` int NULL, \`updated_by\` int NULL, \`name\` varchar(100) NOT NULL, \`phone\` varchar(20) NULL, \`cpf\` varchar(14) NULL, \`email\` varchar(300) NOT NULL, \`username\` varchar(50) NOT NULL, \`password\` varchar(100) NOT NULL, \`is_active\` tinyint NOT NULL DEFAULT 1, \`role_id\` int NULL, \`department_id\` int NULL, UNIQUE INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` (\`email\`), UNIQUE INDEX \`IDX_78a916df40e02a9deb1c4b75ed\` (\`username\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`system_log\` (\`id\` int NOT NULL AUTO_INCREMENT, \`level\` enum ('INFO', 'WARN', 'ERROR', 'FATAL') NOT NULL DEFAULT 'ERROR', \`message\` varchar(1000) NOT NULL, \`status_code\` int NOT NULL, \`is_operational\` tinyint NOT NULL DEFAULT 1, \`stack\` text NULL, \`path\` varchar(500) NULL, \`method\` varchar(10) NULL, \`metadata\` json NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`stock_balance\` (\`id\` int NOT NULL AUTO_INCREMENT, \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`created_by\` int NULL, \`updated_by\` int NULL, \`quantity\` int NOT NULL DEFAULT '0', \`product_id\` int NULL, \`location_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`role_policies\` (\`role_id\` int NOT NULL, \`policy_id\` int NOT NULL, INDEX \`IDX_fb4e9cdfe54bbf9efd1bbd96d4\` (\`role_id\`), INDEX \`IDX_172c36e040c3f8233ce657d65a\` (\`policy_id\`), PRIMARY KEY (\`role_id\`, \`policy_id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`stock_location_product\` ADD CONSTRAINT \`FK_29366848f998d97cacb7093e278\` FOREIGN KEY (\`product_id\`) REFERENCES \`product\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -72,6 +73,7 @@ export class InitialDatabase1775786703010 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_fb4e9cdfe54bbf9efd1bbd96d4\` ON \`role_policies\``);
         await queryRunner.query(`DROP TABLE \`role_policies\``);
         await queryRunner.query(`DROP TABLE \`stock_balance\``);
+        await queryRunner.query(`DROP TABLE \`system_log\``);
         await queryRunner.query(`DROP INDEX \`IDX_78a916df40e02a9deb1c4b75ed\` ON \`user\``);
         await queryRunner.query(`DROP INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` ON \`user\``);
         await queryRunner.query(`DROP TABLE \`user\``);

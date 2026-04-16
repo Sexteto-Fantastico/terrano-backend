@@ -3,11 +3,11 @@ import { Product } from "../infra/entities/product.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
 
-async function findProductById(id: number): Promise<Product | null> {
+async function getProductById(id: number): Promise<Product | null> {
     return productRepository.findOne({ where: { id: id }, relations: ["category"] });
 }
 
-async function findProductByCode(code: string): Promise<Product | null> {
+async function getProductByCode(code: string): Promise<Product | null> {
     return productRepository.findOne({ where: { code } });
 }
 
@@ -20,8 +20,8 @@ async function deleteProduct(id: number): Promise<boolean> {
     return result.affected !== 0;
 }
 
-async function findAllProducts(): Promise<Product[]> {
+async function getAllProducts(): Promise<Product[]> {
     return await productRepository.find({ relations: ["category"] });
 }
 
-export { findProductById, findProductByCode, saveProduct, deleteProduct, findAllProducts };
+export { getProductById, getProductByCode, saveProduct, deleteProduct, getAllProducts };

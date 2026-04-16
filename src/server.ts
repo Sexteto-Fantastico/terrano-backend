@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.routes";
 import productCategoryRoutes from "./routes/product-category.routes";
 import productBrandRoutes from "./routes/product-brand.routes";
 import productRoutes from "./routes/product.routes";
+import departmentRoutes from "./routes/department.routes";
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
@@ -23,6 +24,7 @@ app.use(Endpoints.USERS.BASE, userRoutes);
 app.use(Endpoints.PRODUCT_CATEGORIES.BASE, productCategoryRoutes);
 app.use(Endpoints.PRODUCT_BRANDS.BASE, productBrandRoutes);
 app.use(Endpoints.PRODUCTS.BASE, productRoutes);
+app.use(Endpoints.DEPARTMENTS.BASE, departmentRoutes);
 
 app.use(globalErrorMiddleware);
 
