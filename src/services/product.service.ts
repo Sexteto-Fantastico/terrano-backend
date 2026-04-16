@@ -1,15 +1,15 @@
 import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO } from "../dtos/product.dto";
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
-import { findAllProducts, findProductById, findProductByCode, saveProduct, deleteProduct } from "../repositories/product.repository";
+import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
 
 async function getAllProducts(): Promise<ProductResponseDTO[]> {
-    const allProducts = await findAllProducts();
+    const allProducts = await ProductRepository.findAllProducts();
     return allProducts;
 }
 
 async function getProductById(id: number): Promise<ProductResponseDTO> {
-    const product = await findProductById(id);
+    const product = await ProductRepository.findProductById(id);
     if (!product) {
         throw new NotFoundError("Product not found");
     }
@@ -26,7 +26,7 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
             throw new BadRequestError("Product code is required");
         }
 
-        const existingProduct = await findProductByCode(data.code);
+        const existingProduct = await ProductRepository.findProductByCode(data.code);
         if (existingProduct) {
             throw new ConflictError("Product code already exists");
         }
@@ -52,7 +52,7 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
             min_stock: data.min_stock,
         });
 
-        return await saveProduct(product);
+        return await ProductRepository.saveProduct(product);
 
     } catch (error) {
         if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ConflictError) {
@@ -64,7 +64,7 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
 }
 
 async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResponseDTO> {
-    const existingProduct = await findProductById(data.id);
+    const existingProduct = await ProductRepository.findProductById(data.id);
 
     if (!existingProduct) {
         throw new NotFoundError("Product not found");
@@ -83,7 +83,7 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
         }
 
         if (data.code !== existingProduct.code) {
-            const productWithCode = await findProductByCode(data.code);
+            const productWithCode = await ProductRepository.findProductByCode(data.code);
             if (productWithCode) {
                 throw new ConflictError("Product code already exists");
             }
@@ -110,16 +110,16 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
         existingProduct.min_stock = data.min_stock;
     }
 
-    return await saveProduct(existingProduct);
+    return await ProductRepository.saveProduct(existingProduct);
 }
 
-async function deleteProductService(id: number): Promise<boolean> {
-    const product = await findProductById(id);
+async function deleteProduct(id: number): Promise<boolean> {
+    const product = await ProductRepository.findProductById(id);
     if (!product) {
         throw new NotFoundError("Product not found");
     }
 
-    return await deleteProduct(id);
+    return await ProductRepository.deleteProduct(id);
 }
 
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProductService };
+export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };

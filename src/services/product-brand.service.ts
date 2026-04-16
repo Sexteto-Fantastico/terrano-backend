@@ -6,20 +6,20 @@ import {
     toProductBrandResponseDTO,
     toProductBrandResponseDTOList,
 } from "../dtos/product-brand.dto";
-import { createBrand as repoCreateBrand, getAllBrands as repoGetAllBrands, getBrandById as repoGetBrandById, updateBrand as repoUpdateBrand, deleteBrand as repoDeleteBrand, restoreBrand as repoRestoreBrand } from "../repositories/product-brand.repository";
+import * as ProductBrandRepository from "../repositories/product-brand.repository";
 
 async function createBrand(data: CreateProductBrandDTO): Promise<ProductBrandResponseDTO> {
-    const brand = await repoCreateBrand(data as ProductBrand);
+    const brand = await ProductBrandRepository.createBrand(data as ProductBrand);
     return toProductBrandResponseDTO(brand);
 }
 
 async function getAllBrands(activeOnly: boolean = false): Promise<ProductBrandResponseDTO[]> {
-    const brands = await repoGetAllBrands(activeOnly);
+    const brands = await ProductBrandRepository.getAllBrands(activeOnly);
     return toProductBrandResponseDTOList(brands);
 }
 
 async function getBrandById(id: number): Promise<ProductBrandResponseDTO | null> {
-    const brand = await repoGetBrandById(id, true);
+    const brand = await ProductBrandRepository.getBrandById(id, true);
 
     if (!brand) return null;
 
@@ -31,30 +31,30 @@ async function updateBrand(
     data: UpdateProductBrandDTO
 ): Promise<ProductBrandResponseDTO | null> {
 
-    const brand = await repoGetBrandById(id, true);
+    const brand = await ProductBrandRepository.getBrandById(id, true);
 
     if (!brand) return null;
 
     Object.assign(brand, data);
-    await repoUpdateBrand(brand);
+    await ProductBrandRepository.updateBrand(brand);
 
     return toProductBrandResponseDTO(brand);
 }
 
 async function deleteBrand(id: number): Promise<boolean> {
-    const brand = await repoGetBrandById(id, false);
+    const brand = await ProductBrandRepository.getBrandById(id, false);
     if (!brand) return false;
 
-    await repoDeleteBrand(brand);
+    await ProductBrandRepository.deleteBrand(brand);
     return true;
 }
 
 async function restoreBrand(id: number): Promise<ProductBrandResponseDTO | null> {
-    const brand = await repoGetBrandById(id, true);
+    const brand = await ProductBrandRepository.getBrandById(id, true);
 
     if (!brand || !brand.deleted_at) return null;
 
-    await repoRestoreBrand(brand);
+    await ProductBrandRepository.restoreBrand(brand);
 
     return toProductBrandResponseDTO(brand);
 }

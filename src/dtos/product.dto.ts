@@ -11,15 +11,15 @@ export class ProductResponseDTO {
 }
 
 export class CreateProductRequestDTO {
-    name: string;
-    code: string;
+    name!: string;
+    code!: string;
     description?: string;
-    categoryId: number;
+    categoryId!: number;
     min_stock?: number;
 }
 
 export class ProductUpdateRequestDTO {
-    id: number;
+    id!: number;
     name?: string;
     code?: string;
     description?: string;
