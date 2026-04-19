@@ -2,10 +2,11 @@ import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO } 
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
+import { SystemLogRepository } from "../repositories/system-log.repository";
+import { LogLevel } from "../infra/logger/logger.interface";
 
 async function getAllProducts(): Promise<ProductResponseDTO[]> {
-    const allProducts = await ProductRepository.getAllProducts();
-    return allProducts;
+    return await ProductRepository.getAllProducts();
 }
 
 async function getProductById(id: number): Promise<ProductResponseDTO> {
@@ -52,74 +53,149 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
             min_stock: data.min_stock,
         });
 
-        return await ProductRepository.saveProduct(product);
+        const savedProduct = await ProductRepository.saveProduct(product);
 
-    } catch (error) {
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Product created",
+            status_code: 201,
+            entity_name: "product",
+            entity_id: savedProduct.id,
+            action: "CREATE",
+            metadata: { ...data }
+        });
+
+        return savedProduct;
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error creating product",
+            status_code: 500,
+            entity_name: "product",
+            action: "CREATE",
+            metadata: { error: error.message, data: { ...data } }
+        });
+
         if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ConflictError) {
             throw error;
         }
-        console.error("Error creating product:", error);
+
         throw error;
     }
 }
 
 async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResponseDTO> {
-    const existingProduct = await ProductRepository.getProductById(data.id);
+    try {
+        const existingProduct = await ProductRepository.getProductById(data.id);
 
-    if (!existingProduct) {
-        throw new NotFoundError("Product not found");
-    }
-
-    if (data.name !== undefined) {
-        if (data.name.trim() === "") {
-            throw new BadRequestError("Product name cannot be empty");
-        }
-        existingProduct.name = data.name.trim();
-    }
-
-    if (data.code !== undefined) {
-        if (data.code.trim() === "") {
-            throw new BadRequestError("Product code cannot be empty");
+        if (!existingProduct) {
+            throw new NotFoundError("Product not found");
         }
 
-        if (data.code !== existingProduct.code) {
-            const productWithCode = await ProductRepository.getProductByCode(data.code);
-            if (productWithCode) {
-                throw new ConflictError("Product code already exists");
+        if (data.name !== undefined) {
+            if (data.name.trim() === "") {
+                throw new BadRequestError("Product name cannot be empty");
             }
+            existingProduct.name = data.name.trim();
         }
-        existingProduct.code = data.code.trim();
-    }
 
-    if (data.description !== undefined) {
-        existingProduct.description = data.description?.trim();
-    }
+        if (data.code !== undefined) {
+            if (data.code.trim() === "") {
+                throw new BadRequestError("Product code cannot be empty");
+            }
 
-    if (data.categoryId !== undefined) {
-        const category = await getCategoryById(data.categoryId);
-        if (!category) {
-            throw new NotFoundError("Category not found");
+            if (data.code !== existingProduct.code) {
+                const productWithCode = await ProductRepository.getProductByCode(data.code);
+                if (productWithCode) {
+                    throw new ConflictError("Product code already exists");
+                }
+            }
+            existingProduct.code = data.code.trim();
         }
-        existingProduct.category = category;
-    }
 
-    if (data.min_stock !== undefined) {
-        if (data.min_stock < 0) {
-            throw new BadRequestError("Minimum stock cannot be negative");
+        if (data.description !== undefined) {
+            existingProduct.description = data.description?.trim();
         }
-        existingProduct.min_stock = data.min_stock;
-    }
 
-    return await ProductRepository.saveProduct(existingProduct);
+        if (data.categoryId !== undefined) {
+            const category = await getCategoryById(data.categoryId);
+            if (!category) {
+                throw new NotFoundError("Category not found");
+            }
+            existingProduct.category = category;
+        }
+
+        if (data.min_stock !== undefined) {
+            if (data.min_stock < 0) {
+                throw new BadRequestError("Minimum stock cannot be negative");
+            }
+            existingProduct.min_stock = data.min_stock;
+        }
+
+        const updatedProduct = await ProductRepository.saveProduct(existingProduct);
+
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Product updated",
+            status_code: 200,
+            entity_name: "product",
+            entity_id: updatedProduct.id,
+            action: "UPDATE",
+            metadata: { ...data }
+        });
+
+        return updatedProduct;
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error updating product",
+            status_code: 500,
+            entity_name: "product",
+            entity_id: data.id,
+            action: "UPDATE",
+            metadata: { error: error.message }
+        });
+
+        throw error;
+    }
 }
 
 async function deleteProduct(id: number): Promise<boolean> {
-    const product = await ProductRepository.getProductById(id);
-    if (!product) {
-        throw new NotFoundError("Product not found");
-    }
+    try {
+        const product = await ProductRepository.getProductById(id);
 
-    return await ProductRepository.deleteProduct(id);
+        if (!product) {
+            throw new NotFoundError("Product not found");
+        }
+
+        await ProductRepository.deleteProduct(id);
+
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Product deleted",
+            status_code: 200,
+            entity_name: "product",
+            entity_id: id,
+            action: "DELETE"
+        });
+
+        return true;
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error deleting product",
+            status_code: 500,
+            entity_name: "product",
+            entity_id: id,
+            action: "DELETE",
+            metadata: { error: error.message }
+        });
+
+        throw error;
+    }
 }
 
 export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };

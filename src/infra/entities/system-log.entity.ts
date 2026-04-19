@@ -43,4 +43,13 @@ export class SystemLog extends BaseEntity {
 
     @CreateDateColumn({ name: "created_at" })
     created_at: Date;
+    
+    @Column({ name: "entity_name", type: "varchar", length: 100, nullable: true })
+    entity_name?: string;
+
+    @Column({ name: "entity_id", type: "int", nullable: true })
+    entity_id?: number;
+
+    @Column({ name: "action", type: "varchar", length: 50, nullable: true })
+    action?: string; 
 }
