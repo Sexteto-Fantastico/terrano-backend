@@ -16,6 +16,10 @@ async function getUserByEmail(email: string): Promise<User | null> {
     return await userRepository.findOne({ where: { email } });
 }
 
+async function getUserByPasswordResetToken(token: string): Promise<User | null> {
+    return await userRepository.findOne({ where: { password_reset_token: token } });
+}
+
 async function getUserById(id: number, activeOnly: boolean = false): Promise<User | null> {
     const where: FindOptionsWhere<User> = { id };
     if (activeOnly) where.is_active = true;
@@ -43,4 +47,4 @@ async function updateUser(user: User): Promise<User> {
     return await userRepository.save(user);
 }
 
-export { createUser, getUserByUsername, getUserByEmail, getUserById, getAllUsers, updateUser };
+export { createUser, getUserByUsername, getUserByEmail, getUserByPasswordResetToken, getUserById, getAllUsers, updateUser };
