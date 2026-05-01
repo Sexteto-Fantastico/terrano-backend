@@ -3,6 +3,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/user.routes";
+import authRoutes from "./routes/auth.routes";
+import { authMiddleware } from "./middlewares/auth.middleware";
 import productCategoryRoutes from "./routes/product-category.routes";
 import productBrandRoutes from "./routes/product-brand.routes";
 import productRoutes from "./routes/product.routes";
@@ -19,6 +21,9 @@ app.use(cors());
 app.use(express.json());
 
 setupSwagger(app);
+
+app.use(Endpoints.AUTH.BASE, authRoutes);
+app.use(authMiddleware);
 
 app.use(Endpoints.USERS.BASE, userRoutes);
 app.use(Endpoints.PRODUCT_CATEGORIES.BASE, productCategoryRoutes);

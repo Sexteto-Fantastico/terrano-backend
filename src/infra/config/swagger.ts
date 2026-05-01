@@ -21,6 +21,10 @@ const options: swaggerJSDoc.Options = {
                 name: "Users",
                 description: "User management endpoints",
             },
+            {
+                name: "Auth",
+                description: "Authentication and password reset endpoints",
+            },
         ],
         components: {
             securitySchemes: {
@@ -61,6 +65,45 @@ const options: swaggerJSDoc.Options = {
                             items: { $ref: "#/components/schemas/DepartmentDto" },
                         },
                         is_active: { type: "boolean" },
+                        requires_password_reset: { type: "boolean" },
+                    },
+                },
+                LoginRequestDto: {
+                    type: "object",
+                    required: ["email", "password"],
+                    properties: {
+                        email: { type: "string", format: "email" },
+                        password: { type: "string" },
+                    },
+                },
+                LoginResponseDto: {
+                    type: "object",
+                    properties: {
+                        token: { type: "string" },
+                        expiresAt: { type: "string", format: "date-time" },
+                        must_reset_password: { type: "boolean" },
+                    },
+                },
+                ForgotPasswordRequestDto: {
+                    type: "object",
+                    required: ["email"],
+                    properties: {
+                        email: { type: "string", format: "email" },
+                    },
+                },
+                ResetPasswordRequestDto: {
+                    type: "object",
+                    required: ["token", "password"],
+                    properties: {
+                        token: { type: "string" },
+                        password: { type: "string" },
+                    },
+                },
+                DefinePasswordRequestDto: {
+                    type: "object",
+                    required: ["password"],
+                    properties: {
+                        password: { type: "string" },
                     },
                 },
                 CreateUserRequestDto: {

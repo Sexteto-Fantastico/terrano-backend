@@ -34,6 +34,7 @@ function sanitizeUser(user: User): UserResponseDto {
             name: dept.name,
         })),
         is_active: user.is_active,
+        requires_password_reset: user.requires_password_reset,
     };
 }
 
@@ -100,6 +101,7 @@ async function createUser(request: CreateUserRequestDto): Promise<UserResponseDt
         password: hashPassword(request.password),
         role,
         department,
+        requires_password_reset: request.requiresPasswordReset ?? false,
         updated_by: request.updatedBy,
         is_active: true,
     });
@@ -210,6 +212,9 @@ async function changePassword(id: number, request: ChangePasswordRequestDto): Pr
     }
 
     user.password = hashPassword(request.password);
+    user.requires_password_reset = false;
+    user.password_reset_token = undefined;
+    user.password_reset_token_expires_at = undefined;
     if (request.updatedBy !== undefined) {
         user.updated_by = request.updatedBy;
     }
