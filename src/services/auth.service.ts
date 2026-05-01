@@ -52,12 +52,11 @@ async function forgotPassword(email: string): Promise<void> {
     if (!user || !user.is_active) {
         return;
     }
-console.log(user.id, user.email);
+
     const token = crypto.randomBytes(32).toString("hex");
     user.password_reset_token = token;
     user.password_reset_token_expires_at = new Date(Date.now() + RESET_TOKEN_EXPIRES_IN_MS);
     await repoUpdateUser(user);
-console.log(token);
 
     const resetLink = `${FRONTEND_URL}/defina-sua-senha?token=${token}`;
     await sendResetPasswordEmail({ to: user.email, resetLink });
