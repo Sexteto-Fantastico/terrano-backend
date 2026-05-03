@@ -2,6 +2,8 @@ FROM node:24.13.1-alpine3.22 AS build
 
 WORKDIR /app
 
+RUN apk add --no-cache python3 make g++
+
 COPY package*.json ./
 
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
