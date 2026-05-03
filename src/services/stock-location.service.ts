@@ -1,10 +1,13 @@
-import { CreateStockLocationDto, UpdateStockLocationDto, StockLocationResponseDto, toStockLocationResponseDto, toStockLocationResponseDtoList} from "../dtos/stock-location.dto";
+import {CreateStockLocationDto, UpdateStockLocationDto, StockLocationResponseDto, toStockLocationResponseDto, toStockLocationResponseDtoList} from "../dtos/stock-location.dto";
 import { NotFoundError } from "../errors/app-error";
 import * as StockLocationRepository from "../repositories/stock-location.repository";
+import * as AddressRepository from "../repositories/address.repository";
+import { SystemLogRepository } from "../repositories/system-log.repository";
+import { LogLevel } from "../infra/logger/logger.interface";
 
 async function getAllStockLocations(activeOnly: boolean = false): Promise<StockLocationResponseDto[]> {
-    const list = await StockLocationRepository.getAllStockLocations(activeOnly);
-    return toStockLocationResponseDtoList(list);
+    return await StockLocationRepository.getAllStockLocations(activeOnly)
+        .then(toStockLocationResponseDtoList);
 }
 
 async function getStockLocationById(id: number): Promise<StockLocationResponseDto> {
@@ -18,41 +21,169 @@ async function getStockLocationById(id: number): Promise<StockLocationResponseDt
 }
 
 async function createStockLocation(data: CreateStockLocationDto): Promise<StockLocationResponseDto> {
-    const saved = await StockLocationRepository.saveStockLocation(data);
-    return toStockLocationResponseDto(saved);
+    try {
+        const { address, ...stockLocationData } = data;
+
+        const saved = await StockLocationRepository.saveStockLocation(stockLocationData);
+
+        if (address) {
+            await AddressRepository.saveAddress({
+                ...address,
+                stock_location: saved
+            });
+        }
+
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Stock location created",
+            status_code: 201,
+            entity_name: "stock_location",
+            entity_id: saved.id,
+            action: "CREATE",
+            metadata: { ...data }
+        });
+
+        return toStockLocationResponseDto(saved);
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error creating stock location",
+            status_code: 500,
+            entity_name: "stock_location",
+            action: "CREATE",
+            metadata: { error: error.message, data: { ...data } }
+        });
+
+        throw error;
+    }
 }
 
 async function updateStockLocation(id: number, data: UpdateStockLocationDto): Promise<StockLocationResponseDto> {
-    const existing = await StockLocationRepository.getStockLocationById(id);
+    try {
+        const existing = await StockLocationRepository.getStockLocationById(id);
 
-    if (!existing) {
-        throw new NotFoundError("Stock location not found");
+        if (!existing) {
+            throw new NotFoundError("Stock location not found");
+        }
+
+        const { address, ...stockLocationData } = data;
+
+        const updated = Object.assign(existing, stockLocationData);
+        const saved = await StockLocationRepository.saveStockLocation(updated);
+
+        if (address) {
+            const addresses = await AddressRepository.getAllAddresses();
+            const existingAddress = addresses.find(
+                a => a.stock_location?.id === saved.id
+            );
+
+            if (existingAddress) {
+                const updatedAddress = Object.assign(existingAddress, address);
+                await AddressRepository.saveAddress(updatedAddress);
+            } else {
+                await AddressRepository.saveAddress({
+                    ...address,
+                    stock_location: saved
+                });
+            }
+        }
+
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Stock location updated",
+            status_code: 200,
+            entity_name: "stock_location",
+            entity_id: saved.id,
+            action: "UPDATE",
+            metadata: { ...data }
+        });
+
+        return toStockLocationResponseDto(saved);
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error updating stock location",
+            status_code: 500,
+            entity_name: "stock_location",
+            entity_id: id,
+            action: "UPDATE",
+            metadata: { error: error.message }
+        });
+
+        throw error;
     }
-
-    const updated = Object.assign(existing, data);
-    const saved = await StockLocationRepository.saveStockLocation(updated);
-
-    return toStockLocationResponseDto(saved);
 }
 
 async function deleteStockLocation(id: number): Promise<boolean> {
-    const success = await StockLocationRepository.deleteStockLocation(id);
+    try {
+        const existing = await StockLocationRepository.getStockLocationById(id);
 
-    if (!success) {
-        throw new NotFoundError("Stock location not found");
+        if (!existing) {
+            throw new NotFoundError("Stock location not found");
+        }
+
+        await StockLocationRepository.deleteStockLocation(id);
+
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Stock location deleted",
+            status_code: 200,
+            entity_name: "stock_location",
+            entity_id: id,
+            action: "DELETE"
+        });
+
+        return true;
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error deleting stock location",
+            status_code: 500,
+            entity_name: "stock_location",
+            entity_id: id,
+            action: "DELETE",
+            metadata: { error: error.message }
+        });
+
+        throw error;
     }
-
-    return true;
 }
 
 async function restoreStockLocation(id: number): Promise<StockLocationResponseDto> {
-    const restored = await StockLocationRepository.restoreStockLocation(id);
+    try {
+        const restored = await StockLocationRepository.restoreStockLocation(id);
 
-    if (!restored) {
-        throw new NotFoundError("Stock location not found or not deleted");
+        if (!restored) {
+            throw new NotFoundError("Stock location not found or not deleted");
+        }
+
+        await SystemLogRepository.save({
+            level: LogLevel.INFO,
+            message: "Stock location restored",
+            status_code: 200,
+            entity_name: "stock_location",
+            entity_id: restored.id,
+            action: "RESTORE"
+        });
+
+        return toStockLocationResponseDto(restored);
+
+    } catch (error: any) {
+        await SystemLogRepository.save({
+            level: LogLevel.ERROR,
+            message: "Error restoring stock location",
+            status_code: 500,
+            entity_name: "stock_location",
+            entity_id: id,
+            action: "RESTORE",
+            metadata: { error: error.message }
+        });
+
+        throw error;
     }
-
-    return toStockLocationResponseDto(restored);
 }
 
 export {getAllStockLocations, getStockLocationById, createStockLocation, updateStockLocation, deleteStockLocation, restoreStockLocation};

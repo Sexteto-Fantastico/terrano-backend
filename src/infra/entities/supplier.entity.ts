@@ -1,6 +1,8 @@
 import { Entity, Column, OneToMany } from "typeorm";
 import { PurchaseOrder } from "./purchase-order.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
+import { OneToOne } from "typeorm";
+import { Address } from "./address.entity";
 
 export interface ISupplier extends ITerranoBaseEntity {
     corporate_name: string;
@@ -31,6 +33,9 @@ export class Supplier extends TerranoBaseEntity implements ISupplier {
 
     @OneToMany(() => PurchaseOrder, (po) => po.supplier)
     purchase_orders: PurchaseOrder[];
+
+    @OneToOne(() => Address, (address) => address.supplier)
+    address: Address;
 
     constructor(supplier: ISupplier) {
         super(supplier);
