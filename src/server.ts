@@ -8,11 +8,11 @@ import productBrandRoutes from "./routes/product-brand.routes";
 import productRoutes from "./routes/product.routes";
 import departmentRoutes from "./routes/department.routes";
 import stockLocationRoutes from "./routes/stock-location.routes";
-import systemLogRoutes from "./routes/system-log.routes";
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
 import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
+import { requestContextMiddleware } from "./utils/request-context";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -21,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 setupSwagger(app);
+app.use(requestContextMiddleware);
 
 app.use(Endpoints.USERS.BASE, userRoutes);
 app.use(Endpoints.PRODUCT_CATEGORIES.BASE, productCategoryRoutes);
@@ -28,10 +29,10 @@ app.use(Endpoints.PRODUCT_BRANDS.BASE, productBrandRoutes);
 app.use(Endpoints.PRODUCTS.BASE, productRoutes);
 app.use(Endpoints.DEPARTMENTS.BASE, departmentRoutes);
 app.use(Endpoints.STOCK_LOCATIONS.BASE, stockLocationRoutes);
-app.use(Endpoints.LOGS.BASE, systemLogRoutes);
 
 
 app.use(globalErrorMiddleware);
+
 
 migrateDatabase()
     .then(() => {

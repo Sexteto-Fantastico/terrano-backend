@@ -1,12 +1,12 @@
 import { ILogger, LogEntry } from "./logger.interface";
-import { SystemLog } from "../entities/system-log.entity";
+import { ErrorLog } from "../entities/error-log.entity";
 import { AppDataSource } from "../config/data-source";
 
-const logRepository = AppDataSource.getRepository(SystemLog);
+const logRepository = AppDataSource.getRepository(ErrorLog);
 
 export class DatabaseLogger implements ILogger {
     log(entry: LogEntry): void {
-        const log = new SystemLog();
+        const log = new ErrorLog();
 
         log.level = entry.level;
         log.message = entry.message.substring(0, 1000);
