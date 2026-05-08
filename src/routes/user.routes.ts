@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser } from "../controllers/user.controller";
 import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
+import { getUserLogs } from "../controllers/system-log.controller";
 
 const router = Router();
 
@@ -123,6 +124,12 @@ router.get(Endpoints.USERS.GET_BY_ID, asyncHandler(getUserById));
  *       404:
  *         description: User not found
  */
+
+router.get(
+    "/:id/logs",
+    asyncHandler(getUserLogs)
+);
+
 router.put(Endpoints.USERS.CHANGE_PASSWORD, asyncHandler(changePassword));
 
 /**

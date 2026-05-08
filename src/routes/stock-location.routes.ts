@@ -7,6 +7,7 @@ import {
     deleteStockLocation,
     restoreStockLocation
 } from "../controllers/stock-location.controller";
+import { getStockLocationLogs } from "../controllers/system-log.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
 
@@ -161,6 +162,12 @@ router.get(Endpoints.STOCK_LOCATIONS.GET_BY_ID, asyncHandler(getStockLocationByI
  *       404:
  *         description: Stock location not found
  */
+
+router.get(
+    "/:id/logs",
+    asyncHandler(getStockLocationLogs)
+);
+
 router.put(Endpoints.STOCK_LOCATIONS.UPDATE, asyncHandler(updateStockLocation));
 
 /**

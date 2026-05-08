@@ -14,6 +14,7 @@ import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
 import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
+import { requestContextMiddleware } from "./utils/request-context";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(express.json());
 
 setupSwagger(app);
+app.use(requestContextMiddleware);
 
 app.use(Endpoints.AUTH.BASE, authRoutes);
 app.use(authMiddleware);
@@ -33,7 +35,9 @@ app.use(Endpoints.PRODUCTS.BASE, productRoutes);
 app.use(Endpoints.DEPARTMENTS.BASE, departmentRoutes);
 app.use(Endpoints.STOCK_LOCATIONS.BASE, stockLocationRoutes);
 
+
 app.use(globalErrorMiddleware);
+
 
 migrateDatabase()
     .then(() => {

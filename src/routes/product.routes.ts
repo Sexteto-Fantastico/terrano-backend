@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
+import { getProductLogs } from "../controllers/system-log.controller";
 import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct } from "../controllers/product.controller";
 
 const router = Router();
@@ -168,6 +169,12 @@ router.get(Endpoints.PRODUCTS.GET_BY_ID, asyncHandler(getProductById));
  *       404:
  *         description: Product not found
  */
+
+router.get(
+    "/:id/logs",
+    asyncHandler(getProductLogs)
+);
+
 router.put(Endpoints.PRODUCTS.UPDATE, asyncHandler(updateProduct));
 
 /**

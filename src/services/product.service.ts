@@ -2,6 +2,7 @@ import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO, t
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
+import { LogLevel } from "../infra/logger/logger.interface";
 
 async function getAllProducts(): Promise<ProductResponseDTO[]> {
     const allProducts = await ProductRepository.getAllProducts();
@@ -80,6 +81,7 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
                 throw new ConflictError("Product code already exists");
             }
         }
+
         existingProduct.code = data.code.trim();
     }
 
@@ -108,11 +110,14 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
 
 async function deleteProduct(id: number): Promise<boolean> {
     const product = await ProductRepository.getProductById(id);
+
     if (!product) {
         throw new NotFoundError("Product not found");
     }
 
-    return await ProductRepository.deleteProduct(id);
+    await ProductRepository.deleteProduct(id);
+
+    return true;
 }
 
 export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };
