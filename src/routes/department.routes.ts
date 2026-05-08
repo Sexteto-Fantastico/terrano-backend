@@ -27,12 +27,6 @@ const router = Router();
  *           type: string
  *         managerId:
  *           type: integer
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
  *         deletedAt:
  *           type: string
  *           format: date-time

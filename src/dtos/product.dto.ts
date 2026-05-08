@@ -8,7 +8,6 @@ export class ProductResponseDTO {
     description?: string;
     category: ProductCategoryResponseDTO;
     minStock?: number;
-    createdAt?: Date;
 }
 
 export class CreateProductRequestDTO {
@@ -36,6 +35,5 @@ export function toProductResponseDTO(entity: Product): ProductResponseDTO {
         description: entity.description,
         category: entity.category ? toProductCategoryResponseDTO(entity.category) : (undefined as any),
         minStock: entity.min_stock,
-        createdAt: entity.created_at,
     };
 }

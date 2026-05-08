@@ -29,12 +29,6 @@ const router = Router();
  *           type: string
  *           nullable: true
  *           description: Detailed description of the stock location
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
  *         deletedAt:
  *           type: string
  *           format: date-time

@@ -33,10 +33,6 @@ const router = Router();
  *         minStock:
  *           type: integer
  *           nullable: true
- *         createdAt:
- *           type: string
- *           format: date-time
- *           nullable: true
  *     CreateProductRequestDTO:
  *       type: object
  *       required:

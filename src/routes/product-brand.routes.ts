@@ -21,14 +21,6 @@ const router = Router();
  *         isActive:
  *           type: boolean
  *           description: Whether the brand is active
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Creation timestamp
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: Last update timestamp
  *         deletedAt:
  *           type: string
  *           format: date-time

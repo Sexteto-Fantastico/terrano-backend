@@ -15,8 +15,6 @@ export class DepartmentResponseDto {
     name: string;
     costCenterCode: string;
     managerId?: number;
-    createdAt: Date;
-    updatedAt: Date;
     deletedAt?: Date;
 }
 
@@ -25,8 +23,6 @@ export const toDepartmentResponseDto = (dept: any): DepartmentResponseDto => ({
     name: dept.name,
     costCenterCode: dept.cost_center_code,
     managerId: dept.manager?.id || dept.manager_id,
-    createdAt: dept.created_at,
-    updatedAt: dept.updated_at,
     deletedAt: dept.deleted_at,
 });
 
