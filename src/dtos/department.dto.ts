@@ -1,33 +1,33 @@
 export class CreateDepartmentDto {
     name: string;
-    cost_center_code: string;
-    manager_id: number;
+    costCenterCode: string;
+    managerId: number;
 }
 
 export class UpdateDepartmentDto {
     name?: string;
-    cost_center_code?: string;
-    manager_id?: number;
+    costCenterCode?: string;
+    managerId?: number;
 }
 
 export class DepartmentResponseDto {
     id: number;
     name: string;
-    cost_center_code: string;
-    manager_id: number;
-    created_at: Date;
-    updated_at: Date;
-    deleted_at?: Date;
+    costCenterCode: string;
+    managerId?: number;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
 }
 
 export const toDepartmentResponseDto = (dept: any): DepartmentResponseDto => ({
     id: dept.id,
     name: dept.name,
-    cost_center_code: dept.cost_center_code,
-    manager_id: dept.manager?.id,
-    created_at: dept.created_at,
-    updated_at: dept.updated_at,
-    deleted_at: dept.deleted_at,
+    costCenterCode: dept.cost_center_code,
+    managerId: dept.manager?.id || dept.manager_id,
+    createdAt: dept.created_at,
+    updatedAt: dept.updated_at,
+    deletedAt: dept.deleted_at,
 });
 
 export const toDepartmentResponseDtoList = (list: any[]) =>

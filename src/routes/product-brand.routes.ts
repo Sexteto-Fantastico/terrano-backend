@@ -18,11 +18,18 @@ const router = Router();
  *         name:
  *           type: string
  *           description: The name of the product brand
- *         description:
+ *         isActive:
+ *           type: boolean
+ *           description: Whether the brand is active
+ *         createdAt:
  *           type: string
- *           nullable: true
- *           description: Detailed description of the product brand
- *         deleted_at:
+ *           format: date-time
+ *           description: Creation timestamp
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Last update timestamp
+ *         deletedAt:
  *           type: string
  *           format: date-time
  *           nullable: true
@@ -35,18 +42,12 @@ const router = Router();
  *         name:
  *           type: string
  *           description: The name of the product brand
- *         description:
- *           type: string
- *           description: Detailed description of the product brand
  *     UpdateProductBrandDto:
  *       type: object
  *       properties:
  *         name:
  *           type: string
  *           description: The name of the product brand
- *         description:
- *           type: string
- *           description: Detailed description of the product brand
  */
 
 /**

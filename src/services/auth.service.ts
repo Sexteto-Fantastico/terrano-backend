@@ -16,7 +16,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 interface LoginResult {
     token: string;
     expiresAt: string;
-    must_reset_password: boolean;
+    mustResetPassword: boolean;
 }
 
 async function login(email: string, password: string): Promise<LoginResult> {
@@ -39,7 +39,7 @@ async function login(email: string, password: string): Promise<LoginResult> {
     return {
         token,
         expiresAt,
-        must_reset_password: !!user.requires_password_reset,
+        mustResetPassword: !!user.requires_password_reset,
     };
 }
 

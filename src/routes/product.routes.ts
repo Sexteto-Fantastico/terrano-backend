@@ -30,8 +30,12 @@ const router = Router();
  *           nullable: true
  *         category:
  *           $ref: '#/components/schemas/ProductCategoryResponseDTO'
- *         min_stock:
+ *         minStock:
  *           type: integer
+ *           nullable: true
+ *         createdAt:
+ *           type: string
+ *           format: date-time
  *           nullable: true
  *     CreateProductRequestDTO:
  *       type: object
@@ -48,7 +52,7 @@ const router = Router();
  *           type: string
  *         categoryId:
  *           type: integer
- *         min_stock:
+ *         minStock:
  *           type: integer
  *     ProductUpdateRequestDTO:
  *       type: object
@@ -63,7 +67,7 @@ const router = Router();
  *           type: string
  *         categoryId:
  *           type: integer
- *         min_stock:
+ *         minStock:
  *           type: integer
  */
 

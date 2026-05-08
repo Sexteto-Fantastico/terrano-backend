@@ -60,12 +60,12 @@ const options: swaggerJSDoc.Options = {
                         username: { type: "string" },
                         role: { $ref: "#/components/schemas/RoleDto" },
                         department: { $ref: "#/components/schemas/DepartmentDto" },
-                        managed_departments: {
+                        managedDepartments: {
                             type: "array",
                             items: { $ref: "#/components/schemas/DepartmentDto" },
                         },
-                        is_active: { type: "boolean" },
-                        requires_password_reset: { type: "boolean" },
+                        isActive: { type: "boolean" },
+                        requiresPasswordReset: { type: "boolean" },
                     },
                 },
                 LoginRequestDto: {
@@ -81,7 +81,7 @@ const options: swaggerJSDoc.Options = {
                     properties: {
                         token: { type: "string" },
                         expiresAt: { type: "string", format: "date-time" },
-                        must_reset_password: { type: "boolean" },
+                        mustResetPassword: { type: "boolean" },
                     },
                 },
                 ForgotPasswordRequestDto: {

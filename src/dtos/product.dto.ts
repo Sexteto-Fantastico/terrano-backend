@@ -1,4 +1,5 @@
-import { ProductCategoryResponseDTO } from "./product-category.dto";
+import { ProductCategoryResponseDTO, toProductCategoryResponseDTO } from "./product-category.dto";
+import { Product } from "../infra/entities/product.entity";
 
 export class ProductResponseDTO {
     id: number;
@@ -6,8 +7,8 @@ export class ProductResponseDTO {
     code: string;
     description?: string;
     category: ProductCategoryResponseDTO;
-    min_stock?: number;
-    created_at?: Date;
+    minStock?: number;
+    createdAt?: Date;
 }
 
 export class CreateProductRequestDTO {
@@ -15,7 +16,7 @@ export class CreateProductRequestDTO {
     code!: string;
     description?: string;
     categoryId!: number;
-    min_stock?: number;
+    minStock?: number;
 }
 
 export class ProductUpdateRequestDTO {
@@ -24,5 +25,17 @@ export class ProductUpdateRequestDTO {
     code?: string;
     description?: string;
     categoryId?: number;
-    min_stock?: number;
-};
+    minStock?: number;
+}
+
+export function toProductResponseDTO(entity: Product): ProductResponseDTO {
+    return {
+        id: entity.id,
+        name: entity.name,
+        code: entity.code,
+        description: entity.description,
+        category: entity.category ? toProductCategoryResponseDTO(entity.category) : (undefined as any),
+        minStock: entity.min_stock,
+        createdAt: entity.created_at,
+    };
+}

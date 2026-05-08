@@ -53,7 +53,7 @@ router.post(Endpoints.USERS.CREATE, asyncHandler(createUser));
  *           type: string
  *         description: Filter users by name
  *       - in: query
- *         name: only_active
+ *         name: onlyActive
  *         schema:
  *           type: boolean
  *         description: Filter only active users
