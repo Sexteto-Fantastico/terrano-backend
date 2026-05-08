@@ -2,10 +2,10 @@ import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO } 
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
+import { LogLevel } from "../infra/logger/logger.interface";
 
 async function getAllProducts(): Promise<ProductResponseDTO[]> {
-    const allProducts = await ProductRepository.getAllProducts();
-    return allProducts;
+    return await ProductRepository.getAllProducts();
 }
 
 async function getProductById(id: number): Promise<ProductResponseDTO> {
@@ -17,50 +17,33 @@ async function getProductById(id: number): Promise<ProductResponseDTO> {
 }
 
 async function createProduct(data: CreateProductRequestDTO): Promise<ProductResponseDTO> {
-    try {
-        if (!data.name || data.name.trim() === "") {
-            throw new BadRequestError("Product name is required");
-        }
-
-        if (!data.code || data.code.trim() === "") {
-            throw new BadRequestError("Product code is required");
-        }
-
-        const existingProduct = await ProductRepository.getProductByCode(data.code);
-        if (existingProduct) {
-            throw new ConflictError("Product code already exists");
-        }
-
-        if (!data.categoryId) {
-            throw new BadRequestError("Category ID is required");
-        }
-
-        const category = await getCategoryById(data.categoryId);
-        if (!category) {
-            throw new NotFoundError("Category not found");
-        }
-
-        if (data.min_stock !== undefined && data.min_stock < 0) {
-            throw new BadRequestError("Minimum stock cannot be negative");
-        }
-
-        const product = new (require("../infra/entities/product.entity").Product)({
-            name: data.name.trim(),
-            code: data.code.trim(),
-            description: data.description?.trim(),
-            category,
-            min_stock: data.min_stock,
-        });
-
-        return await ProductRepository.saveProduct(product);
-
-    } catch (error) {
-        if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ConflictError) {
-            throw error;
-        }
-        console.error("Error creating product:", error);
-        throw error;
+    if (!data.name || data.name.trim() === "") {
+        throw new BadRequestError("Product name is required");
     }
+
+    if (!data.code || data.code.trim() === "") {
+        throw new BadRequestError("Product code is required");
+    }
+
+    const existingProduct = await ProductRepository.getProductByCode(data.code);
+    if (existingProduct) {
+        throw new ConflictError("Product code already exists");
+    }
+
+    const category = await getCategoryById(data.categoryId);
+    if (!category) {
+        throw new NotFoundError("Category not found");
+    }
+
+    const product = new (require("../infra/entities/product.entity").Product)({
+        name: data.name.trim(),
+        code: data.code.trim(),
+        description: data.description?.trim(),
+        category,
+        min_stock: data.min_stock,
+    });
+
+    return await ProductRepository.saveProduct(product);
 }
 
 async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResponseDTO> {
@@ -88,6 +71,7 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
                 throw new ConflictError("Product code already exists");
             }
         }
+
         existingProduct.code = data.code.trim();
     }
 
@@ -110,16 +94,21 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
         existingProduct.min_stock = data.min_stock;
     }
 
-    return await ProductRepository.saveProduct(existingProduct);
+    const updatedProduct = await ProductRepository.saveProduct(existingProduct);
+
+    return updatedProduct;
 }
 
 async function deleteProduct(id: number): Promise<boolean> {
     const product = await ProductRepository.getProductById(id);
+
     if (!product) {
         throw new NotFoundError("Product not found");
     }
 
-    return await ProductRepository.deleteProduct(id);
+    await ProductRepository.deleteProduct(id);
+
+    return true;
 }
 
 export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };

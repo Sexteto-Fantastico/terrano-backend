@@ -50,4 +50,8 @@ export const Endpoints = {
         ...CRUD_ROUTES,
         RESTORE: "/:id/restore",
     },
+    LOGS: {
+        BASE: "/logs",
+        GET: "/"
+    }
 } as const;
