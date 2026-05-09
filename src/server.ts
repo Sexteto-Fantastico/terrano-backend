@@ -10,6 +10,7 @@ import productBrandRoutes from "./routes/product-brand.routes";
 import productRoutes from "./routes/product.routes";
 import departmentRoutes from "./routes/department.routes";
 import stockLocationRoutes from "./routes/stock-location.routes";
+import measurementUnitRoutes from "./routes/measurement-unit.routes";
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
@@ -34,6 +35,7 @@ app.use(Endpoints.PRODUCT_BRANDS.BASE, productBrandRoutes);
 app.use(Endpoints.PRODUCTS.BASE, productRoutes);
 app.use(Endpoints.DEPARTMENTS.BASE, departmentRoutes);
 app.use(Endpoints.STOCK_LOCATIONS.BASE, stockLocationRoutes);
+app.use(Endpoints.MEASUREMENT_UNITS.BASE, measurementUnitRoutes);
 
 
 app.use(globalErrorMiddleware);

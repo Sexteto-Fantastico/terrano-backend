@@ -3,7 +3,7 @@ import * as DepartmentService from "../services/department.service";
 import { CreateDepartmentDto, DepartmentResponseDto, UpdateDepartmentDto } from "../dtos/department.dto";
 
 async function getAllDepartments(
-    req: Request<{}, DepartmentResponseDto[], {}>, 
+    req: Request<DepartmentResponseDto[]>,
     res: Response<DepartmentResponseDto[]>
 ) {
     const activeOnly = req.query.activeOnly === 'true';
@@ -12,7 +12,7 @@ async function getAllDepartments(
 }
 
 async function getDepartmentById(
-    req: Request<{ id: string }, DepartmentResponseDto, {}>, 
+    req: Request<{ id: string }, DepartmentResponseDto>,
     res: Response<DepartmentResponseDto>
 ) {
     const id = Number(req.params.id);
@@ -21,7 +21,7 @@ async function getDepartmentById(
 }
 
 async function createDepartment(
-    req: Request<{}, DepartmentResponseDto, CreateDepartmentDto>, 
+    req: Request<DepartmentResponseDto, CreateDepartmentDto>,
     res: Response<DepartmentResponseDto>
 ) {
     const newDepartment = await DepartmentService.createDepartment(req.body);
@@ -29,7 +29,7 @@ async function createDepartment(
 }
 
 async function updateDepartment(
-    req: Request<{ id: string }, DepartmentResponseDto, UpdateDepartmentDto>, 
+    req: Request<{ id: string }, DepartmentResponseDto, UpdateDepartmentDto>,
     res: Response<DepartmentResponseDto>
 ) {
     const id = Number(req.params.id);
@@ -38,7 +38,7 @@ async function updateDepartment(
 }
 
 async function deleteDepartment(
-    req: Request<{ id: string }, {}, {}>, 
+    req: Request<{ id: string }>,
     res: Response<{ message: string }>
 ) {
     const id = Number(req.params.id);
@@ -47,7 +47,7 @@ async function deleteDepartment(
 }
 
 async function restoreDepartment(
-    req: Request<{ id: string }, DepartmentResponseDto, {}>, 
+    req: Request<{ id: string }, DepartmentResponseDto>,
     res: Response<DepartmentResponseDto>
 ) {
     const id = Number(req.params.id);

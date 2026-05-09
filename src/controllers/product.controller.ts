@@ -1,9 +1,17 @@
 import { Request, Response } from "express";
 import * as ProductService from "../services/product.service";
-import { CreateProductRequestDTO, ProductResponseDTO } from "../dtos/product.dto";
+import { CreateProductRequestDTO, ProductResponseDTO, ProductQueryDTO } from "../dtos/product.dto";
+import { parseBooleanQuery } from "../utils/query.util";
 
-async function getAllProducts(req: Request<{}, ProductResponseDTO[], {}>, res: Response<ProductResponseDTO[]>) {
-    const products = await ProductService.getAllProducts();
+async function getAllProducts(req: Request<{}, ProductResponseDTO[], {}, ProductQueryDTO>, res: Response<ProductResponseDTO[]>) {
+    const filters: ProductQueryDTO = {
+        name: req.query.name,
+        activeOnly: parseBooleanQuery(req.query.activeOnly),
+        brandId: req.query.brandId ? Number(req.query.brandId) : undefined,
+        categoryId: req.query.categoryId ? Number(req.query.categoryId) : undefined,
+        code: req.query.code,
+    };
+    const products = await ProductService.getAllProducts(filters);
     res.status(200).json(products);
 }
 
@@ -24,11 +32,17 @@ async function updateProduct(req: Request<{ id: string }, ProductResponseDTO, an
     res.status(200).json(updatedProduct);
 }
 
-async function deleteProduct(req: Request<{ id: string }, {}, {}>, res: Response<{ message: string }>) {
+async function deleteProduct(req: Request<{ id: string }>, res: Response<{ message: string }>) {
     const id = Number(req.params.id);
-    const deletedProduct = await ProductService.deleteProduct(id);
+    await ProductService.deleteProduct(id);
     res.status(200).json({ message: "Product deleted successfully" });
 }
 
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };
+async function restoreProduct(req: Request<{ id: string }, ProductResponseDTO>, res: Response<ProductResponseDTO>) {
+    const id = Number(req.params.id);
+    const restoredProduct = await ProductService.restoreProduct(id);
+    res.status(200).json(restoredProduct);
+}
+
+export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct };
 

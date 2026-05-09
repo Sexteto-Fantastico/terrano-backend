@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser } from "../controllers/user.controller";
+import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser } from "../controllers/user.controller";
 import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
 import { getUserLogs } from "../controllers/system-log.controller";
@@ -191,5 +191,41 @@ router.put(Endpoints.USERS.UPDATE, asyncHandler(updateUser));
  *         description: User not found
  */
 router.delete(Endpoints.USERS.DELETE, asyncHandler(deleteUser));
+
+/**
+ * @openapi
+ * /api/users/{id}/restore:
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Restore a deleted user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               updatedBy:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: User restored successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponseDto'
+ *       400:
+ *         description: User is not deleted
+ *       404:
+ *         description: User not found
+ */
+router.post(Endpoints.USERS.RESTORE, asyncHandler(restoreUser));
 
 export default router;

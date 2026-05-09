@@ -1,6 +1,8 @@
 import { AppDataSource } from "../infra/config/data-source";
 import { ProductCategory, IProductCategory } from "../infra/entities/product-category.entity";
 
+import { ILike } from "typeorm";
+
 const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
 
 async function createCategory(data: IProductCategory): Promise<ProductCategory> {
@@ -8,8 +10,16 @@ async function createCategory(data: IProductCategory): Promise<ProductCategory> 
     return await productCategoryRepository.save(category);
 }
 
-async function getAllCategories(activeOnly: boolean = false): Promise<ProductCategory[]> {
+async function getAllCategories(filters: { activeOnly?: boolean; name?: string }): Promise<ProductCategory[]> {
+    const { activeOnly = false, name } = filters;
+    const where: any = {};
+    
+    if (name) {
+        where.name = ILike(`%${name}%`);
+    }
+
     return await productCategoryRepository.find({
+        where,
         withDeleted: !activeOnly,
         relations: ["parent"],
     });

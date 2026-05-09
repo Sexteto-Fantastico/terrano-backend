@@ -57,7 +57,7 @@ export class DeleteUserRequestDto {
 
 export class GetUsersQueryDto {
     name?: string;
-    onlyActive?: string | boolean;
+    onlyActive?: boolean;
 }
 
 export class LoginRequestDto {

@@ -1,5 +1,15 @@
 import { ProductCategoryResponseDTO, toProductCategoryResponseDTO } from "./product-category.dto";
 import { Product } from "../infra/entities/product.entity";
+import { MeasurementUnitResponseDto, toMeasurementUnitResponseDto } from "./measurement-unit.dto";
+import { ProductBrandResponseDTO, toProductBrandResponseDTO } from "./product-brand.dto";
+
+export interface ProductQueryDTO {
+    name?: string;
+    activeOnly?: boolean;
+    brandId?: number;
+    categoryId?: number;
+    code?: string;
+}
 
 export class ProductResponseDTO {
     id: number;
@@ -7,7 +17,11 @@ export class ProductResponseDTO {
     code: string;
     description?: string;
     category: ProductCategoryResponseDTO;
+    measurementUnit: MeasurementUnitResponseDto;
+    brand: ProductBrandResponseDTO;
     minStock?: number;
+    maxStock?: number;
+    deletedAt: Date | null;
 }
 
 export class CreateProductRequestDTO {
@@ -15,7 +29,10 @@ export class CreateProductRequestDTO {
     code!: string;
     description?: string;
     categoryId!: number;
+    measurementUnitId!: number;
+    brandId!: number;
     minStock?: number;
+    maxStock?: number;
 }
 
 export class ProductUpdateRequestDTO {
@@ -24,7 +41,10 @@ export class ProductUpdateRequestDTO {
     code?: string;
     description?: string;
     categoryId?: number;
+    measurementUnitId?: number;
+    brandId?: number;
     minStock?: number;
+    maxStock?: number;
 }
 
 export function toProductResponseDTO(entity: Product): ProductResponseDTO {
@@ -33,7 +53,11 @@ export function toProductResponseDTO(entity: Product): ProductResponseDTO {
         name: entity.name,
         code: entity.code,
         description: entity.description,
-        category: entity.category ? toProductCategoryResponseDTO(entity.category) : (undefined as any),
+        category: toProductCategoryResponseDTO(entity.category),
+        measurementUnit: toMeasurementUnitResponseDto(entity.measurement_unit),
+        brand: toProductBrandResponseDTO(entity.brand),
         minStock: entity.min_stock,
+        maxStock: entity.max_stock,
+        deletedAt: entity.deleted_at ?? null,
     };
-}
+}
