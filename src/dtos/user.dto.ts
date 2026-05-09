@@ -17,9 +17,9 @@ export class UserResponseDto {
     username!: string;
     role?: RoleDto;
     department?: DepartmentDto;
-    managed_departments: DepartmentDto[] = [];
-    is_active!: boolean;
-    requires_password_reset?: boolean;
+    managedDepartments: DepartmentDto[] = [];
+    isActive!: boolean;
+    requiresPasswordReset?: boolean;
 }
 
 export class CreateUserRequestDto {
@@ -57,7 +57,7 @@ export class DeleteUserRequestDto {
 
 export class GetUsersQueryDto {
     name?: string;
-    only_active?: string | boolean;
+    onlyActive?: string | boolean;
 }
 
 export class LoginRequestDto {
@@ -68,7 +68,7 @@ export class LoginRequestDto {
 export class LoginResponseDto {
     token!: string;
     expiresAt!: string;
-    must_reset_password?: boolean;
+    mustResetPassword?: boolean;
 }
 
 export class ForgotPasswordRequestDto {

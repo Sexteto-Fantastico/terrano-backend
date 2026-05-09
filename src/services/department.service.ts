@@ -1,5 +1,3 @@
-import { User } from "../infra/entities/user.entity";
-import { AppDataSource } from "../infra/config/data-source";
 import {
     CreateDepartmentDto,
     UpdateDepartmentDto,
@@ -7,10 +5,9 @@ import {
     toDepartmentResponseDto,
     toDepartmentResponseDtoList,
 } from "../dtos/department.dto";
-import { NotFoundError } from "../errors/app-error";
+import { NotFoundError, BadRequestError } from "../errors/app-error";
 import * as DepartmentRepository from "../repositories/department.repository";
-
-const userRepository = AppDataSource.getRepository(User);
+import * as UserRepository from "../repositories/user.repository";
 
 async function getAllDepartments(activeOnly: boolean = false): Promise<DepartmentResponseDto[]> {
     const allDepartments = await DepartmentRepository.getAllDepartments(activeOnly);
@@ -26,30 +23,27 @@ async function getDepartmentById(id: number): Promise<DepartmentResponseDto> {
 }
 
 async function createDepartment(data: CreateDepartmentDto): Promise<DepartmentResponseDto> {
-    try {
-        const { manager_id, ...rest } = data;
+    const { managerId, costCenterCode, ...rest } = data;
 
-        if (!manager_id) {
-            throw new Error("Manager ID is required");
-        }
-
-        const manager = await userRepository.findOneBy({ id: manager_id });
-        
-        if (!manager) {
-            throw new NotFoundError("Manager not found");
-        }
-
-        const departmentData = {
-            ...rest,
-            manager,
-        };
-
-        const saved = await DepartmentRepository.saveDepartment(departmentData);
-        return toDepartmentResponseDto(saved);
-    } catch (error) {
-        console.error("Error creating department:", error);
-        throw error;
+    if (!managerId) {
+        throw new BadRequestError("Manager ID is required");
     }
+
+    const manager = await UserRepository.getUserById(managerId);
+    
+    if (!manager) {
+        throw new NotFoundError("Manager not found");
+    }
+
+    const departmentData = {
+        ...rest,
+        cost_center_code: costCenterCode,
+        manager_id: managerId,
+        manager,
+    };
+
+    const saved = await DepartmentRepository.saveDepartment(departmentData);
+    return toDepartmentResponseDto(saved);
 }
 
 async function updateDepartment(id: number, data: UpdateDepartmentDto): Promise<DepartmentResponseDto> {
@@ -59,16 +53,18 @@ async function updateDepartment(id: number, data: UpdateDepartmentDto): Promise<
         throw new NotFoundError("Department not found");
     }
 
-    if (data.manager_id) {
-        const manager = await userRepository.findOneBy({ id: data.manager_id });
+    if (data.managerId) {
+        const manager = await UserRepository.getUserById(data.managerId);
         if (!manager) {
             throw new NotFoundError("Manager not found");
         }
         existingDepartment.manager = manager;
     }
 
-    const updatedDepartment = Object.assign(existingDepartment, data);
-    const saved = await DepartmentRepository.saveDepartment(updatedDepartment);
+    if (data.name !== undefined) existingDepartment.name = data.name;
+    if (data.costCenterCode !== undefined) existingDepartment.cost_center_code = data.costCenterCode;
+
+    const saved = await DepartmentRepository.saveDepartment(existingDepartment);
     
     return toDepartmentResponseDto(saved);
 }

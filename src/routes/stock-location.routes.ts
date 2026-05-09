@@ -30,13 +30,7 @@ const router = Router();
  *           type: string
  *           nullable: true
  *           description: Detailed description of the stock location
- *         created_at:
- *           type: string
- *           format: date-time
- *         updated_at:
- *           type: string
- *           format: date-time
- *         deleted_at:
+ *         deletedAt:
  *           type: string
  *           format: date-time
  *           nullable: true

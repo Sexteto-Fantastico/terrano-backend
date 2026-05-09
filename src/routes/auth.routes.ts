@@ -2,6 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/async-handler";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { definePassword, forgotPassword, login, resetPassword } from "../controllers/auth.controller";
+import { Endpoints } from "../utils/constants/endpoints";
 
 const router = Router();
 
@@ -35,7 +36,7 @@ const router = Router();
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login", asyncHandler(login));
+router.post(Endpoints.AUTH.LOGIN, asyncHandler(login));
 
 /**
  * @openapi
@@ -54,7 +55,7 @@ router.post("/login", asyncHandler(login));
  *       200:
  *         description: Password reset email queued or logged
  */
-router.post("/forgot-password", asyncHandler(forgotPassword));
+router.post(Endpoints.AUTH.FORGOT_PASSWORD, asyncHandler(forgotPassword));
 
 /**
  * @openapi
@@ -75,7 +76,7 @@ router.post("/forgot-password", asyncHandler(forgotPassword));
  *       400:
  *         description: Invalid or expired reset token
  */
-router.post("/reset-password", asyncHandler(resetPassword));
+router.post(Endpoints.AUTH.RESET_PASSWORD, asyncHandler(resetPassword));
 
 /**
  * @openapi
@@ -98,6 +99,6 @@ router.post("/reset-password", asyncHandler(resetPassword));
  *       401:
  *         description: Unauthorized
  */
-router.post("/define-password", authMiddleware, asyncHandler(definePassword));
+router.post(Endpoints.AUTH.DEFINE_PASSWORD, authMiddleware, asyncHandler(definePassword));
 
 export default router;

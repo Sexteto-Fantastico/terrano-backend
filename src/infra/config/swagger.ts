@@ -16,137 +16,12 @@ const options: swaggerJSDoc.Options = {
                 description: "Local Development Server",
             },
         ],
-        tags: [
-            {
-                name: "Users",
-                description: "User management endpoints",
-            },
-            {
-                name: "Auth",
-                description: "Authentication and password reset endpoints",
-            },
-        ],
         components: {
             securitySchemes: {
                 bearerAuth: {
                     type: "http",
                     scheme: "bearer",
                     bearerFormat: "JWT",
-                },
-            },
-            schemas: {
-                RoleDto: {
-                    type: "object",
-                    properties: {
-                        id: { type: "number" },
-                        name: { type: "string" },
-                    },
-                },
-                DepartmentDto: {
-                    type: "object",
-                    properties: {
-                        id: { type: "number" },
-                        name: { type: "string" },
-                    },
-                },
-                UserResponseDto: {
-                    type: "object",
-                    properties: {
-                        id: { type: "number" },
-                        name: { type: "string" },
-                        phone: { type: "string" },
-                        cpf: { type: "string" },
-                        email: { type: "string" },
-                        username: { type: "string" },
-                        role: { $ref: "#/components/schemas/RoleDto" },
-                        department: { $ref: "#/components/schemas/DepartmentDto" },
-                        managed_departments: {
-                            type: "array",
-                            items: { $ref: "#/components/schemas/DepartmentDto" },
-                        },
-                        is_active: { type: "boolean" },
-                        requires_password_reset: { type: "boolean" },
-                    },
-                },
-                LoginRequestDto: {
-                    type: "object",
-                    required: ["email", "password"],
-                    properties: {
-                        email: { type: "string", format: "email" },
-                        password: { type: "string" },
-                    },
-                },
-                LoginResponseDto: {
-                    type: "object",
-                    properties: {
-                        token: { type: "string" },
-                        expiresAt: { type: "string", format: "date-time" },
-                        must_reset_password: { type: "boolean" },
-                    },
-                },
-                ForgotPasswordRequestDto: {
-                    type: "object",
-                    required: ["email"],
-                    properties: {
-                        email: { type: "string", format: "email" },
-                    },
-                },
-                ResetPasswordRequestDto: {
-                    type: "object",
-                    required: ["token", "password"],
-                    properties: {
-                        token: { type: "string" },
-                        password: { type: "string" },
-                    },
-                },
-                DefinePasswordRequestDto: {
-                    type: "object",
-                    required: ["password"],
-                    properties: {
-                        password: { type: "string" },
-                    },
-                },
-                CreateUserRequestDto: {
-                    type: "object",
-                    required: ["name", "email", "username", "password"],
-                    properties: {
-                        name: { type: "string" },
-                        phone: { type: "string" },
-                        cpf: { type: "string" },
-                        email: { type: "string" },
-                        username: { type: "string" },
-                        password: { type: "string" },
-                        roleId: { type: "number" },
-                        departmentId: { type: "number" },
-                        updatedBy: { type: "number" },
-                    },
-                },
-                UpdateUserRequestDto: {
-                    type: "object",
-                    properties: {
-                        name: { type: "string" },
-                        phone: { type: "string" },
-                        cpf: { type: "string" },
-                        email: { type: "string" },
-                        username: { type: "string" },
-                        roleId: { type: "number" },
-                        departmentId: { type: "number" },
-                        updatedBy: { type: "number" },
-                    },
-                },
-                ChangePasswordRequestDto: {
-                    type: "object",
-                    required: ["password"],
-                    properties: {
-                        password: { type: "string" },
-                        updatedBy: { type: "number" },
-                    },
-                },
-                DeleteUserRequestDto: {
-                    type: "object",
-                    properties: {
-                        updatedBy: { type: "number" },
-                    },
                 },
             },
         },
@@ -160,9 +35,11 @@ const options: swaggerJSDoc.Options = {
         "./src/routes/*.{ts,js}",
         "./src/controllers/*.{ts,js}",
         "./src/entities/*.{ts,js}",
+        "./src/dtos/*.{ts,js}",
         "./dist/routes/*.{ts,js}",
         "./dist/controllers/*.{ts,js}",
-        "./dist/entities/*.{ts,js}"
+        "./dist/entities/*.{ts,js}",
+        "./dist/dtos/*.{ts,js}",
     ], // Path to the API specs
 };
 

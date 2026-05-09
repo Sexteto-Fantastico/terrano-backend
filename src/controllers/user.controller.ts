@@ -17,7 +17,7 @@ async function createUser(req: Request<{}, UserResponseDto, CreateUserRequestDto
 async function getUsers(req: Request<{}, UserResponseDto[], {}, GetUsersQueryDto>, res: Response<UserResponseDto[]>) {
         const users = await UserService.getUsers({
             name: req.query.name ? String(req.query.name) : undefined,
-            only_active: req.query.only_active === "true" ? true : undefined,
+            onlyActive: req.query.onlyActive === "true" || req.query.onlyActive === true ? true : undefined,
         });
         res.json(users);
     }

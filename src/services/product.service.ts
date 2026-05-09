@@ -1,11 +1,12 @@
-import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO } from "../dtos/product.dto";
+import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO, toProductResponseDTO } from "../dtos/product.dto";
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
 import { LogLevel } from "../infra/logger/logger.interface";
 
 async function getAllProducts(): Promise<ProductResponseDTO[]> {
-    return await ProductRepository.getAllProducts();
+    const allProducts = await ProductRepository.getAllProducts();
+    return allProducts.map(toProductResponseDTO);
 }
 
 async function getProductById(id: number): Promise<ProductResponseDTO> {
@@ -13,7 +14,7 @@ async function getProductById(id: number): Promise<ProductResponseDTO> {
     if (!product) {
         throw new NotFoundError("Product not found");
     }
-    return product;
+    return toProductResponseDTO(product);
 }
 
 async function createProduct(data: CreateProductRequestDTO): Promise<ProductResponseDTO> {
@@ -30,9 +31,17 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
         throw new ConflictError("Product code already exists");
     }
 
+    if (!data.categoryId) {
+        throw new BadRequestError("Category ID is required");
+    }
+
     const category = await getCategoryById(data.categoryId);
     if (!category) {
         throw new NotFoundError("Category not found");
+    }
+
+    if (data.minStock !== undefined && data.minStock < 0) {
+        throw new BadRequestError("Minimum stock cannot be negative");
     }
 
     const product = new (require("../infra/entities/product.entity").Product)({
@@ -40,10 +49,11 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
         code: data.code.trim(),
         description: data.description?.trim(),
         category,
-        min_stock: data.min_stock,
+        min_stock: data.minStock,
     });
 
-    return await ProductRepository.saveProduct(product);
+    const savedProduct = await ProductRepository.saveProduct(product);
+    return toProductResponseDTO(savedProduct);
 }
 
 async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResponseDTO> {
@@ -87,16 +97,15 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
         existingProduct.category = category;
     }
 
-    if (data.min_stock !== undefined) {
-        if (data.min_stock < 0) {
+    if (data.minStock !== undefined) {
+        if (data.minStock < 0) {
             throw new BadRequestError("Minimum stock cannot be negative");
         }
-        existingProduct.min_stock = data.min_stock;
+        existingProduct.min_stock = data.minStock;
     }
 
     const updatedProduct = await ProductRepository.saveProduct(existingProduct);
-
-    return updatedProduct;
+    return toProductResponseDTO(updatedProduct);
 }
 
 async function deleteProduct(id: number): Promise<boolean> {
