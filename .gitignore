@@ -40,3 +40,5 @@ nodejs-sample-kubernetes.yaml
 !tailwind.config.js
 !postcss.config.js
 !tsconfig.json
+
+database.sqlite
