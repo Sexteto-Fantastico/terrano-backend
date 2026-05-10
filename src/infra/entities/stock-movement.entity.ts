@@ -33,7 +33,7 @@ export class StockMovement extends TerranoBaseEntity implements IStockMovement {
     @ManyToOne(() => StockLocation, (location) => location.stock_movements)
     location: StockLocation;
 
-    @Column({ type: "enum", enum: MovementType })
+    @Column({ type: "simple-enum", enum: MovementType })
     movement_type: MovementType;
 
     @ManyToOne(() => PurchaseOrder, (po) => po.stock_movements, { nullable: true })
@@ -45,7 +45,7 @@ export class StockMovement extends TerranoBaseEntity implements IStockMovement {
     @Column({ type: "int" })
     quantity: number;
 
-    @Column({ type: "decimal", precision: 10, scale: 4 })
+    @Column({ type: "real" })
     unit_cost: number;
 
     constructor(movement: IStockMovement) {
