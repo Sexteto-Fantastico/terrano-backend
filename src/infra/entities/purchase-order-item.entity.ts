@@ -26,10 +26,10 @@ export class PurchaseOrderItem extends TerranoBaseEntity implements IPurchaseOrd
     @Column({ type: "int" })
     quantity: number;
 
-    @Column({ type: "decimal", precision: 10, scale: 2 })
+    @Column({ type: "real" })
     unit_price: number;
 
-    @Column({ type: "decimal", precision: 10, scale: 2 })
+    @Column({ type: "real" })
     subtotal: number;
 
     constructor(item: IPurchaseOrderItem) {

@@ -25,7 +25,7 @@ export class Department extends TerranoBaseEntity implements IDepartment {
     @Column({ type: "varchar", name: "cost_center_code", length: 50 })
     cost_center_code: string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: "manager_id" })
     manager: User;
 
