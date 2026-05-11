@@ -40,7 +40,7 @@ export class StockRequisition extends TerranoBaseEntity implements IStockRequisi
     company_name: string;
 
     @Column({
-        type: "enum",
+        type: "simple-enum",
         enum: RequisitionStatus,
         default: RequisitionStatus.PENDING
     })
@@ -49,7 +49,7 @@ export class StockRequisition extends TerranoBaseEntity implements IStockRequisi
     @Column({ name: "declared_at", type: "date" })
     declared_at: Date;
 
-    @Column({ name: "total_value", type: "decimal", precision: 10, scale: 2, default: 0 })
+    @Column({ name: "total_value", type: "real", default: 0 })
     total_value: number;
 
     @ManyToOne(() => Department)

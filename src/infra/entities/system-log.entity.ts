@@ -24,7 +24,7 @@ export class SystemLog extends TerranoBaseEntity implements ISystemLog {
     @Column({ name: "user_id", type: "int", nullable: true })
     user_id?: number;
 
-    @Column({ type: "json", nullable: true })
+    @Column({ type: "simple-json", nullable: true })
     metadata?: Record<string, unknown>;
 
     constructor(data: ISystemLog) {

@@ -1,12 +1,20 @@
 import { AppDataSource } from "./data-source";
-import { ensureDatabaseExists } from "./ensure-database";
+import { createAdminSeed } from "../seeds/admin.seed";
 
 export async function migrateDatabase(): Promise<void> {
-    await ensureDatabaseExists();
-    await AppDataSource.initialize();
+    try {
+        await AppDataSource.initialize();
 
-    console.log("Database connected successfully");
-    console.log("Running migrations...");
-    await AppDataSource.runMigrations();
-    console.log("Migrations executed successfully");
+        console.log("Database connected successfully");
+        console.log("Running migrations...");
+
+        await AppDataSource.runMigrations();
+
+        console.log("Migrations executed successfully");
+
+        await createAdminSeed();
+    } catch (err) {
+        console.error("Migration error:", err);
+        throw err;
+    }
 }

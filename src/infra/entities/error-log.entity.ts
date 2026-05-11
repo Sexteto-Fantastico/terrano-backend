@@ -14,7 +14,7 @@ export class ErrorLog extends BaseEntity {
     id: number;
 
     @Column({
-        type: "enum",
+        type: "simple-enum",
         enum: LogLevel,
     })
     level: LogLevel;
@@ -37,7 +37,7 @@ export class ErrorLog extends BaseEntity {
     @Column({ type: "varchar", length: 10, nullable: true })
     method?: string;
 
-    @Column({ type: "json", nullable: true })
+    @Column({ type: "simple-json", nullable: true })
     metadata?: Record<string, unknown>;
 
     @CreateDateColumn({ name: "created_at" })

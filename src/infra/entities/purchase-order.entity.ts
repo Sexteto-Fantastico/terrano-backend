@@ -38,7 +38,7 @@ export class PurchaseOrder extends TerranoBaseEntity implements IPurchaseOrder {
     order_date: Date;
 
     @Column({
-        type: "enum",
+        type: "simple-enum",
         enum: PurchaseOrderStatus,
         default: PurchaseOrderStatus.DRAFT
     })
@@ -48,7 +48,7 @@ export class PurchaseOrder extends TerranoBaseEntity implements IPurchaseOrder {
     @JoinColumn({ name: "supplier_id" })
     supplier: Supplier;
 
-    @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+    @Column({ type: "real", default: 0 })
     total: number;
 
     @OneToMany(() => PurchaseOrderItem, (item) => item.purchase_order)
