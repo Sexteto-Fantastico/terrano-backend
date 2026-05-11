@@ -3,11 +3,31 @@ import { StockLocation } from "../infra/entities/stock-location.entity";
 export class CreateStockLocationDto {
     name: string;
     description?: string;
+
+    address?: {
+        street: string;
+        number: string;
+        neighborhood: string;
+        city: string;
+        state: string;
+        country: string;
+        complement?: string;
+    };
 }
 
 export class UpdateStockLocationDto {
     name?: string;
     description?: string;
+
+    address?: {
+        street?: string;
+        number?: string;
+        neighborhood?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+        complement?: string;
+    };
 }
 
 export class StockLocationResponseDto {

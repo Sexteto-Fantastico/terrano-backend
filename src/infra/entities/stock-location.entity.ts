@@ -6,6 +6,8 @@ import {
 import { StockMovement } from "./stock-movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
+import { OneToOne } from "typeorm";
+import { Address } from "./address.entity";
 
 export interface IStockLocation extends ITerranoBaseEntity {
     name: string;
@@ -28,6 +30,9 @@ export class StockLocation extends TerranoBaseEntity implements IStockLocation {
 
     @OneToMany(() => StockMovement, (movement) => movement.location)
     stock_movements: StockMovement[];
+
+    @OneToOne(() => Address, (address) => address.stock_location)
+    address: Address;
 
     constructor(location: IStockLocation) {
         super(location);
