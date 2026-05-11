@@ -9,6 +9,13 @@ const CRUD_ROUTES = {
 export const API_PREFIX = "/api" as const;
 
 export const Endpoints = {
+    AUTH: {
+        BASE: `${API_PREFIX}/auth`,
+        LOGIN: "/login",
+        FORGOT_PASSWORD: "/forgot-password",
+        RESET_PASSWORD: "/reset-password",
+        DEFINE_PASSWORD: "/define-password",
+    },
     USERS: {
         BASE: `${API_PREFIX}/users`,
         ...CRUD_ROUTES,

@@ -23,17 +23,11 @@ const router = Router();
  *           type: integer
  *         name:
  *           type: string
- *         cost_center_code:
+ *         costCenterCode:
  *           type: string
- *         manager_id:
+ *         managerId:
  *           type: integer
- *         created_at:
- *           type: string
- *           format: date-time
- *         updated_at:
- *           type: string
- *           format: date-time
- *         deleted_at:
+ *         deletedAt:
  *           type: string
  *           format: date-time
  *           nullable: true
@@ -41,23 +35,23 @@ const router = Router();
  *       type: object
  *       required:
  *         - name
- *         - cost_center_code
- *         - manager_id
+ *         - costCenterCode
+ *         - managerId
  *       properties:
  *         name:
  *           type: string
- *         cost_center_code:
+ *         costCenterCode:
  *           type: string
- *         manager_id:
+ *         managerId:
  *           type: integer
  *     UpdateDepartmentDto:
  *       type: object
  *       properties:
  *         name:
  *           type: string
- *         cost_center_code:
+ *         costCenterCode:
  *           type: string
- *         manager_id:
+ *         managerId:
  *           type: integer
  */
 

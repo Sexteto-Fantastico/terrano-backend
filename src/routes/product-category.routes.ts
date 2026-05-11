@@ -22,7 +22,7 @@ const router = Router();
  *           type: string
  *           nullable: true
  *           description: Description of the parent category
- *         deleted_at:
+ *         deletedAt:
  *           type: string
  *           format: date-time
  *           nullable: true
@@ -40,7 +40,7 @@ const router = Router();
  *           type: string
  *           nullable: true
  *           description: Detailed description of the product category
- *         deleted_at:
+ *         deletedAt:
  *           type: string
  *           format: date-time
  *           nullable: true
@@ -61,7 +61,7 @@ const router = Router();
  *         description:
  *           type: string
  *           description: Detailed description of the product category
- *         parent_id:
+ *         parentId:
  *           type: integer
  *           description: The id of the parent category (optional)
  *     UpdateProductCategoryDto:
@@ -73,7 +73,7 @@ const router = Router();
  *         description:
  *           type: string
  *           description: Detailed description of the product category
- *         parent_id:
+ *         parentId:
  *           type: integer
  *           nullable: true
  *           description: The id of the parent category (null to remove parent)

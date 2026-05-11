@@ -9,7 +9,12 @@ import {
 import * as ProductCategoryRepository from "../repositories/product-category.repository";
 
 async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCategoryResponseDTO> {
-    const category = await ProductCategoryRepository.createCategory(data as IProductCategory);
+    const entityData: IProductCategory = {
+        name: data.name,
+        description: data.description,
+        parent_id: data.parentId,
+    };
+    const category = await ProductCategoryRepository.createCategory(entityData);
     const loaded = await ProductCategoryRepository.getCategoryById(category.id);
     return toProductCategoryResponseDTO(loaded!);
 }
@@ -29,7 +34,17 @@ async function updateCategory(id: number, data: UpdateProductCategoryDTO): Promi
     const category = await ProductCategoryRepository.getCategoryById(id, true);
     if (!category) return null;
 
-    Object.assign(category, data);
+    if (data.name !== undefined) category.name = data.name;
+    if (data.description !== undefined) category.description = data.description;
+    if (data.parentId !== undefined) {
+        if (data.parentId === null) {
+            category.parent_id = null as any;
+            category.parent = null as any;
+        } else {
+            category.parent_id = data.parentId;
+        }
+    }
+
     await ProductCategoryRepository.updateCategory(category);
 
     const loaded = await ProductCategoryRepository.getCategoryById(id, true);

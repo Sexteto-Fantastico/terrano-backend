@@ -29,11 +29,12 @@ function sanitizeUser(user: User): UserResponseDto {
             id: user.department.id,
             name: user.department.name,
         },
-        managed_departments: (user.managed_departments ?? []).map((dept) => ({
+        managedDepartments: (user.managed_departments ?? []).map((dept) => ({
             id: dept.id,
             name: dept.name,
         })),
-        is_active: user.is_active,
+        isActive: user.is_active,
+        requiresPasswordReset: user.requires_password_reset,
     };
 }
 
@@ -100,6 +101,7 @@ async function createUser(request: CreateUserRequestDto): Promise<UserResponseDt
         password: hashPassword(request.password),
         role,
         department,
+        requires_password_reset: request.requiresPasswordReset ?? false,
         updated_by: request.updatedBy,
         is_active: true,
     });
@@ -110,7 +112,7 @@ async function createUser(request: CreateUserRequestDto): Promise<UserResponseDt
 
 async function getUsers(filters: GetUsersQueryDto): Promise<UserResponseDto[]> {
     const users = await getAllUsers({
-        onlyActive: filters.only_active === true,
+        onlyActive: filters.onlyActive === true,
         name: filters.name,
     });
 
@@ -210,6 +212,9 @@ async function changePassword(id: number, request: ChangePasswordRequestDto): Pr
     }
 
     user.password = hashPassword(request.password);
+    user.requires_password_reset = false;
+    user.password_reset_token = undefined;
+    user.password_reset_token_expires_at = undefined;
     if (request.updatedBy !== undefined) {
         user.updated_by = request.updatedBy;
     }

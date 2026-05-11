@@ -17,8 +17,9 @@ export class UserResponseDto {
     username!: string;
     role?: RoleDto;
     department?: DepartmentDto;
-    managed_departments: DepartmentDto[] = [];
-    is_active!: boolean;
+    managedDepartments: DepartmentDto[] = [];
+    isActive!: boolean;
+    requiresPasswordReset?: boolean;
 }
 
 export class CreateUserRequestDto {
@@ -30,6 +31,7 @@ export class CreateUserRequestDto {
     password!: string;
     roleId?: number;
     departmentId?: number;
+    requiresPasswordReset?: boolean;
     updatedBy?: number;
 }
 
@@ -55,5 +57,29 @@ export class DeleteUserRequestDto {
 
 export class GetUsersQueryDto {
     name?: string;
-    only_active?: string | boolean;
+    onlyActive?: string | boolean;
+}
+
+export class LoginRequestDto {
+    email!: string;
+    password!: string;
+}
+
+export class LoginResponseDto {
+    token!: string;
+    expiresAt!: string;
+    mustResetPassword?: boolean;
+}
+
+export class ForgotPasswordRequestDto {
+    email!: string;
+}
+
+export class ResetPasswordRequestDto {
+    token!: string;
+    password!: string;
+}
+
+export class DefinePasswordRequestDto {
+    password!: string;
 }

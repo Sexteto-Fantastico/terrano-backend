@@ -1,19 +1,44 @@
-
 import { Request, Response } from "express";
-import { SystemLogService } from "../services/system-log.service";
+import * as SystemLogService from "../services/system-log.service";
 
-const service = new SystemLogService();
+export async function getUserLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
 
-export class SystemLogController {
+    const logs = await SystemLogService.getEntityLogs(
+        "user",
+        id
+    );
 
-    async getLogs(req: Request, res: Response) {
-        const { entity, entityId } = req.query;
+    return res.status(200).json(logs);
+}
 
-        const logs = await service.getLogs(
-            entity as string,
-            entityId ? Number(entityId) : undefined
-        );
+export async function getProductLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
 
-        return res.json(logs);
-    }
+    const logs = await SystemLogService.getEntityLogs(
+        "product",
+        id
+    );
+
+    return res.status(200).json(logs);
+}
+
+export async function getStockLocationLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
+
+    const logs = await SystemLogService.getEntityLogs(
+        "stock_location",
+        id
+    );
+
+    return res.status(200).json(logs);
 }
