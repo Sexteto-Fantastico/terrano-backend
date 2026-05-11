@@ -145,11 +145,17 @@ router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, asyncHandler(createProductCateg
  *     tags: [Product Categories]
  *     parameters:
  *       - in: query
- *         name: active
+ *         name: activeOnly
  *         schema:
  *           type: boolean
  *         required: false
  *         description: If true, returns only active (non-deleted) categories
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter categories by name (partial match)
  *     responses:
  *       200:
  *         description: The list of product categories

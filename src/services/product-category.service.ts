@@ -19,8 +19,8 @@ async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCa
     return toProductCategoryResponseDTO(loaded!);
 }
 
-async function getAllCategories(activeOnly: boolean = false): Promise<ProductCategoryResponseDTO[]> {
-    const categories = await ProductCategoryRepository.getAllCategories(activeOnly);
+async function getAllCategories(filters: { activeOnly?: boolean; name?: string }): Promise<ProductCategoryResponseDTO[]> {
+    const categories = await ProductCategoryRepository.getAllCategories(filters);
     return toProductCategoryResponseDTOList(categories);
 }
 

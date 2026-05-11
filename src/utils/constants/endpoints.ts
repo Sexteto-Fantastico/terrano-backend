@@ -19,6 +19,7 @@ export const Endpoints = {
     USERS: {
         BASE: `${API_PREFIX}/users`,
         ...CRUD_ROUTES,
+        RESTORE: "/:id/restore",
         CHANGE_PASSWORD: "/:id/password",
     },
 
@@ -31,6 +32,7 @@ export const Endpoints = {
     PRODUCTS: {
         BASE: `${API_PREFIX}/products`,
         ...CRUD_ROUTES,
+        RESTORE: "/:id/restore",
     },
 
     PRODUCT_BRANDS: {
@@ -53,5 +55,10 @@ export const Endpoints = {
     LOGS: {
         BASE: "/logs",
         GET: "/"
-    }
+    },
+    MEASUREMENT_UNITS: {
+        BASE: `${API_PREFIX}/measurement-units`,
+        ...CRUD_ROUTES,
+        RESTORE: "/:id/restore",
+    },
 } as const;

@@ -238,4 +238,23 @@ async function deleteUser(id: number, updatedBy?: number): Promise<UserResponseD
     return sanitizeUser(user);
 }
 
-export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser };
+async function restoreUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
+    const user = await repoGetUserById(id, true);
+    if (!user) {
+        throw new NotFoundError("User not found.");
+    }
+
+    if (user.is_active) {
+        throw new BadRequestError("User is not deleted.");
+    }
+
+    user.is_active = true;
+    if (updatedBy !== undefined) {
+        user.updated_by = updatedBy;
+    }
+
+    await repoUpdateUser(user);
+    return sanitizeUser(user);
+}
+
+export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser };

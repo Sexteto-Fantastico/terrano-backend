@@ -1,10 +1,12 @@
 import { AppDataSource } from "../infra/config/data-source";
 import { Product } from "../infra/entities/product.entity";
+import { FindOptionsWhere, ILike } from "typeorm";
+import { ProductQueryDTO } from "../dtos/product.dto";
 
 const productRepository = AppDataSource.getRepository(Product);
 
-async function getProductById(id: number): Promise<Product | null> {
-    return productRepository.findOne({ where: { id: id }, relations: ["category"] });
+async function getProductById(id: number, withDeleted = false): Promise<Product | null> {
+    return productRepository.findOne({ where: { id: id }, relations: ["category", "measurement_unit", "brand"], withDeleted });
 }
 
 async function getProductByCode(code: string): Promise<Product | null> {
@@ -16,12 +18,30 @@ async function saveProduct(product: Product): Promise<Product> {
 }
 
 async function deleteProduct(id: number): Promise<boolean> {
-    const result = await productRepository.delete(id);
+    const result = await productRepository.softDelete(id);
     return result.affected !== 0;
 }
 
-async function getAllProducts(): Promise<Product[]> {
-    return await productRepository.find({ relations: ["category"] });
+async function restoreProduct(id: number): Promise<boolean> {
+    const result = await productRepository.restore(id);
+    return result.affected !== 0;
 }
 
-export { getProductById, getProductByCode, saveProduct, deleteProduct, getAllProducts };
+async function getAllProducts(filters: ProductQueryDTO = {}): Promise<Product[]> {
+    const { name, activeOnly = true, brandId, categoryId, code } = filters;
+    const where: FindOptionsWhere<Product> = {};
+
+    if (name) where.name = ILike(`%${name}%`);
+    if (code) where.code = ILike(`%${code}%`);
+    if (brandId) where.brand_id = brandId;
+    if (categoryId) where.category_id = categoryId;
+
+    return await productRepository.find({
+        where,
+        relations: ["category", "measurement_unit", "brand"],
+        withDeleted: !activeOnly,
+        order: { name: "ASC" }
+    });
+}
+
+export { getProductById, getProductByCode, saveProduct, deleteProduct, restoreProduct, getAllProducts };

@@ -1,16 +1,17 @@
-import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO, toProductResponseDTO } from "../dtos/product.dto";
+import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO, toProductResponseDTO, ProductQueryDTO } from "../dtos/product.dto";
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
-import { LogLevel } from "../infra/logger/logger.interface";
+import { findMeasurementUnitById } from "../repositories/measurement-unit.repository";
+import { getBrandById } from "../repositories/product-brand.repository";
 
-async function getAllProducts(): Promise<ProductResponseDTO[]> {
-    const allProducts = await ProductRepository.getAllProducts();
+async function getAllProducts(filters: ProductQueryDTO = {}): Promise<ProductResponseDTO[]> {
+    const allProducts = await ProductRepository.getAllProducts(filters);
     return allProducts.map(toProductResponseDTO);
 }
 
 async function getProductById(id: number): Promise<ProductResponseDTO> {
-    const product = await ProductRepository.getProductById(id);
+    const product = await ProductRepository.getProductById(id, false);
     if (!product) {
         throw new NotFoundError("Product not found");
     }
@@ -35,6 +36,15 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
         throw new BadRequestError("Category ID is required");
     }
 
+    if (!data.measurementUnitId) {
+        throw new BadRequestError("Measurement Unit ID is required");
+    }
+
+    const measurementUnit = await findMeasurementUnitById(data.measurementUnitId);
+    if (!measurementUnit) {
+        throw new NotFoundError("Measurement Unit not found");
+    }
+
     const category = await getCategoryById(data.categoryId);
     if (!category) {
         throw new NotFoundError("Category not found");
@@ -44,12 +54,28 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
         throw new BadRequestError("Minimum stock cannot be negative");
     }
 
+    if (data.maxStock !== undefined && data.maxStock < 0) {
+        throw new BadRequestError("Maximum stock cannot be negative");
+    }
+
+    if (!data.brandId) {
+        throw new BadRequestError("Brand ID is required");
+    }
+
+    const brand = await getBrandById(data.brandId);
+    if (!brand) {
+        throw new NotFoundError("Brand not found");
+    }
+
     const product = new (require("../infra/entities/product.entity").Product)({
         name: data.name.trim(),
         code: data.code.trim(),
         description: data.description?.trim(),
+        measurement_unit: measurementUnit,
         category,
+        brand,
         min_stock: data.minStock,
+        max_stock: data.maxStock,
     });
 
     const savedProduct = await ProductRepository.saveProduct(product);
@@ -57,7 +83,7 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
 }
 
 async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResponseDTO> {
-    const existingProduct = await ProductRepository.getProductById(data.id);
+    const existingProduct = await ProductRepository.getProductById(data.id, false);
 
     if (!existingProduct) {
         throw new NotFoundError("Product not found");
@@ -97,6 +123,22 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
         existingProduct.category = category;
     }
 
+    if (data.measurementUnitId !== undefined) {
+        const measurementUnit = await findMeasurementUnitById(data.measurementUnitId);
+        if (!measurementUnit) {
+            throw new NotFoundError("Measurement Unit not found");
+        }
+        existingProduct.measurement_unit = measurementUnit;
+    }
+
+    if (data.brandId !== undefined) {
+        const brand = await getBrandById(data.brandId);
+        if (!brand) {
+            throw new NotFoundError("Brand not found");
+        }
+        existingProduct.brand = brand;
+    }
+
     if (data.minStock !== undefined) {
         if (data.minStock < 0) {
             throw new BadRequestError("Minimum stock cannot be negative");
@@ -104,12 +146,19 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
         existingProduct.min_stock = data.minStock;
     }
 
+    if (data.maxStock !== undefined) {
+        if (data.maxStock < 0) {
+            throw new BadRequestError("Maximum stock cannot be negative");
+        }
+        existingProduct.max_stock = data.maxStock;
+    }
+
     const updatedProduct = await ProductRepository.saveProduct(existingProduct);
     return toProductResponseDTO(updatedProduct);
 }
 
 async function deleteProduct(id: number): Promise<boolean> {
-    const product = await ProductRepository.getProductById(id);
+    const product = await ProductRepository.getProductById(id, false);
 
     if (!product) {
         throw new NotFoundError("Product not found");
@@ -120,4 +169,21 @@ async function deleteProduct(id: number): Promise<boolean> {
     return true;
 }
 
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };
+async function restoreProduct(id: number): Promise<ProductResponseDTO> {
+    const product = await ProductRepository.getProductById(id, true);
+
+    if (!product) {
+        throw new NotFoundError("Product not found");
+    }
+
+    if (!product.deleted_at) {
+        throw new BadRequestError("Product is not deleted");
+    }
+
+    await ProductRepository.restoreProduct(id);
+
+    const restoredProduct = await ProductRepository.getProductById(id, true);
+    return toProductResponseDTO(restoredProduct!);
+}
+
+export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct };

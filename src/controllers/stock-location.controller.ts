@@ -7,7 +7,7 @@ import {
 } from "../dtos/stock-location.dto";
 
 async function getAllStockLocations(
-    req: Request<{}, StockLocationResponseDto[], {}>,
+    req: Request<StockLocationResponseDto[]>,
     res: Response<StockLocationResponseDto[]>
 ) {
     const activeOnly = req.query.activeOnly === "true";
@@ -16,7 +16,7 @@ async function getAllStockLocations(
 }
 
 async function getStockLocationById(
-    req: Request<{ id: string }, StockLocationResponseDto, {}>,
+    req: Request<{ id: string }, StockLocationResponseDto>,
     res: Response<StockLocationResponseDto>
 ) {
     const id = Number(req.params.id);
@@ -25,7 +25,7 @@ async function getStockLocationById(
 }
 
 async function createStockLocation(
-    req: Request<{}, StockLocationResponseDto, CreateStockLocationDto>,
+    req: Request<StockLocationResponseDto, CreateStockLocationDto>,
     res: Response<StockLocationResponseDto>
 ) {
     const data = await StockLocationService.createStockLocation(req.body);
@@ -42,7 +42,7 @@ async function updateStockLocation(
 }
 
 async function deleteStockLocation(
-    req: Request<{ id: string }, {}, {}>,
+    req: Request<{ id: string }>,
     res: Response<{ message: string }>
 ) {
     const id = Number(req.params.id);
@@ -51,7 +51,7 @@ async function deleteStockLocation(
 }
 
 async function restoreStockLocation(
-    req: Request<{ id: string }, StockLocationResponseDto, {}>,
+    req: Request<{ id: string }, StockLocationResponseDto>,
     res: Response<StockLocationResponseDto>
 ) {
     const id = Number(req.params.id);

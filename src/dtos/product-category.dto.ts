@@ -1,5 +1,10 @@
 import { ProductCategory } from "../infra/entities/product-category.entity";
 
+export class ProductCategoryQueryDTO {
+    name?: string;
+    activeOnly?: boolean;
+}
+
 export class ProductCategoryParentDTO {
     id!: number;
     name!: string;

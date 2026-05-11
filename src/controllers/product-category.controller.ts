@@ -5,16 +5,21 @@ import {
     CreateProductCategoryDTO,
     UpdateProductCategoryDTO,
     ProductCategoryResponseDTO,
+    ProductCategoryQueryDTO,
 } from "../dtos/product-category.dto";
+import { parseBooleanQuery } from "../utils/query.util";
 
-async function createProductCategory(req: Request<{}, ProductCategoryResponseDTO, CreateProductCategoryDTO>, res: Response<ProductCategoryResponseDTO>) {
+async function createProductCategory(req: Request<ProductCategoryResponseDTO, CreateProductCategoryDTO>, res: Response<ProductCategoryResponseDTO>) {
     const category = await ProductCategoyService.createCategory(req.body);
     res.status(201).json(category);
 }
 
-async function getAllProductCategories(req: Request<{}, ProductCategoryResponseDTO[], {}, { active?: string }>, res: Response<ProductCategoryResponseDTO[]>) {
-    const activeOnly = req.query.active === "true";
-    const categories = await ProductCategoyService.getAllCategories(activeOnly);
+async function getAllProductCategories(req: Request<{}, ProductCategoryResponseDTO[], {}, ProductCategoryQueryDTO>, res: Response<ProductCategoryResponseDTO[]>) {
+    const query: ProductCategoryQueryDTO = {
+        name: req.query.name,
+        activeOnly: parseBooleanQuery(req.query.activeOnly)
+    };
+    const categories = await ProductCategoyService.getAllCategories(query);
     res.status(200).json(categories);
 }
 
