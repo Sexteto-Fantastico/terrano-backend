@@ -16,12 +16,16 @@ import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
 import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
 import { requestContextMiddleware } from "./utils/request-context";
+import { paginationMiddleware } from "./middlewares/pagination.middleware";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-app.use(cors());
+app.use(cors({
+    exposedHeaders: ["X-Total-Count", "X-Total-Pages", "X-Page", "X-Limit"],
+}));
 app.use(express.json());
+app.use(paginationMiddleware);
 
 setupSwagger(app);
 app.use(requestContextMiddleware);
