@@ -9,7 +9,7 @@ import {
 } from "../controllers/department.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
-
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 const router = Router();
 
 /**
@@ -107,7 +107,7 @@ router.post(Endpoints.DEPARTMENTS.CREATE, asyncHandler(createDepartment));
  *               items:
  *                 $ref: '#/components/schemas/DepartmentResponseDto'
  */
-router.get(Endpoints.DEPARTMENTS.GET_ALL, asyncHandler(getAllDepartments));
+router.get(Endpoints.DEPARTMENTS.GET_ALL, paginationMiddleware, asyncHandler(getAllDepartments));
 
 /**
  * @swagger

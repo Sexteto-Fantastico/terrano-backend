@@ -10,6 +10,7 @@ import {
 import { getStockLocationLogs } from "../controllers/system-log.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 
 const router = Router();
 
@@ -106,7 +107,7 @@ router.post(Endpoints.STOCK_LOCATIONS.CREATE, asyncHandler(createStockLocation))
  *               items:
  *                 $ref: '#/components/schemas/StockLocationResponseDto'
  */
-router.get(Endpoints.STOCK_LOCATIONS.GET_ALL, asyncHandler(getAllStockLocations));
+router.get(Endpoints.STOCK_LOCATIONS.GET_ALL, paginationMiddleware, asyncHandler(getAllStockLocations));
 
 /**
  * @swagger

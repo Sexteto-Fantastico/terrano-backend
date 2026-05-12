@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createProductBrand, getAllProductBrands, getProductBrandById, updateProductBrand, deleteProductBrand, restoreProductBrand } from "../controllers/product-brand.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 
 const router = Router();
 
@@ -96,7 +97,7 @@ router.post(Endpoints.PRODUCT_BRANDS.CREATE, asyncHandler(createProductBrand));
  *               items:
  *                 $ref: '#/components/schemas/ProductBrandResponseDto'
  */
-router.get(Endpoints.PRODUCT_BRANDS.GET_ALL, asyncHandler(getAllProductBrands));
+router.get(Endpoints.PRODUCT_BRANDS.GET_ALL, paginationMiddleware, asyncHandler(getAllProductBrands));
 
 /**
  * @swagger

@@ -11,7 +11,9 @@ async function getAllProducts(req: Request<{}, ProductResponseDTO[], {}, Product
         categoryId: req.query.categoryId ? Number(req.query.categoryId) : undefined,
         code: req.query.code,
     };
-    const products = await ProductService.getAllProducts(filters);
+    const { limit, offset } = req.pagination;
+    const [products, total] = await ProductService.getAllProducts(filters, limit, offset);
+    res.setPaginationHeaders(total);
     res.status(200).json(products);
 }
 

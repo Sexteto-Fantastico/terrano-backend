@@ -30,16 +30,18 @@ async function getUserById(id: number, activeOnly: boolean = false): Promise<Use
     });
 }
 
-async function getAllUsers(filters: { onlyActive?: boolean; name?: string }): Promise<User[]> {
+async function getAllUsers(filters: { onlyActive?: boolean; name?: string }, limit: number = 20, offset: number = 0): Promise<[User[], number]> {
     const where: FindOptionsWhere<User> = {};
 
     if (filters.onlyActive) where.is_active = true;
     if (filters.name) where.name = ILike(`%${filters.name}%`);
 
-    return await userRepository.find({
+    return await userRepository.findAndCount({
         where,
         relations: ["role", "department"],
         order: { name: "ASC" },
+        take: limit,
+        skip: offset,
     });
 }
 

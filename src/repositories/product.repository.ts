@@ -27,7 +27,7 @@ async function restoreProduct(id: number): Promise<boolean> {
     return result.affected !== 0;
 }
 
-async function getAllProducts(filters: ProductQueryDTO = {}): Promise<Product[]> {
+async function getAllProducts(filters: ProductQueryDTO = {}, limit: number = 20, offset: number = 0): Promise<[Product[], number]> {
     const { name, activeOnly = true, brandId, categoryId, code } = filters;
     const where: FindOptionsWhere<Product> = {};
 
@@ -36,11 +36,13 @@ async function getAllProducts(filters: ProductQueryDTO = {}): Promise<Product[]>
     if (brandId) where.brand_id = brandId;
     if (categoryId) where.category_id = categoryId;
 
-    return await productRepository.find({
+    return await productRepository.findAndCount({
         where,
         relations: ["category", "measurement_unit", "brand"],
         withDeleted: !activeOnly,
-        order: { name: "ASC" }
+        order: { name: "ASC" },
+        take: limit,
+        skip: offset,
     });
 }
 

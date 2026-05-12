@@ -11,7 +11,9 @@ async function getAllStockLocations(
     res: Response<StockLocationResponseDto[]>
 ) {
     const activeOnly = req.query.activeOnly === "true";
-    const data = await StockLocationService.getAllStockLocations(activeOnly);
+    const { limit, offset } = req.pagination;
+    const [data, total] = await StockLocationService.getAllStockLocations(activeOnly, limit, offset);
+    res.setPaginationHeaders(total);
     res.status(200).json(data);
 }
 

@@ -4,7 +4,7 @@ import { ILike } from "typeorm";
 
 const repository = AppDataSource.getRepository(MeasurementUnit);
 
-export async function findAllMeasurementUnits(filters: { name?: string; activeOnly?: boolean }): Promise<MeasurementUnit[]> {
+export async function findAllMeasurementUnits(filters: { name?: string; activeOnly?: boolean }, limit: number = 20, offset: number = 0): Promise<[MeasurementUnit[], number]> {
     const { name, activeOnly = true } = filters;
 
     const where: any = {};
@@ -12,10 +12,12 @@ export async function findAllMeasurementUnits(filters: { name?: string; activeOn
         where.name = ILike(`%${name}%`);
     }
 
-    return repository.find({
+    return repository.findAndCount({
         where,
         withDeleted: !activeOnly,
         order: { name: "ASC" },
+        take: limit,
+        skip: offset,
     });
 }
 

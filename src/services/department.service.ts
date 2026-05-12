@@ -9,9 +9,9 @@ import { NotFoundError, BadRequestError } from "../errors/app-error";
 import * as DepartmentRepository from "../repositories/department.repository";
 import * as UserRepository from "../repositories/user.repository";
 
-async function getAllDepartments(activeOnly: boolean = false): Promise<DepartmentResponseDto[]> {
-    const allDepartments = await DepartmentRepository.getAllDepartments(activeOnly);
-    return toDepartmentResponseDtoList(allDepartments);
+async function getAllDepartments(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[DepartmentResponseDto[], number]> {
+    const [allDepartments, total] = await DepartmentRepository.getAllDepartments(activeOnly, limit, offset);
+    return [toDepartmentResponseDtoList(allDepartments), total];
 }
 
 async function getDepartmentById(id: number): Promise<DepartmentResponseDto> {

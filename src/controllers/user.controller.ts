@@ -20,7 +20,9 @@ async function getUsers(req: Request<unknown, UserResponseDto[], unknown, GetUse
         name: req.query.name,
         onlyActive: parseBooleanQuery(req.query.onlyActive),
     };
-    const users = await UserService.getUsers(query);
+    const { limit, offset } = req.pagination;
+    const [users, total] = await UserService.getUsers(query, limit, offset);
+    res.setPaginationHeaders(total);
     res.json(users);
 }
 

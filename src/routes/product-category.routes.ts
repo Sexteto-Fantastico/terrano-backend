@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createProductCategory, getAllProductCategories, getProductCategoryById, updateProductCategory, deleteProductCategory, restoreProductCategory } from "../controllers/product-category.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 
 const router = Router();
 
