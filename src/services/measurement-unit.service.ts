@@ -16,15 +16,15 @@ import {
 import { NotFoundError, BadRequestError } from "../errors";
 import { MeasurementUnitType, MeasurementUnitSymbol } from "../infra/entities/measurement-unit.entity";
 
-export async function getAllMeasurementUnits(query: MeasurementUnitQueryDto): Promise<MeasurementUnitResponseDto[]> {
+export async function getAllMeasurementUnits(query: MeasurementUnitQueryDto, limit: number = 20, offset: number = 0): Promise<[MeasurementUnitResponseDto[], number]> {
     const activeOnly = query.activeOnly !== undefined ? query.activeOnly : true;
 
-    const units = await findAllMeasurementUnits({
+    const [units, total] = await findAllMeasurementUnits({
         name: query.name,
         activeOnly,
-    });
+    }, limit, offset);
 
-    return units.map(toMeasurementUnitResponseDto);
+    return [units.map(toMeasurementUnitResponseDto), total];
 }
 
 export async function getMeasurementUnitById(id: number): Promise<MeasurementUnitResponseDto> {

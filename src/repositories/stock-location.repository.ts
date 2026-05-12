@@ -3,9 +3,11 @@ import { StockLocation } from "../infra/entities/stock-location.entity";
 
 const repository = AppDataSource.getRepository(StockLocation);
 
-async function getAllStockLocations(activeOnly: boolean = false): Promise<StockLocation[]> {
-    return await repository.find({
+async function getAllStockLocations(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[StockLocation[], number]> {
+    return await repository.findAndCount({
         withDeleted: !activeOnly,
+        take: limit,
+        skip: offset,
     });
 }
 

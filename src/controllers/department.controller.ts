@@ -7,7 +7,9 @@ async function getAllDepartments(
     res: Response<DepartmentResponseDto[]>
 ) {
     const activeOnly = req.query.activeOnly === 'true';
-    const departments = await DepartmentService.getAllDepartments(activeOnly);
+    const { limit, offset } = req.pagination;
+    const [departments, total] = await DepartmentService.getAllDepartments(activeOnly, limit, offset);
+    res.setPaginationHeaders(total);
     res.status(200).json(departments);
 }
 

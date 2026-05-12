@@ -20,7 +20,9 @@ async function getAllProductBrands(
     res: Response<ProductBrandResponseDTO[]>
 ) {
     const activeOnly = req.query.active === "true";
-    const brands = await ProductBrandService.getAllBrands(activeOnly);
+    const { limit, offset } = req.pagination;
+    const [brands, total] = await ProductBrandService.getAllBrands(activeOnly, limit, offset);
+    res.setPaginationHeaders(total);
     res.status(200).json(brands);
 }
 

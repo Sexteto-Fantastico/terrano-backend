@@ -8,9 +8,11 @@ async function createBrand(data: ProductBrand): Promise<ProductBrand> {
     return await productBrandRepository.save(brand);
 }
 
-async function getAllBrands(activeOnly: boolean = false): Promise<ProductBrand[]> {
-    return await productBrandRepository.find({
+async function getAllBrands(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[ProductBrand[], number]> {
+    return await productBrandRepository.findAndCount({
         withDeleted: !activeOnly,
+        take: limit,
+        skip: offset,
     });
 }
 

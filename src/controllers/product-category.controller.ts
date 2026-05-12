@@ -19,7 +19,9 @@ async function getAllProductCategories(req: Request<{}, ProductCategoryResponseD
         name: req.query.name,
         activeOnly: parseBooleanQuery(req.query.activeOnly)
     };
-    const categories = await ProductCategoyService.getAllCategories(query);
+    const { limit, offset } = req.pagination;
+    const [categories, total] = await ProductCategoyService.getAllCategories(query, limit, offset);
+    res.setPaginationHeaders(total);
     res.status(200).json(categories);
 }
 

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getAll, getById, create, update, remove, restore } from "../controllers/measurement-unit.controller";
 import { Endpoints } from "../utils/constants/endpoints";
 import { asyncHandler } from "../utils/async-handler";
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 
 const router = Router();
 
@@ -39,7 +40,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/MeasurementUnitResponseDto'
  */
-router.get(Endpoints.MEASUREMENT_UNITS.GET_ALL, asyncHandler(getAll));
+router.get(Endpoints.MEASUREMENT_UNITS.GET_ALL, paginationMiddleware, asyncHandler(getAll));
 
 /**
  * @swagger

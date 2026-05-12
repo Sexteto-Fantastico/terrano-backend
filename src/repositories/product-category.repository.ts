@@ -10,7 +10,7 @@ async function createCategory(data: IProductCategory): Promise<ProductCategory> 
     return await productCategoryRepository.save(category);
 }
 
-async function getAllCategories(filters: { activeOnly?: boolean; name?: string }): Promise<ProductCategory[]> {
+async function getAllCategories(filters: { activeOnly?: boolean; name?: string }, limit: number = 20, offset: number = 0): Promise<[ProductCategory[], number]> {
     const { activeOnly = false, name } = filters;
     const where: any = {};
     
@@ -18,10 +18,12 @@ async function getAllCategories(filters: { activeOnly?: boolean; name?: string }
         where.name = ILike(`%${name}%`);
     }
 
-    return await productCategoryRepository.find({
+    return await productCategoryRepository.findAndCount({
         where,
         withDeleted: !activeOnly,
         relations: ["parent"],
+        take: limit,
+        skip: offset,
     });
 }
 

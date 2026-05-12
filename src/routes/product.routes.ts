@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { getProductLogs } from "../controllers/system-log.controller";
 import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct } from "../controllers/product.controller";
 
@@ -160,7 +161,7 @@ router.post(Endpoints.PRODUCTS.CREATE, asyncHandler(createProduct));
  *               items:
  *                 $ref: '#/components/schemas/ProductResponseDTO'
  */
-router.get(Endpoints.PRODUCTS.GET_ALL, asyncHandler(getAllProducts));
+router.get(Endpoints.PRODUCTS.GET_ALL, paginationMiddleware, asyncHandler(getAllProducts));
 
 /**
  * @swagger

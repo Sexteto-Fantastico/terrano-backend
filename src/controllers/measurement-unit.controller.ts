@@ -23,7 +23,9 @@ export const getAll = async (
         name: req.query.name,
         activeOnly: parseBooleanQuery(req.query.activeOnly)
     };
-    const units = await getAllMeasurementUnits(query);
+    const { limit, offset } = req.pagination;
+    const [units, total] = await getAllMeasurementUnits(query, limit, offset);
+    res.setPaginationHeaders(total);
     res.json(units);
 };
 

@@ -31,14 +31,14 @@ export class MeasurementUnit extends TerranoBaseEntity implements IMeasurementUn
     name: string;
 
     @Column({
-        type: "enum",
+        type: "simple-enum",
         enum: MeasurementUnitSymbol,
         default: MeasurementUnitSymbol.UN,
     })
     symbol: MeasurementUnitSymbol;
 
     @Column({
-        type: "enum",
+        type: "simple-enum",
         enum: MeasurementUnitType,
         default: MeasurementUnitType.UNIT,
     })

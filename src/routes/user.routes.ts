@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser } from "../controllers/user.controller";
 import { asyncHandler } from "../utils/async-handler";
 import { Endpoints } from "../utils/constants/endpoints";
+import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { getUserLogs } from "../controllers/system-log.controller";
 
 const router = Router();
@@ -68,7 +69,7 @@ router.post(Endpoints.USERS.CREATE, asyncHandler(createUser));
  *               items:
  *                 $ref: '#/components/schemas/UserResponseDto'
  */
-router.get(Endpoints.USERS.GET_ALL, asyncHandler(getUsers));
+router.get(Endpoints.USERS.GET_ALL, paginationMiddleware, asyncHandler(getUsers));
 
 /**
  * @openapi
