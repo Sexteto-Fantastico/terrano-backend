@@ -14,7 +14,6 @@ import {
     MeasurementUnitQueryDto,
 } from "../dtos/measurement-unit.dto";
 import { NotFoundError, BadRequestError } from "../errors";
-import { MeasurementUnitType, MeasurementUnitSymbol } from "../infra/entities/measurement-unit.entity";
 
 export async function getAllMeasurementUnits(query: MeasurementUnitQueryDto, limit: number = 20, offset: number = 0): Promise<[MeasurementUnitResponseDto[], number]> {
     const activeOnly = query.activeOnly !== undefined ? query.activeOnly : true;
@@ -36,13 +35,6 @@ export async function getMeasurementUnitById(id: number): Promise<MeasurementUni
 }
 
 export async function createNewMeasurementUnit(data: CreateMeasurementUnitDto): Promise<MeasurementUnitResponseDto> {
-    if (!Object.values(MeasurementUnitSymbol).includes(data.symbol)) {
-        throw new BadRequestError("Invalid measurement unit symbol");
-    }
-    if (!Object.values(MeasurementUnitType).includes(data.type)) {
-        throw new BadRequestError("Invalid measurement unit type");
-    }
-
     const unit = await createMeasurementUnit({
         name: data.name,
         symbol: data.symbol,
@@ -63,16 +55,10 @@ export async function updateExistingMeasurementUnit(id: number, data: UpdateMeas
     }
 
     if (data.symbol) {
-        if (!Object.values(MeasurementUnitSymbol).includes(data.symbol)) {
-            throw new BadRequestError("Invalid measurement unit symbol");
-        }
         unit.symbol = data.symbol;
     }
 
     if (data.type) {
-        if (!Object.values(MeasurementUnitType).includes(data.type)) {
-            throw new BadRequestError("Invalid measurement unit type");
-        }
         unit.type = data.type;
     }
 

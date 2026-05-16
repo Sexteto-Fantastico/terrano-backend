@@ -19,25 +19,9 @@ async function getProductById(id: number): Promise<ProductResponseDTO> {
 }
 
 async function createProduct(data: CreateProductRequestDTO): Promise<ProductResponseDTO> {
-    if (!data.name || data.name.trim() === "") {
-        throw new BadRequestError("Product name is required");
-    }
-
-    if (!data.code || data.code.trim() === "") {
-        throw new BadRequestError("Product code is required");
-    }
-
     const existingProduct = await ProductRepository.getProductByCode(data.code);
     if (existingProduct) {
         throw new ConflictError("Product code already exists");
-    }
-
-    if (!data.categoryId) {
-        throw new BadRequestError("Category ID is required");
-    }
-
-    if (!data.measurementUnitId) {
-        throw new BadRequestError("Measurement Unit ID is required");
     }
 
     const measurementUnit = await findMeasurementUnitById(data.measurementUnitId);
@@ -50,17 +34,7 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
         throw new NotFoundError("Category not found");
     }
 
-    if (data.minStock !== undefined && data.minStock < 0) {
-        throw new BadRequestError("Minimum stock cannot be negative");
-    }
 
-    if (data.maxStock !== undefined && data.maxStock < 0) {
-        throw new BadRequestError("Maximum stock cannot be negative");
-    }
-
-    if (!data.brandId) {
-        throw new BadRequestError("Brand ID is required");
-    }
 
     const brand = await getBrandById(data.brandId);
     if (!brand) {
@@ -90,17 +64,10 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
     }
 
     if (data.name !== undefined) {
-        if (data.name.trim() === "") {
-            throw new BadRequestError("Product name cannot be empty");
-        }
         existingProduct.name = data.name.trim();
     }
 
     if (data.code !== undefined) {
-        if (data.code.trim() === "") {
-            throw new BadRequestError("Product code cannot be empty");
-        }
-
         if (data.code !== existingProduct.code) {
             const productWithCode = await ProductRepository.getProductByCode(data.code);
             if (productWithCode) {
@@ -140,16 +107,10 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
     }
 
     if (data.minStock !== undefined) {
-        if (data.minStock < 0) {
-            throw new BadRequestError("Minimum stock cannot be negative");
-        }
         existingProduct.min_stock = data.minStock;
     }
 
     if (data.maxStock !== undefined) {
-        if (data.maxStock < 0) {
-            throw new BadRequestError("Maximum stock cannot be negative");
-        }
         existingProduct.max_stock = data.maxStock;
     }
 

@@ -46,7 +46,7 @@ async function changePassword(req: Request<{ id: string }, UserResponseDto, Chan
 
 async function deleteUser(req: Request<{ id: string }, void, DeleteUserRequestDto>, res: Response<void>) {
     const id = Number(req.params.id);
-    await UserService.deleteUser(id, req.body.updatedBy);
+    await UserService.deleteUser(id, req.body?.updatedBy);
     res.status(204).send();
 }
 

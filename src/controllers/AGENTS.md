@@ -5,5 +5,5 @@ Controllers are STRICTLY responsible for handling incoming HTTP requests and sen
 ## Implementation Rules
 - **Async Handling:** EVERY exported controller function must be wrapped in the `asyncHandler` utility.
 - **No Business Logic:** It is strictly forbidden to write business rules, validations, or database queries in this layer. Delegate everything to the respective Service.
-- **Typing:** Strongly type requests using the appropriate DTOs (`Request<Params, ResBody, ReqBody, ReqQuery>`).
-- **Data Extraction:** Always extract and parse parameters before passing them to the service (e.g., `Number(req.params.id)`).
+- **Typing & Validation:** Data arriving in `req.body`, `req.query`, and `req.params` is already validated and typed by the Zod middleware.
+- **Data Extraction:** Pass the validated data directly to the service. Eliminate the need for manual type conversions during extraction (unless Zod has not parsed/transformed it).

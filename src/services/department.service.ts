@@ -25,10 +25,6 @@ async function getDepartmentById(id: number): Promise<DepartmentResponseDto> {
 async function createDepartment(data: CreateDepartmentDto): Promise<DepartmentResponseDto> {
     const { managerId, costCenterCode, ...rest } = data;
 
-    if (!managerId) {
-        throw new BadRequestError("Manager ID is required");
-    }
-
     const manager = await UserRepository.getUserById(managerId);
     
     if (!manager) {

@@ -20,10 +20,6 @@ interface LoginResult {
 }
 
 async function login(email: string, password: string): Promise<LoginResult> {
-    if (!email || !password) {
-        throw new BadRequestError("Email and password are required.");
-    }
-
     const user = await getUserByEmail(email);
     if (!user || !user.is_active) {
         throw new UnauthorizedError("Invalid credentials.");
@@ -44,10 +40,6 @@ async function login(email: string, password: string): Promise<LoginResult> {
 }
 
 async function forgotPassword(email: string): Promise<void> {
-    if (!email) {
-        throw new BadRequestError("Email is required.");
-    }
-
     const user = await getUserByEmail(email);
     if (!user || !user.is_active) {
         return;
@@ -63,10 +55,6 @@ async function forgotPassword(email: string): Promise<void> {
 }
 
 async function resetPassword(token: string, password: string): Promise<void> {
-    if (!token || !password) {
-        throw new BadRequestError("Token and password are required.");
-    }
-
     const user = await getUserByPasswordResetToken(token);
     if (!user || !user.password_reset_token_expires_at || user.password_reset_token_expires_at < new Date()) {
         throw new BadRequestError("Invalid or expired reset token.");
@@ -80,10 +68,6 @@ async function resetPassword(token: string, password: string): Promise<void> {
 }
 
 async function definePassword(userId: number, password: string): Promise<void> {
-    if (!password) {
-        throw new BadRequestError("Password is required.");
-    }
-
     const user = await repoGetUserById(userId, true);
     if (!user) {
         throw new NotFoundError("User not found.");
