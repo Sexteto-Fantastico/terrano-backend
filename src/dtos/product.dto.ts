@@ -4,9 +4,7 @@ import { Product } from "../infra/entities/product.entity";
 import { MeasurementUnitResponseDto, toMeasurementUnitResponseDto } from "./measurement-unit.dto";
 import { ProductBrandResponseDTO, toProductBrandResponseDTO } from "./product-brand.dto";
 
-// ============ Response Schema (for OpenAPI docs only) ============
-
-const ProductResponseSchema = registry.register(
+export const ProductResponseSchema = registry.register(
     "ProductResponseDTO",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
@@ -44,8 +42,6 @@ const ProductResponseSchema = registry.register(
     })
 );
 
-// ============ Input Schemas ============
-
 export const productQuerySchema = z.object({
     query: z.object({
         name: z.string().optional(),
@@ -53,12 +49,12 @@ export const productQuerySchema = z.object({
         brandId: z.coerce.number().int().positive().optional(),
         categoryId: z.coerce.number().int().positive().optional(),
         code: z.string().optional(),
-    }).default({})
+    })
 });
 
 export type ProductQueryDTO = z.infer<typeof productQuerySchema>["query"];
 
-const CreateProductBodySchema = registry.register(
+export const CreateProductBodySchema = registry.register(
     "CreateProductRequestDTO",
     z.object({
         name: z.string().min(1, "Product name is required").openapi({ example: "Steel Rod 12mm" }),
@@ -78,7 +74,7 @@ export const createProductSchema = z.object({
 
 export type CreateProductRequestDTO = z.infer<typeof createProductSchema>["body"];
 
-const UpdateProductBodySchema = registry.register(
+export const UpdateProductBodySchema = registry.register(
     "ProductUpdateRequestDTO",
     z.object({
         name: z.string().min(1, "Product name cannot be empty").optional().openapi({ example: "Updated Steel Rod" }),
@@ -106,156 +102,6 @@ export const productIdSchema = z.object({
         id: z.coerce.number().int().positive()
     })
 });
-
-// ============ Route Registrations ============
-
-registry.registerPath({
-    method: "post",
-    path: "/api/products",
-    tags: ["Products"],
-    summary: "Create a new product",
-    request: {
-        body: {
-            content: {
-                "application/json": {
-                    schema: CreateProductBodySchema,
-                },
-            },
-        },
-    },
-    responses: {
-        201: {
-            description: "The created product",
-            content: {
-                "application/json": {
-                    schema: ProductResponseSchema,
-                },
-            },
-        },
-        400: { description: "Validation error" },
-    },
-});
-
-registry.registerPath({
-    method: "get",
-    path: "/api/products",
-    tags: ["Products"],
-    summary: "Returns the list of all products",
-    request: {
-        query: z.object({
-            name: z.string().optional(),
-            activeOnly: z.string().optional(),
-            brandId: z.coerce.number().int().optional(),
-            categoryId: z.coerce.number().int().optional(),
-            code: z.string().optional(),
-        }),
-    },
-    responses: {
-        200: {
-            description: "The list of products",
-            content: {
-                "application/json": {
-                    schema: z.array(ProductResponseSchema),
-                },
-            },
-        },
-    },
-});
-
-registry.registerPath({
-    method: "get",
-    path: "/api/products/{id}",
-    tags: ["Products"],
-    summary: "Get a product by id",
-    request: {
-        params: z.object({
-            id: z.coerce.number().int(),
-        }),
-    },
-    responses: {
-        200: {
-            description: "The product",
-            content: {
-                "application/json": {
-                    schema: ProductResponseSchema,
-                },
-            },
-        },
-        404: { description: "Product not found" },
-    },
-});
-
-registry.registerPath({
-    method: "put",
-    path: "/api/products/{id}",
-    tags: ["Products"],
-    summary: "Update a product",
-    request: {
-        params: z.object({
-            id: z.coerce.number().int(),
-        }),
-        body: {
-            content: {
-                "application/json": {
-                    schema: UpdateProductBodySchema,
-                },
-            },
-        },
-    },
-    responses: {
-        200: {
-            description: "The updated product",
-            content: {
-                "application/json": {
-                    schema: ProductResponseSchema,
-                },
-            },
-        },
-        404: { description: "Product not found" },
-    },
-});
-
-registry.registerPath({
-    method: "delete",
-    path: "/api/products/{id}",
-    tags: ["Products"],
-    summary: "Delete a product",
-    request: {
-        params: z.object({
-            id: z.coerce.number().int(),
-        }),
-    },
-    responses: {
-        200: { description: "Product deleted successfully" },
-        404: { description: "Product not found" },
-    },
-});
-
-registry.registerPath({
-    method: "post",
-    path: "/api/products/{id}/restore",
-    tags: ["Products"],
-    summary: "Restore a deleted product",
-    request: {
-        params: z.object({
-            id: z.coerce.number().int(),
-        }),
-    },
-    responses: {
-        200: {
-            description: "Product restored successfully",
-            content: {
-                "application/json": {
-                    schema: ProductResponseSchema,
-                },
-            },
-        },
-        400: { description: "Product is not deleted" },
-        404: { description: "Product not found" },
-    },
-});
-
-// ============ Response DTO (Runtime) ============
 
 export class ProductResponseDTO {
     id: number;

@@ -10,7 +10,7 @@ export const userIdParamsSchema = z.object({
 
 // ============ Auth Schemas ============
 
-const LoginBodySchema = registry.register(
+export const LoginBodySchema = registry.register(
     "LoginRequestDto",
     z.object({
         email: z.email("Invalid email format").openapi({ example: "user@email.com" }),
@@ -21,7 +21,7 @@ const LoginBodySchema = registry.register(
 export const loginSchema = z.object({ body: LoginBodySchema });
 export type LoginRequestDto = z.infer<typeof loginSchema>["body"];
 
-const ForgotPasswordBodySchema = registry.register(
+export const ForgotPasswordBodySchema = registry.register(
     "ForgotPasswordRequestDto",
     z.object({
         email: z.email("Invalid email format").openapi({ example: "user@email.com" }),
@@ -31,7 +31,7 @@ const ForgotPasswordBodySchema = registry.register(
 export const forgotPasswordSchema = z.object({ body: ForgotPasswordBodySchema });
 export type ForgotPasswordRequestDto = z.infer<typeof forgotPasswordSchema>["body"];
 
-const ResetPasswordBodySchema = registry.register(
+export const ResetPasswordBodySchema = registry.register(
     "ResetPasswordRequestDto",
     z.object({
         token: z.string().min(1, "Token is required").openapi({ example: "token123" }),
@@ -41,7 +41,7 @@ const ResetPasswordBodySchema = registry.register(
 export const resetPasswordSchema = z.object({ body: ResetPasswordBodySchema });
 export type ResetPasswordRequestDto = z.infer<typeof resetPasswordSchema>["body"];
 
-const DefinePasswordBodySchema = registry.register(
+export const DefinePasswordBodySchema = registry.register(
     "DefinePasswordRequestDto",
     z.object({
         password: z.string().min(1, "Password is required").openapi({ example: "newpassword123" }),
@@ -52,7 +52,7 @@ export type DefinePasswordRequestDto = z.infer<typeof definePasswordSchema>["bod
 
 // ============ User Schemas ============
 
-const CreateUserBodySchema = registry.register(
+export const CreateUserBodySchema = registry.register(
     "CreateUserRequestDto",
     z.object({
         name: z.string().min(1, "Name is required").openapi({ example: "John Doe" }),
@@ -71,7 +71,7 @@ const CreateUserBodySchema = registry.register(
 export const createUserSchema = z.object({ body: CreateUserBodySchema });
 export type CreateUserRequestDto = z.infer<typeof createUserSchema>["body"];
 
-const UpdateUserBodySchema = registry.register(
+export const UpdateUserBodySchema = registry.register(
     "UpdateUserRequestDto",
     z.object({
         name: z.string().min(1, "Name cannot be empty").optional().openapi({ example: "John Doe" }),
@@ -91,7 +91,7 @@ export const updateUserSchema = z.object({
 });
 export type UpdateUserRequestDto = z.infer<typeof updateUserSchema>["body"];
 
-const ChangePasswordBodySchema = registry.register(
+export const ChangePasswordBodySchema = registry.register(
     "ChangePasswordRequestDto",
     z.object({
         password: z.string().min(1, "Password is required").openapi({ example: "password123" }),
@@ -105,7 +105,7 @@ export const changePasswordSchema = z.object({
 });
 export type ChangePasswordRequestDto = z.infer<typeof changePasswordSchema>["body"];
 
-const DeleteUserBodySchema = registry.register(
+export const DeleteUserBodySchema = registry.register(
     "DeleteUserRequestDto",
     z.object({
         updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
@@ -122,11 +122,11 @@ export const getUsersQuerySchema = z.object({
     query: z.object({
         name: z.string().optional(),
         onlyActive: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
-    }).default({})
+    })
 });
 export type GetUsersQueryDto = z.infer<typeof getUsersQuerySchema>["query"];
 
-const RestoreUserBodySchema = registry.register(
+export const RestoreUserBodySchema = registry.register(
     "RestoreUserRequestDto",
     z.object({
         updatedBy: z.number().int().positive().optional(),
@@ -140,7 +140,7 @@ export const restoreUserSchema = z.object({
 
 // ============ Response Schemas ============
 
-const RoleResponseSchema = registry.register(
+export const RoleResponseSchema = registry.register(
     "RoleDto",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
@@ -148,7 +148,7 @@ const RoleResponseSchema = registry.register(
     })
 );
 
-const DepartmentResponseSchema = registry.register(
+export const DepartmentResponseSchema = registry.register(
     "DepartmentDto",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
@@ -156,7 +156,7 @@ const DepartmentResponseSchema = registry.register(
     })
 );
 
-const UserResponseSchema = registry.register(
+export const UserResponseSchema = registry.register(
     "UserResponseDto",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
@@ -173,7 +173,7 @@ const UserResponseSchema = registry.register(
     })
 );
 
-const LoginResponseSchema = registry.register(
+export const LoginResponseSchema = registry.register(
     "LoginResponseDto",
     z.object({
         token: z.string().openapi({ example: "token123" }),
@@ -181,212 +181,6 @@ const LoginResponseSchema = registry.register(
         mustResetPassword: z.boolean().optional().openapi({ example: false }),
     })
 );
-
-// ============ Auth Route Registrations ============
-
-registry.registerPath({
-    method: "post",
-    path: "/api/auth/login",
-    tags: ["Auth"],
-    summary: "Log in with email and password",
-    request: {
-        body: {
-            content: { "application/json": { schema: LoginBodySchema } }
-        }
-    },
-    responses: {
-        200: {
-            description: "Login response with bearer token",
-            content: { "application/json": { schema: LoginResponseSchema } }
-        },
-        401: { description: "Invalid credentials" }
-    }
-});
-
-registry.registerPath({
-    method: "post",
-    path: "/api/auth/forgot-password",
-    tags: ["Auth"],
-    summary: "Request a password reset link",
-    request: {
-        body: {
-            content: { "application/json": { schema: ForgotPasswordBodySchema } }
-        }
-    },
-    responses: {
-        200: { description: "Password reset email queued or logged" }
-    }
-});
-
-registry.registerPath({
-    method: "post",
-    path: "/api/auth/reset-password",
-    tags: ["Auth"],
-    summary: "Reset password using token from email",
-    request: {
-        body: {
-            content: { "application/json": { schema: ResetPasswordBodySchema } }
-        }
-    },
-    responses: {
-        200: { description: "Password reset successfully" },
-        400: { description: "Invalid or expired reset token" }
-    }
-});
-
-registry.registerPath({
-    method: "post",
-    path: "/api/auth/define-password",
-    tags: ["Auth"],
-    summary: "Define or change password for the logged in user",
-    security: [{ bearerAuth: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: DefinePasswordBodySchema } }
-        }
-    },
-    responses: {
-        200: { description: "Password updated successfully" },
-        401: { description: "Unauthorized" }
-    }
-});
-
-// ============ User Route Registrations ============
-
-registry.registerPath({
-    method: "post",
-    path: "/api/users",
-    tags: ["Users"],
-    summary: "Create a new user",
-    request: {
-        body: {
-            content: { "application/json": { schema: CreateUserBodySchema } }
-        }
-    },
-    responses: {
-        201: {
-            description: "Created user",
-            content: { "application/json": { schema: UserResponseSchema } }
-        },
-        400: { description: "Validation or request error" },
-        409: { description: "Username or email already exists" }
-    }
-});
-
-registry.registerPath({
-    method: "get",
-    path: "/api/users",
-    tags: ["Users"],
-    summary: "List users",
-    request: {
-        query: z.object({
-            name: z.string().optional(),
-            onlyActive: z.string().optional(),
-        })
-    },
-    responses: {
-        200: {
-            description: "List of users",
-            content: { "application/json": { schema: z.array(UserResponseSchema) } }
-        }
-    }
-});
-
-registry.registerPath({
-    method: "get",
-    path: "/api/users/{id}",
-    tags: ["Users"],
-    summary: "Get a user by ID",
-    request: {
-        params: userIdParamsSchema.shape.params
-    },
-    responses: {
-        200: {
-            description: "User details",
-            content: { "application/json": { schema: UserResponseSchema } }
-        },
-        404: { description: "User not found" }
-    }
-});
-
-registry.registerPath({
-    method: "put",
-    path: "/api/users/{id}/password",
-    tags: ["Users"],
-    summary: "Change user password",
-    request: {
-        params: userIdParamsSchema.shape.params,
-        body: {
-            content: { "application/json": { schema: ChangePasswordBodySchema } }
-        }
-    },
-    responses: {
-        200: {
-            description: "Password changed successfully",
-            content: { "application/json": { schema: UserResponseSchema } }
-        },
-        404: { description: "User not found" }
-    }
-});
-
-registry.registerPath({
-    method: "put",
-    path: "/api/users/{id}",
-    tags: ["Users"],
-    summary: "Update user details",
-    request: {
-        params: userIdParamsSchema.shape.params,
-        body: {
-            content: { "application/json": { schema: UpdateUserBodySchema } }
-        }
-    },
-    responses: {
-        200: {
-            description: "Updated user",
-            content: { "application/json": { schema: UserResponseSchema } }
-        },
-        404: { description: "User not found" },
-        409: { description: "Username or email already exists" }
-    }
-});
-
-registry.registerPath({
-    method: "delete",
-    path: "/api/users/{id}",
-    tags: ["Users"],
-    summary: "Delete a user",
-    request: {
-        params: userIdParamsSchema.shape.params,
-        body: {
-            content: { "application/json": { schema: DeleteUserBodySchema } }
-        }
-    },
-    responses: {
-        204: { description: "User deleted successfully" },
-        404: { description: "User not found" }
-    }
-});
-
-registry.registerPath({
-    method: "post",
-    path: "/api/users/{id}/restore",
-    tags: ["Users"],
-    summary: "Restore a deleted user",
-    request: {
-        params: userIdParamsSchema.shape.params,
-        body: {
-            content: { "application/json": { schema: RestoreUserBodySchema } }
-        }
-    },
-    responses: {
-        200: {
-            description: "User restored successfully",
-            content: { "application/json": { schema: UserResponseSchema } }
-        },
-        400: { description: "User is not deleted" },
-        404: { description: "User not found" }
-    }
-});
 
 // ============ Classes for Runtime ============
 

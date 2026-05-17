@@ -1,18 +1,121 @@
 import { Router } from "express";
+import { z } from "zod";
 import { createProductCategory, getAllProductCategories, getProductCategoryById, updateProductCategory, deleteProductCategory, restoreProductCategory } from "../controllers/product-category.controller";
-import { Endpoints } from "../utils/constants/endpoints";
-import { asyncHandler } from "../utils/async-handler";
+import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { paginationMiddleware } from "../middlewares/pagination.middleware";
-import { validateRequest } from "../middlewares/validate.middleware";
-import { createProductCategorySchema, updateProductCategorySchema, productCategoryIdSchema, productCategoryQuerySchema } from "../dtos/product-category.dto";
+import { createRoute } from "../utils/route-builder";
+import {
+    productCategoryQuerySchema,
+    CreateProductCategoryBodySchema,
+    UpdateProductCategoryBodySchema,
+    productCategoryIdSchema,
+    ProductCategoryResponseSchema
+} from "../dtos/product-category.dto";
 
 const router = Router();
 
-router.post(Endpoints.PRODUCT_CATEGORIES.CREATE, validateRequest(createProductCategorySchema), asyncHandler(createProductCategory));
-router.get(Endpoints.PRODUCT_CATEGORIES.GET_ALL, validateRequest(productCategoryQuerySchema), paginationMiddleware, asyncHandler(getAllProductCategories));
-router.get(Endpoints.PRODUCT_CATEGORIES.GET_BY_ID, validateRequest(productCategoryIdSchema), asyncHandler(getProductCategoryById));
-router.put(Endpoints.PRODUCT_CATEGORIES.UPDATE, validateRequest(updateProductCategorySchema), asyncHandler(updateProductCategory));
-router.delete(Endpoints.PRODUCT_CATEGORIES.DELETE, validateRequest(productCategoryIdSchema), asyncHandler(deleteProductCategory));
-router.patch(Endpoints.PRODUCT_CATEGORIES.RESTORE, validateRequest(productCategoryIdSchema), asyncHandler(restoreProductCategory));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.PRODUCT_CATEGORIES.CREATE,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Create a new product category",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: CreateProductCategoryBodySchema } } }
+    },
+    responses: {
+        201: {
+            description: "The created product category",
+            content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
+        }
+    }
+}, createProductCategory);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCT_CATEGORIES.GET_ALL,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Returns the list of all product categories",
+    request: {
+        query: productCategoryQuerySchema.shape.query
+    },
+    responses: {
+        200: {
+            description: "The list of product categories",
+            content: { [ContentType.JSON]: { schema: z.array(ProductCategoryResponseSchema) } }
+        }
+    },
+    middlewares: [paginationMiddleware]
+}, getAllProductCategories);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCT_CATEGORIES.GET_BY_ID,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Get a product category by id",
+    request: {
+        params: productCategoryIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The product category",
+            content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
+        },
+        404: { description: "Product category not found" }
+    }
+}, getProductCategoryById);
+
+createRoute(router, {
+    method: HttpMethod.PUT,
+    path: Endpoints.PRODUCT_CATEGORIES.UPDATE,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Update a product category",
+    request: {
+        params: productCategoryIdSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: UpdateProductCategoryBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "The updated product category",
+            content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
+        },
+        404: { description: "Product category not found" }
+    }
+}, updateProductCategory);
+
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.PRODUCT_CATEGORIES.DELETE,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Soft delete a product category",
+    request: {
+        params: productCategoryIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "Product category deleted successfully" }
+    }
+}, deleteProductCategory);
+
+createRoute(router, {
+    method: HttpMethod.PATCH,
+    path: Endpoints.PRODUCT_CATEGORIES.RESTORE,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Restore a soft-deleted product category",
+    request: {
+        params: productCategoryIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The restored product category",
+            content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
+        },
+        404: { description: "Product category not found" }
+    }
+}, restoreProductCategory);
 
 export default router;

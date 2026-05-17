@@ -1,30 +1,139 @@
 import { Router } from "express";
-import { asyncHandler } from "../utils/async-handler";
-import { Endpoints } from "../utils/constants/endpoints";
+import { z } from "zod";
+import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { getProductLogs } from "../controllers/system-log.controller";
 import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct } from "../controllers/product.controller";
-import { validateRequest } from "../middlewares/validate.middleware";
-import { productQuerySchema, createProductSchema, updateProductSchema, productIdSchema } from "../dtos/product.dto";
+import { createRoute } from "../utils/route-builder";
+import {
+    productQuerySchema,
+    CreateProductBodySchema,
+    UpdateProductBodySchema,
+    productIdSchema,
+    ProductResponseSchema
+} from "../dtos/product.dto";
 
 const router = Router();
 
-router.post(Endpoints.PRODUCTS.CREATE, validateRequest(createProductSchema), asyncHandler(createProduct));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.PRODUCTS.CREATE,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Create a new product",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: CreateProductBodySchema } } }
+    },
+    responses: {
+        201: {
+            description: "The created product",
+            content: { [ContentType.JSON]: { schema: ProductResponseSchema } }
+        },
+        400: { description: "Validation error" }
+    }
+}, createProduct);
 
-router.get(Endpoints.PRODUCTS.GET_ALL, validateRequest(productQuerySchema), paginationMiddleware, asyncHandler(getAllProducts));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCTS.GET_ALL,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Returns the list of all products",
+    request: {
+        query: productQuerySchema.shape.query
+    },
+    responses: {
+        200: {
+            description: "The list of products",
+            content: { [ContentType.JSON]: { schema: z.array(ProductResponseSchema) } }
+        }
+    },
+    middlewares: [paginationMiddleware]
+}, getAllProducts);
 
-router.get(Endpoints.PRODUCTS.GET_BY_ID, validateRequest(productIdSchema), asyncHandler(getProductById));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCTS.GET_BY_ID,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Get a product by id",
+    request: {
+        params: productIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The product",
+            content: { [ContentType.JSON]: { schema: ProductResponseSchema } }
+        },
+        404: { description: "Product not found" }
+    }
+}, getProductById);
 
-router.get(
-    "/:id/logs",
-    validateRequest(productIdSchema),
-    asyncHandler(getProductLogs)
-);
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCTS.GET_LOGS,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Get logs for a product",
+    request: {
+        params: productIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "List of product logs" }
+    }
+}, getProductLogs);
 
-router.put(Endpoints.PRODUCTS.UPDATE, validateRequest(updateProductSchema), asyncHandler(updateProduct));
+createRoute(router, {
+    method: HttpMethod.PUT,
+    path: Endpoints.PRODUCTS.UPDATE,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Update a product",
+    request: {
+        params: productIdSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: UpdateProductBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "The updated product",
+            content: { [ContentType.JSON]: { schema: ProductResponseSchema } }
+        },
+        404: { description: "Product not found" }
+    }
+}, updateProduct);
 
-router.delete(Endpoints.PRODUCTS.DELETE, validateRequest(productIdSchema), asyncHandler(deleteProduct));
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.PRODUCTS.DELETE,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Delete a product",
+    request: {
+        params: productIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "Product deleted successfully" },
+        404: { description: "Product not found" }
+    }
+}, deleteProduct);
 
-router.post(Endpoints.PRODUCTS.RESTORE, validateRequest(productIdSchema), asyncHandler(restoreProduct));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.PRODUCTS.RESTORE,
+    basePath: Endpoints.PRODUCTS.BASE,
+    tags: ["Products"],
+    summary: "Restore a deleted product",
+    request: {
+        params: productIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "Product restored successfully",
+            content: { [ContentType.JSON]: { schema: ProductResponseSchema } }
+        },
+        400: { description: "Product is not deleted" },
+        404: { description: "Product not found" }
+    }
+}, restoreProduct);
 
 export default router;

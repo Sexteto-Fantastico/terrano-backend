@@ -1,9 +1,29 @@
+export const HttpMethod = {
+    GET: "get",
+    POST: "post",
+    PUT: "put",
+    DELETE: "delete",
+    PATCH: "patch",
+} as const;
+
+export type HttpMethod = typeof HttpMethod[keyof typeof HttpMethod];
+
+export const ContentType = {
+    JSON: "application/json",
+    FORM_DATA: "multipart/form-data",
+    URL_ENCODED: "application/x-www-form-urlencoded",
+} as const;
+
+export type ContentType = typeof ContentType[keyof typeof ContentType];
+
 const CRUD_ROUTES = {
     CREATE: "/",
     GET_ALL: "/",
     GET_BY_ID: "/:id",
     UPDATE: "/:id",
     DELETE: "/:id",
+    GET_LOGS: "/:id/logs",
+    RESTORE: "/:id/restore",
 } as const;
 
 export const API_PREFIX = "/api" as const;
@@ -19,46 +39,36 @@ export const Endpoints = {
     USERS: {
         BASE: `${API_PREFIX}/users`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
         CHANGE_PASSWORD: "/:id/password",
     },
 
     PRODUCT_CATEGORIES: {
         BASE: `${API_PREFIX}/product-categories`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
     },
 
     PRODUCTS: {
         BASE: `${API_PREFIX}/products`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
     },
 
     PRODUCT_BRANDS: {
         BASE: `${API_PREFIX}/product-brands`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
     },
 
     DEPARTMENTS: {
         BASE: `${API_PREFIX}/departments`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
     },
 
     STOCK_LOCATIONS: {
         BASE: `${API_PREFIX}/stock-locations`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
     },
-    LOGS: {
-        BASE: "/logs",
-        GET: "/"
-    },
+
     MEASUREMENT_UNITS: {
         BASE: `${API_PREFIX}/measurement-units`,
         ...CRUD_ROUTES,
-        RESTORE: "/:id/restore",
     },
 } as const;
