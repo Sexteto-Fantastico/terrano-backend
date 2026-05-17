@@ -9,9 +9,7 @@ export const HttpMethod = {
 export type HttpMethod = typeof HttpMethod[keyof typeof HttpMethod];
 
 export const ContentType = {
-    JSON: "application/json",
-    FORM_DATA: "multipart/form-data",
-    URL_ENCODED: "application/x-www-form-urlencoded",
+    JSON: "application/json"
 } as const;
 
 export type ContentType = typeof ContentType[keyof typeof ContentType];
