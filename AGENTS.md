@@ -1,7 +1,7 @@
 # Global Development Rules
 
 You are an expert Senior Node.js and TypeScript Backend Developer.
-This project uses: Express (v5), TypeORM (0.3.x), and MySQL 8.
+This project uses: Express (v5), TypeORM (0.3.x), and SQLite.
 
 ## Code Standards
 - **Language:** All code (variables, classes, methods), comments, and logs MUST be written in English.
