@@ -1,104 +1,80 @@
 import { Router } from "express";
-import { asyncHandler } from "../utils/async-handler";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { definePassword, forgotPassword, login, resetPassword } from "../controllers/auth.controller";
-import { Endpoints } from "../utils/constants/endpoints";
+import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
+import { createRoute } from "../utils/route-builder";
+import {
+    LoginBodySchema,
+    LoginResponseSchema,
+    ForgotPasswordBodySchema,
+    ResetPasswordBodySchema,
+    DefinePasswordBodySchema
+} from "../dtos/user.dto";
 
 const router = Router();
 
-/**
- * @openapi
- * tags:
- *   - name: Auth
- *     description: Authentication and password recovery
- */
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.AUTH.LOGIN,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Log in with email and password",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: LoginBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "Login response with bearer token",
+            content: { [ContentType.JSON]: { schema: LoginResponseSchema } }
+        },
+        401: { description: "Invalid credentials" }
+    }
+}, login);
 
-/**
- * @openapi
- * /api/auth/login:
- *   post:
- *     tags:
- *       - Auth
- *     summary: Log in with email and password
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/LoginRequestDto'
- *     responses:
- *       200:
- *         description: Login response with bearer token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/LoginResponseDto'
- *       401:
- *         description: Invalid credentials
- */
-router.post(Endpoints.AUTH.LOGIN, asyncHandler(login));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.AUTH.FORGOT_PASSWORD,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Request a password reset link",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: ForgotPasswordBodySchema } } }
+    },
+    responses: {
+        200: { description: "Password reset email queued or logged" }
+    }
+}, forgotPassword);
 
-/**
- * @openapi
- * /api/auth/forgot-password:
- *   post:
- *     tags:
- *       - Auth
- *     summary: Request a password reset link
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ForgotPasswordRequestDto'
- *     responses:
- *       200:
- *         description: Password reset email queued or logged
- */
-router.post(Endpoints.AUTH.FORGOT_PASSWORD, asyncHandler(forgotPassword));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.AUTH.RESET_PASSWORD,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Reset password using token from email",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: ResetPasswordBodySchema } } }
+    },
+    responses: {
+        200: { description: "Password reset successfully" },
+        400: { description: "Invalid or expired reset token" }
+    }
+}, resetPassword);
 
-/**
- * @openapi
- * /api/auth/reset-password:
- *   post:
- *     tags:
- *       - Auth
- *     summary: Reset password using token from email
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ResetPasswordRequestDto'
- *     responses:
- *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Invalid or expired reset token
- */
-router.post(Endpoints.AUTH.RESET_PASSWORD, asyncHandler(resetPassword));
-
-/**
- * @openapi
- * /api/auth/define-password:
- *   post:
- *     tags:
- *       - Auth
- *     summary: Define or change password for the logged in user
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DefinePasswordRequestDto'
- *     responses:
- *       200:
- *         description: Password updated successfully
- *       401:
- *         description: Unauthorized
- */
-router.post(Endpoints.AUTH.DEFINE_PASSWORD, authMiddleware, asyncHandler(definePassword));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.AUTH.DEFINE_PASSWORD,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Define or change password for the logged in user",
+    security: [{ bearerAuth: [] }],
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: DefinePasswordBodySchema } } }
+    },
+    responses: {
+        200: { description: "Password updated successfully" },
+        401: { description: "Unauthorized" }
+    },
+    middlewares: [authMiddleware]
+}, definePassword);
 
 export default router;

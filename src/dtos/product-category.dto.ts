@@ -1,9 +1,68 @@
+import { z, registry } from "../infra/config/openapi";
 import { ProductCategory } from "../infra/entities/product-category.entity";
 
-export class ProductCategoryQueryDTO {
-    name?: string;
-    activeOnly?: boolean;
-}
+export const productCategoryIdSchema = z.object({
+    params: z.object({
+        id: z.coerce.number().int().positive()
+    })
+});
+
+export const productCategoryQuerySchema = z.object({
+    query: z.object({
+        name: z.string().optional(),
+        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+    })
+});
+
+export type ProductCategoryQueryDTO = z.infer<typeof productCategoryQuerySchema>["query"];
+
+export const CreateProductCategoryBodySchema = registry.register(
+    "CreateProductCategoryDto",
+    z.object({
+        name: z.string().min(1, "Category name is required").openapi({ example: "Electronics" }),
+        description: z.string().optional().openapi({ example: "Electronic devices" }),
+        parentId: z.number().int().positive().optional().openapi({ example: 1 }),
+    })
+);
+
+export const createProductCategorySchema = z.object({ body: CreateProductCategoryBodySchema });
+export type CreateProductCategoryDTO = z.infer<typeof createProductCategorySchema>["body"];
+
+export const UpdateProductCategoryBodySchema = registry.register(
+    "UpdateProductCategoryDto",
+    z.object({
+        name: z.string().min(1, "Category name cannot be empty").optional().openapi({ example: "Electronics" }),
+        description: z.string().optional().openapi({ example: "Electronic devices" }),
+        parentId: z.number().int().positive().nullable().optional().openapi({ example: 1 }),
+    })
+);
+
+export const updateProductCategorySchema = z.object({
+    params: productCategoryIdSchema.shape.params,
+    body: UpdateProductCategoryBodySchema,
+});
+export type UpdateProductCategoryDTO = z.infer<typeof updateProductCategorySchema>["body"];
+
+export const ProductCategoryParentSchema = registry.register(
+    "ProductCategoryParentDto",
+    z.object({
+        id: z.number().int().openapi({ example: 1 }),
+        name: z.string().openapi({ example: "Electronics" }),
+        description: z.string().optional().openapi({ example: "Electronic devices" }),
+        deletedAt: z.date().nullable().optional().openapi({ type: "string", format: "date-time" }),
+    })
+);
+
+export const ProductCategoryResponseSchema = registry.register(
+    "ProductCategoryResponseDto",
+    z.object({
+        id: z.number().int().openapi({ example: 2 }),
+        name: z.string().openapi({ example: "Computers" }),
+        description: z.string().optional().openapi({ example: "All kinds of computers" }),
+        deletedAt: z.date().nullable().optional().openapi({ type: "string", format: "date-time" }),
+        parent: ProductCategoryParentSchema.nullable().optional(),
+    })
+);
 
 export class ProductCategoryParentDTO {
     id!: number;
@@ -18,18 +77,6 @@ export class ProductCategoryResponseDTO {
     description?: string;
     deletedAt?: Date | null;
     parent?: ProductCategoryParentDTO | null;
-}
-
-export class CreateProductCategoryDTO {
-    name!: string;
-    description?: string;
-    parentId?: number;
-}
-
-export class UpdateProductCategoryDTO {
-    name?: string;
-    description?: string;
-    parentId?: number | null;
 }
 
 export function toProductCategoryResponseDTO(entity: ProductCategory): ProductCategoryResponseDTO {

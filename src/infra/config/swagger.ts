@@ -1,9 +1,12 @@
-import swaggerJSDoc from "swagger-jsdoc";
+import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 import swaggerUi from "swagger-ui-express";
 import { Application } from "express";
+import { registry } from "./openapi";
 
-const options: swaggerJSDoc.Options = {
-    definition: {
+export const setupSwagger = (app: Application) => {
+    const generator = new OpenApiGeneratorV3(registry.definitions);
+
+    const swaggerSpec = generator.generateDocument({
         openapi: "3.0.0",
         info: {
             title: "Terrano API",
@@ -16,44 +19,30 @@ const options: swaggerJSDoc.Options = {
                 description: "Local Development Server",
             },
         ],
-        components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: "http",
-                    scheme: "bearer",
-                    bearerFormat: "JWT",
-                },
-            },
-        },
         security: [
             {
                 bearerAuth: [],
             },
         ],
-    },
-    apis: [
-        "./src/routes/*.{ts,js}",
-        "./src/controllers/*.{ts,js}",
-        "./src/entities/*.{ts,js}",
-        "./src/dtos/*.{ts,js}",
-        "./dist/routes/*.{ts,js}",
-        "./dist/controllers/*.{ts,js}",
-        "./dist/entities/*.{ts,js}",
-        "./dist/dtos/*.{ts,js}",
-    ], // Path to the API specs
-};
+    });
 
-const swaggerSpec = swaggerJSDoc(options);
+    swaggerSpec.components = {
+        ...swaggerSpec.components,
+        securitySchemes: {
+            bearerAuth: {
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT",
+            },
+        },
+    };
 
-export const setupSwagger = (app: Application) => {
-    // Serve Swagger UI
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
         explorer: true,
         customCss: '.swagger-ui .topbar { display: none }',
         customSiteTitle: "Terrano API Documentation"
     }));
 
-    // Serve swagger spec as JSON
     app.get("/api-docs.json", (_req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.send(swaggerSpec);

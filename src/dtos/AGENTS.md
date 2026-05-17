@@ -1,13 +1,17 @@
 # Agent Context: DTOs (Data Transfer Objects)
 
-This layer defines the strict data contracts for input and output.
+This layer defines the strict data contracts for input and output, and is the source of truth for validation.
 
 ## Implementation Rules
-- **Structure:** Use TypeScript classes to define `Request` and `Response` schemas.
-- **Naming Convention:** ALL property names in DTOs (Request, Query, and Response) MUST use `camelCase` (e.g., `onlyActive`, `costCenterCode`, `managerId`).
-- **Mappers:** Export mapping functions (e.g., `toUserResponseDto(entity: User)`) at the bottom of the file to centralize transformation logic.
+- **Strictly Dumb & Data-Focused:** The DTO layer must be strictly dumb and focused on data. It should ONLY contain Zod Schema definitions (`z.object`), type inference (`z.infer`), and mapping functions. Route registrations MUST NEVER be done here.
+- **Structure:** Use **Zod schemas** (`z.object({...})`) to define input DTOs (Request Body, Query, Params). Import `z` and `registry` from `../infra/config/openapi` instead of directly from `zod`.
+- **OpenAPI Annotations:** Add `.openapi({ example: ... })` to schema fields for automatic Swagger documentation enrichment.
+- **Schema Registration:** Register reusable body/response schemas with `registry.register('ModelName', schema)` for `$ref` reuse in the generated OpenAPI spec.
+- **Type Inference:** Infer static types from schemas using `export type MyDto = z.infer<typeof mySchema>`.
+- **Naming Convention:** ALL property names in schemas and DTOs MUST use `camelCase` (e.g., `onlyActive`, `costCenterCode`, `managerId`).
+- **Mappers:** Response DTOs can continue as interfaces/classes of mapping or schemas, but export mapping functions (e.g., `toUserResponseDto(entity: User)`) at the bottom of the file to centralize transformation logic.
 - **Database Alignment:** The DTO layer is responsible for translating database `snake_case` or entity properties into `camelCase` for the frontend.
 - **Security & Privacy:** NEVER include sensitive fields (like `password` or `password_reset_token`) in Response DTOs.
 - **Audit Fields Policy:** - **Prohibited:** Purely internal audit fields such as `createdAt`, `updatedAt`, `createdBy`, and `updatedBy` MUST NOT be returned in API responses.
     - **Allowed:** Fields with associated functional logic, such as `deletedAt` (used to handle `activeOnly` filters and soft-delete state), SHOULD be included in Response DTOs when relevant to the frontend's state management.
-- **Typing:** Do not use `any`. Always specify primitive types or use other DTOs for nested objects.
+- **Typing:** Do not use `any`. Rely on Zod to generate static types for requests, and specify explicit types for responses.

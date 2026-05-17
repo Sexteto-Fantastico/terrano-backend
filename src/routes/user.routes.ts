@@ -1,232 +1,165 @@
 import { Router } from "express";
+import { z } from "zod";
 import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser } from "../controllers/user.controller";
-import { asyncHandler } from "../utils/async-handler";
-import { Endpoints } from "../utils/constants/endpoints";
+import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { getUserLogs } from "../controllers/system-log.controller";
+import { createRoute } from "../utils/route-builder";
+import {
+    CreateUserBodySchema,
+    UpdateUserBodySchema,
+    ChangePasswordBodySchema,
+    DeleteUserBodySchema,
+    RestoreUserBodySchema,
+    UserResponseSchema,
+    userIdParamsSchema,
+    getUsersQuerySchema
+} from "../dtos/user.dto";
 
 const router = Router();
 
-/**
- * @openapi
- * tags:
- *   - name: Users
- *     description: User management endpoints
- */
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.USERS.CREATE,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Create a new user",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: CreateUserBodySchema } } }
+    },
+    responses: {
+        201: {
+            description: "Created user",
+            content: { [ContentType.JSON]: { schema: UserResponseSchema } }
+        },
+        400: { description: "Validation or request error" },
+        409: { description: "Username or email already exists" }
+    }
+}, createUser);
 
-/**
- * @openapi
- * /api/users:
- *   post:
- *     tags:
- *       - Users
- *     summary: Create a new user
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateUserRequestDto'
- *     responses:
- *       201:
- *         description: Created user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponseDto'
- *       400:
- *         description: Validation or request error
- *       409:
- *         description: Username or email already exists
- */
-router.post(Endpoints.USERS.CREATE, asyncHandler(createUser));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.USERS.GET_ALL,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "List users",
+    request: {
+        query: getUsersQuerySchema.shape.query
+    },
+    responses: {
+        200: {
+            description: "List of users",
+            content: { [ContentType.JSON]: { schema: z.array(UserResponseSchema) } }
+        }
+    },
+    middlewares: [paginationMiddleware]
+}, getUsers);
 
-/**
- * @openapi
- * /api/users:
- *   get:
- *     tags:
- *       - Users
- *     summary: List users
- *     parameters:
- *       - in: query
- *         name: name
- *         schema:
- *           type: string
- *         description: Filter users by name
- *       - in: query
- *         name: onlyActive
- *         schema:
- *           type: boolean
- *         description: Filter only active users
- *     responses:
- *       200:
- *         description: List of users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/UserResponseDto'
- */
-router.get(Endpoints.USERS.GET_ALL, paginationMiddleware, asyncHandler(getUsers));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.USERS.GET_BY_ID,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Get a user by ID",
+    request: {
+        params: userIdParamsSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "User details",
+            content: { [ContentType.JSON]: { schema: UserResponseSchema } }
+        },
+        404: { description: "User not found" }
+    }
+}, getUserById);
 
-/**
- * @openapi
- * /api/users/{id}:
- *   get:
- *     tags:
- *       - Users
- *     summary: Get a user by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: User details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponseDto'
- *       404:
- *         description: User not found
- */
-router.get(Endpoints.USERS.GET_BY_ID, asyncHandler(getUserById));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.USERS.GET_LOGS,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Get logs for a user",
+    request: {
+        params: userIdParamsSchema.shape.params
+    },
+    responses: {
+        200: { description: "List of user logs" }
+    }
+}, getUserLogs);
 
-/**
- * @openapi
- * /api/users/{id}/password:
- *   put:
- *     tags:
- *       - Users
- *     summary: Change user password
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ChangePasswordRequestDto'
- *     responses:
- *       200:
- *         description: Password changed successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponseDto'
- *       404:
- *         description: User not found
- */
+createRoute(router, {
+    method: HttpMethod.PUT,
+    path: Endpoints.USERS.CHANGE_PASSWORD,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Change user password",
+    request: {
+        params: userIdParamsSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: ChangePasswordBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "Password changed successfully",
+            content: { [ContentType.JSON]: { schema: UserResponseSchema } }
+        },
+        404: { description: "User not found" }
+    }
+}, changePassword);
 
-router.get(
-    "/:id/logs",
-    asyncHandler(getUserLogs)
-);
+createRoute(router, {
+    method: HttpMethod.PUT,
+    path: Endpoints.USERS.UPDATE,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Update user details",
+    request: {
+        params: userIdParamsSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: UpdateUserBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "Updated user",
+            content: { [ContentType.JSON]: { schema: UserResponseSchema } }
+        },
+        404: { description: "User not found" },
+        409: { description: "Username or email already exists" }
+    }
+}, updateUser);
 
-router.put(Endpoints.USERS.CHANGE_PASSWORD, asyncHandler(changePassword));
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.USERS.DELETE,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Delete a user",
+    request: {
+        params: userIdParamsSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: DeleteUserBodySchema } } }
+    },
+    responses: {
+        204: { description: "User deleted successfully" },
+        404: { description: "User not found" }
+    }
+}, deleteUser);
 
-/**
- * @openapi
- * /api/users/{id}:
- *   put:
- *     tags:
- *       - Users
- *     summary: Update user details
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateUserRequestDto'
- *     responses:
- *       200:
- *         description: Updated user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponseDto'
- *       404:
- *         description: User not found
- *       409:
- *         description: Username or email already exists
- */
-router.put(Endpoints.USERS.UPDATE, asyncHandler(updateUser));
-
-/**
- * @openapi
- * /api/users/{id}:
- *   delete:
- *     tags:
- *       - Users
- *     summary: Delete a user
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DeleteUserRequestDto'
- *     responses:
- *       204:
- *         description: User deleted successfully
- *       404:
- *         description: User not found
- */
-router.delete(Endpoints.USERS.DELETE, asyncHandler(deleteUser));
-
-/**
- * @openapi
- * /api/users/{id}/restore:
- *   post:
- *     tags:
- *       - Users
- *     summary: Restore a deleted user
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               updatedBy:
- *                 type: integer
- *     responses:
- *       200:
- *         description: User restored successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponseDto'
- *       400:
- *         description: User is not deleted
- *       404:
- *         description: User not found
- */
-router.post(Endpoints.USERS.RESTORE, asyncHandler(restoreUser));
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.USERS.RESTORE,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Restore a deleted user",
+    request: {
+        params: userIdParamsSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: RestoreUserBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "User restored successfully",
+            content: { [ContentType.JSON]: { schema: UserResponseSchema } }
+        },
+        400: { description: "User is not deleted" },
+        404: { description: "User not found" }
+    }
+}, restoreUser);
 
 export default router;

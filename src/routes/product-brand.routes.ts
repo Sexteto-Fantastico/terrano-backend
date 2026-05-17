@@ -1,202 +1,121 @@
 import { Router } from "express";
+import { z } from "zod";
 import { createProductBrand, getAllProductBrands, getProductBrandById, updateProductBrand, deleteProductBrand, restoreProductBrand } from "../controllers/product-brand.controller";
-import { Endpoints } from "../utils/constants/endpoints";
-import { asyncHandler } from "../utils/async-handler";
+import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { paginationMiddleware } from "../middlewares/pagination.middleware";
+import { createRoute } from "../utils/route-builder";
+import {
+    productBrandQuerySchema,
+    CreateProductBrandBodySchema,
+    UpdateProductBrandBodySchema,
+    productBrandIdSchema,
+    ProductBrandResponseSchema
+} from "../dtos/product-brand.dto";
 
 const router = Router();
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     ProductBrandResponseDto:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           description: The auto-generated id of the product brand
- *         name:
- *           type: string
- *           description: The name of the product brand
- *         isActive:
- *           type: boolean
- *           description: Whether the brand is active
- *         deletedAt:
- *           type: string
- *           format: date-time
- *           nullable: true
- *           description: Deletion timestamp (for soft delete)
- *     CreateProductBrandDto:
- *       type: object
- *       required:
- *         - name
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the product brand
- *     UpdateProductBrandDto:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the product brand
- */
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.PRODUCT_BRANDS.CREATE,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Create a new product brand",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: CreateProductBrandBodySchema } } }
+    },
+    responses: {
+        201: {
+            description: "The created product brand",
+            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
+        }
+    }
+}, createProductBrand);
 
-/**
- * @swagger
- * tags:
- *   name: Product Brands
- *   description: The product brands managing API
- */
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCT_BRANDS.GET_ALL,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Returns the list of all product brands",
+    request: {
+        query: productBrandQuerySchema.shape.query
+    },
+    responses: {
+        200: {
+            description: "The list of product brands",
+            content: { [ContentType.JSON]: { schema: z.array(ProductBrandResponseSchema) } }
+        }
+    },
+    middlewares: [paginationMiddleware]
+}, getAllProductBrands);
 
-/**
- * @swagger
- * /api/product-brands:
- *   post:
- *     summary: Create a new product brand
- *     tags: [Product Brands]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateProductBrandDto'
- *     responses:
- *       201:
- *         description: The created product brand
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ProductBrandResponseDto'
- *       400:
- *         description: Failed to create brand
- */
-router.post(Endpoints.PRODUCT_BRANDS.CREATE, asyncHandler(createProductBrand));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCT_BRANDS.GET_BY_ID,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Get a product brand by id",
+    request: {
+        params: productBrandIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The product brand",
+            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
+        },
+        404: { description: "Product brand not found" }
+    }
+}, getProductBrandById);
 
-/**
- * @swagger
- * /api/product-brands:
- *   get:
- *     summary: Returns the list of all product brands
- *     tags: [Product Brands]
- *     parameters:
- *       - in: query
- *         name: active
- *         schema:
- *           type: boolean
- *         required: false
- *         description: If true, returns only active (non-deleted) brands
- *     responses:
- *       200:
- *         description: The list of product brands
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/ProductBrandResponseDto'
- */
-router.get(Endpoints.PRODUCT_BRANDS.GET_ALL, paginationMiddleware, asyncHandler(getAllProductBrands));
+createRoute(router, {
+    method: HttpMethod.PUT,
+    path: Endpoints.PRODUCT_BRANDS.UPDATE,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Update a product brand",
+    request: {
+        params: productBrandIdSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: UpdateProductBrandBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "The updated product brand",
+            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
+        },
+        404: { description: "Product brand not found" }
+    }
+}, updateProductBrand);
 
-/**
- * @swagger
- * /api/product-brands/{id}:
- *   get:
- *     summary: Get a product brand by id
- *     tags: [Product Brands]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The product brand id
- *     responses:
- *       200:
- *         description: The product brand description by id
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ProductBrandResponseDto'
- *       404:
- *         description: Product brand not found
- */
-router.get(Endpoints.PRODUCT_BRANDS.GET_BY_ID, asyncHandler(getProductBrandById));
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.PRODUCT_BRANDS.DELETE,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Soft delete a product brand",
+    request: {
+        params: productBrandIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "Product brand deleted successfully" }
+    }
+}, deleteProductBrand);
 
-/**
- * @swagger
- * /api/product-brands/{id}:
- *   put:
- *     summary: Update a product brand
- *     tags: [Product Brands]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The product brand id
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateProductBrandDto'
- *     responses:
- *       200:
- *         description: The updated product brand
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ProductBrandResponseDto'
- *       404:
- *         description: Product brand not found
- */
-router.put(Endpoints.PRODUCT_BRANDS.UPDATE, asyncHandler(updateProductBrand));
-
-/**
- * @swagger
- * /api/product-brands/{id}:
- *   delete:
- *     summary: Soft delete a product brand
- *     tags: [Product Brands]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The product brand id
- *     responses:
- *       200:
- *         description: Product brand deleted successfully (soft delete)
- */
-router.delete(Endpoints.PRODUCT_BRANDS.DELETE, asyncHandler(deleteProductBrand));
-
-/**
- * @swagger
- * /api/product-brands/{id}/restore:
- *   patch:
- *     summary: Restore a soft-deleted product brand
- *     tags: [Product Brands]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The product brand id
- *     responses:
- *       200:
- *         description: The restored product brand
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ProductBrandResponseDto'
- *       404:
- *         description: Product brand not found
- */
-router.patch(Endpoints.PRODUCT_BRANDS.RESTORE, asyncHandler(restoreProductBrand));
+createRoute(router, {
+    method: HttpMethod.PATCH,
+    path: Endpoints.PRODUCT_BRANDS.RESTORE,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Restore a soft-deleted product brand",
+    request: {
+        params: productBrandIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The restored product brand",
+            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
+        },
+        404: { description: "Product brand not found" }
+    }
+}, restoreProductBrand);
 
 export default router;

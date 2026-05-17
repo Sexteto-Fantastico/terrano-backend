@@ -39,30 +39,6 @@ function sanitizeUser(user: User): UserResponseDto {
 }
 
 async function createUser(request: CreateUserRequestDto): Promise<UserResponseDto> {
-    if (!request.username || request.username.trim() === "") {
-        throw new BadRequestError("Username is required.");
-    }
-
-    if (!request.name || request.name.trim() === "") {
-        throw new BadRequestError("Name is required.");
-    }
-
-    if (!request.email || request.email.trim() === "") {
-        throw new BadRequestError("Email is required.");
-    }
-
-    if (!request.password || request.password.trim() === "") {
-        throw new BadRequestError("Password is required.");
-    }
-
-    if (!request.roleId) {
-        throw new BadRequestError("Role ID is required.");
-    }
-
-    if (!request.departmentId) {
-        throw new BadRequestError("Department ID is required.");
-    }
-
     const existingUser = await getUserByUsername(request.username);
     if (existingUser) {
         throw new ConflictError("Username already exists.");
@@ -205,10 +181,6 @@ async function changePassword(id: number, request: ChangePasswordRequestDto): Pr
     const user = await repoGetUserById(id, true);
     if (!user) {
         throw new NotFoundError("User not found.");
-    }
-
-    if (!request.password) {
-        throw new BadRequestError("Password is required.");
     }
 
     user.password = hashPassword(request.password);

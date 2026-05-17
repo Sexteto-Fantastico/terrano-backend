@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 import {
     createDepartment,
     getAllDepartments,
@@ -7,202 +8,121 @@ import {
     deleteDepartment,
     restoreDepartment
 } from "../controllers/department.controller";
-import { Endpoints } from "../utils/constants/endpoints";
-import { asyncHandler } from "../utils/async-handler";
+import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
+import { createRoute } from "../utils/route-builder";
 import { paginationMiddleware } from "../middlewares/pagination.middleware";
+import {
+    CreateDepartmentBodySchema,
+    UpdateDepartmentBodySchema,
+    DepartmentResponseSchema,
+    departmentIdSchema,
+    departmentQuerySchema
+} from "../dtos/department.dto";
+
 const router = Router();
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     DepartmentResponseDto:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *         name:
- *           type: string
- *         costCenterCode:
- *           type: string
- *         managerId:
- *           type: integer
- *         deletedAt:
- *           type: string
- *           format: date-time
- *           nullable: true
- *     CreateDepartmentDto:
- *       type: object
- *       required:
- *         - name
- *         - costCenterCode
- *         - managerId
- *       properties:
- *         name:
- *           type: string
- *         costCenterCode:
- *           type: string
- *         managerId:
- *           type: integer
- *     UpdateDepartmentDto:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *         costCenterCode:
- *           type: string
- *         managerId:
- *           type: integer
- */
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.DEPARTMENTS.CREATE,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Create a new department",
+    request: {
+        body: { content: { [ContentType.JSON]: { schema: CreateDepartmentBodySchema } } }
+    },
+    responses: {
+        201: {
+            description: "The created department",
+            content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
+        }
+    }
+}, createDepartment);
 
-/**
- * @swagger
- * tags:
- *   name: Departments
- *   description: The departments managing API
- */
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.DEPARTMENTS.GET_ALL,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Returns the list of all departments",
+    request: {
+        query: departmentQuerySchema.shape.query
+    },
+    responses: {
+        200: {
+            description: "The list of departments",
+            content: { [ContentType.JSON]: { schema: z.array(DepartmentResponseSchema) } }
+        }
+    },
+    middlewares: [paginationMiddleware]
+}, getAllDepartments);
 
-/**
- * @swagger
- * /api/departments:
- *   post:
- *     summary: Create a new department
- *     tags: [Departments]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateDepartmentDto'
- *     responses:
- *       201:
- *         description: The created department
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/DepartmentResponseDto'
- */
-router.post(Endpoints.DEPARTMENTS.CREATE, asyncHandler(createDepartment));
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.DEPARTMENTS.GET_BY_ID,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Get a department by id",
+    request: {
+        params: departmentIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The department",
+            content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
+        },
+        404: { description: "Department not found" }
+    }
+}, getDepartmentById);
 
-/**
- * @swagger
- * /api/departments:
- *   get:
- *     summary: Returns the list of all departments
- *     tags: [Departments]
- *     parameters:
- *       - in: query
- *         name: activeOnly
- *         schema:
- *           type: boolean
- *         required: false
- *         description: If true, returns only active (non-deleted) departments
- *     responses:
- *       200:
- *         description: The list of departments
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/DepartmentResponseDto'
- */
-router.get(Endpoints.DEPARTMENTS.GET_ALL, paginationMiddleware, asyncHandler(getAllDepartments));
+createRoute(router, {
+    method: HttpMethod.PUT,
+    path: Endpoints.DEPARTMENTS.UPDATE,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Update a department",
+    request: {
+        params: departmentIdSchema.shape.params,
+        body: { content: { [ContentType.JSON]: { schema: UpdateDepartmentBodySchema } } }
+    },
+    responses: {
+        200: {
+            description: "The updated department",
+            content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
+        },
+        404: { description: "Department not found" }
+    }
+}, updateDepartment);
 
-/**
- * @swagger
- * /api/departments/{id}:
- *   get:
- *     summary: Get a department by id
- *     tags: [Departments]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *     responses:
- *       200:
- *         description: The department
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/DepartmentResponseDto'
- *       404:
- *         description: Department not found
- */
-router.get(Endpoints.DEPARTMENTS.GET_BY_ID, asyncHandler(getDepartmentById));
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.DEPARTMENTS.DELETE,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Soft delete a department",
+    request: {
+        params: departmentIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "Department deleted successfully" }
+    }
+}, deleteDepartment);
 
-/**
- * @swagger
- * /api/departments/{id}:
- *   put:
- *     summary: Update a department
- *     tags: [Departments]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateDepartmentDto'
- *     responses:
- *       200:
- *         description: The updated department
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/DepartmentResponseDto'
- *       404:
- *         description: Department not found
- */
-router.put(Endpoints.DEPARTMENTS.UPDATE, asyncHandler(updateDepartment));
-
-/**
- * @swagger
- * /api/departments/{id}:
- *   delete:
- *     summary: Soft delete a department
- *     tags: [Departments]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *     responses:
- *       200:
- *         description: Department deleted successfully
- */
-router.delete(Endpoints.DEPARTMENTS.DELETE, asyncHandler(deleteDepartment));
-
-/**
- * @swagger
- * /api/departments/{id}/restore:
- *   patch:
- *     summary: Restore a soft-deleted department
- *     tags: [Departments]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *     responses:
- *       200:
- *         description: The restored department
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/DepartmentResponseDto'
- *       404:
- *         description: Department not found
- */
-router.patch(Endpoints.DEPARTMENTS.RESTORE, asyncHandler(restoreDepartment));
+createRoute(router, {
+    method: HttpMethod.PATCH,
+    path: Endpoints.DEPARTMENTS.RESTORE,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Restore a soft-deleted department",
+    request: {
+        params: departmentIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The restored department",
+            content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
+        },
+        404: { description: "Department not found" }
+    }
+}, restoreDepartment);
 
 export default router;

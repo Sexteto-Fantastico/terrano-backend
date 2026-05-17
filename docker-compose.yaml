@@ -10,11 +10,15 @@ services:
       PORT: 3000
       NODE_ENV: production
       JWT_SECRET: asedsadsaeweew
-    depends_on:
-      - db
+      DB_PATH: /app/data/database.sqlite
+    volumes:
+      - terrano-data:/app/data
     restart: unless-stopped
     networks:
       - terrano-network
+
+volumes:
+  terrano-data:
 
 networks:
   terrano-network:
