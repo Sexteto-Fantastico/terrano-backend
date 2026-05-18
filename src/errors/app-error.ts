@@ -50,3 +50,21 @@ export class UnprocessableEntityError extends AppError {
         super(message, 422);
     }
 }
+
+export class InternalServerError extends AppError {
+    constructor(message: string = "Internal server error") {
+        super(message, 500, false); 
+    }
+}
+
+export class EmailConfigurationError extends AppError {
+    constructor(message: string = "Email service configuration is missing or invalid") {
+        super(message, 500, false);
+    }
+}
+
+export class EmailSendError extends AppError {
+    constructor(message: string = "Failed to send the email via SMTP server") {
+        super(message, 502, true);
+    }
+}
