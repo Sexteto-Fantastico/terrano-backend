@@ -11,9 +11,29 @@ services:
       NODE_ENV: production
       JWT_SECRET: asedsadsaeweew
       DB_PATH: /app/data/database.sqlite
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_USER: admin
+      SMTP_PASS: terrano123
+      EMAIL_FROM: no-reply@terrano.com.br
     volumes:
       - terrano-data:/app/data
     restart: unless-stopped
+    networks:
+      - terrano-network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: terrano-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+    command: >
+      MailHog
+      -auth-file=/mailhog/auth.txt
+    volumes:
+      - ./mailhog.auth.txt:/mailhog/auth.txt
     networks:
       - terrano-network
 
