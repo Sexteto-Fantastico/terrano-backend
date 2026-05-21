@@ -22,3 +22,8 @@ export const toProductBrandResponseDTO = (brand: any): ProductBrandResponseDTO =
 
 export const toProductBrandResponseDTOList = (brands: any[]): ProductBrandResponseDTO[] =>
     brands.map(toProductBrandResponseDTO);
+
+export class ProductBrandQueryDTO {
+    name?: string;
+    activeOnly?: boolean;
+}
