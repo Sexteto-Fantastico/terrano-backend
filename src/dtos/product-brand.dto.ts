@@ -1,4 +1,5 @@
 import { z, registry } from "../infra/config/openapi";
+import { paginationFields } from "./common/pagination.dto";
 
 export const productBrandIdSchema = z.object({
     params: z.object({
@@ -8,6 +9,7 @@ export const productBrandIdSchema = z.object({
 
 export const productBrandQuerySchema = z.object({
     query: z.object({
+        ...paginationFields,
         active: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });

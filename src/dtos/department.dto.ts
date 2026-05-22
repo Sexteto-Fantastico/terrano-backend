@@ -1,4 +1,5 @@
 import { z, registry } from "../infra/config/openapi";
+import { paginationFields } from "./common/pagination.dto";
 
 export const departmentIdSchema = z.object({
     params: z.object({
@@ -8,6 +9,7 @@ export const departmentIdSchema = z.object({
 
 export const departmentQuerySchema = z.object({
     query: z.object({
+        ...paginationFields,
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });

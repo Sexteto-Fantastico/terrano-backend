@@ -1,4 +1,5 @@
 import { z, registry } from "../infra/config/openapi";
+import { paginationFields } from "./common/pagination.dto";
 import { MeasurementUnit, MeasurementUnitSymbol, MeasurementUnitType } from "../infra/entities/measurement-unit.entity";
 
 export const measurementUnitIdSchema = z.object({
@@ -9,6 +10,7 @@ export const measurementUnitIdSchema = z.object({
 
 export const measurementUnitQuerySchema = z.object({
     query: z.object({
+        ...paginationFields,
         name: z.string().optional(),
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })

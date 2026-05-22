@@ -1,7 +1,7 @@
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/user.entity";
 import { Role } from "../entities/role.entity";
-import bcrypt from "bcrypt";
+import { hashPassword } from "../../utils/password.util";
 
 export async function createAdminSeed(): Promise<void> {
     const userRepository = AppDataSource.getRepository(User);
@@ -32,7 +32,7 @@ export async function createAdminSeed(): Promise<void> {
         throw new Error("ADMIN role not found");
     }
 
-    const passwordHash = await bcrypt.hash("admin", 10);
+    const passwordHash = hashPassword("admin123")
 
     const admin = userRepository.create({
         name: "System Admin",
