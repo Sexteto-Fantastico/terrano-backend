@@ -2,7 +2,6 @@ import { Router } from "express";
 import { z } from "zod";
 import { createProductCategory, getAllProductCategories, getProductCategoryById, updateProductCategory, deleteProductCategory, restoreProductCategory } from "../controllers/product-category.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { createRoute } from "../utils/route-builder";
 import {
     productCategoryQuerySchema,
@@ -46,7 +45,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(ProductCategoryResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getAllProductCategories);
 
 createRoute(router, {

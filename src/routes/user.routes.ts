@@ -2,7 +2,6 @@ import { Router } from "express";
 import { z } from "zod";
 import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser } from "../controllers/user.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { getUserLogs } from "../controllers/system-log.controller";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -52,7 +51,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(UserResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getUsers);
 
 createRoute(router, {

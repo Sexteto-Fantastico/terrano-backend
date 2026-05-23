@@ -9,19 +9,26 @@ async function createBrand(data: ProductBrand): Promise<ProductBrand> {
     return await productBrandRepository.save(brand);
 }
 
-async function getAllBrands(filters: { name?: string; activeOnly?: boolean } = {}, limit: number = 20, offset: number = 0): Promise<[ProductBrand[], number]> {
-    const { name, activeOnly = true } = filters;
+async function getAllBrands(filters: { name?: string; activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[ProductBrand[], number]> {
+    const { name, activeOnly = true, pageIndex, pageSize } = filters;
 
     const where: FindOptionsWhere<ProductBrand> = {} as FindOptionsWhere<ProductBrand>;
     if (name) where.name = ILike(`%${name}%`);
 
-    return await productBrandRepository.findAndCount({
+    const dbQuery: any = {
         where,
         withDeleted: !activeOnly,
         order: { name: "ASC" },
-        take: limit,
-        skip: offset,
-    });
+    };
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        dbQuery.take = pageSize;
+        dbQuery.skip = (pageIndex - 1) * pageSize;
+        return await productBrandRepository.findAndCount(dbQuery);
+    }
+
+    const results = await productBrandRepository.find(dbQuery);
+    return [results, results.length];
 }
 
 async function getBrandById(id: number, withDeleted: boolean = false): Promise<ProductBrand | null> {

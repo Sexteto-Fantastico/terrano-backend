@@ -10,7 +10,6 @@ import {
 } from "../controllers/department.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import {
     CreateDepartmentBodySchema,
     UpdateDepartmentBodySchema,
@@ -53,7 +52,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(DepartmentResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getAllDepartments);
 
 createRoute(router, {

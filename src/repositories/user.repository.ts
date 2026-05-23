@@ -30,19 +30,27 @@ async function getUserById(id: number, activeOnly: boolean = false): Promise<Use
     });
 }
 
-async function getAllUsers(filters: { onlyActive?: boolean; name?: string }, limit: number = 20, offset: number = 0): Promise<[User[], number]> {
+async function getAllUsers(filters: { onlyActive?: boolean; name?: string; pageIndex?: number; pageSize?: number; } = {}): Promise<[User[], number]> {
+    const { onlyActive, name, pageIndex, pageSize } = filters;
     const where: FindOptionsWhere<User> = {};
 
-    if (filters.onlyActive) where.is_active = true;
-    if (filters.name) where.name = ILike(`%${filters.name}%`);
+    if (onlyActive) where.is_active = true;
+    if (name) where.name = ILike(`%${name}%`);
 
-    return await userRepository.findAndCount({
+    const dbQuery: any = {
         where,
         relations: ["role", "department"],
         order: { name: "ASC" },
-        take: limit,
-        skip: offset,
-    });
+    };
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        dbQuery.take = pageSize;
+        dbQuery.skip = (pageIndex - 1) * pageSize;
+        return await userRepository.findAndCount(dbQuery);
+    }
+
+    const results = await userRepository.find(dbQuery);
+    return [results, results.length];
 }
 
 async function updateUser(user: User): Promise<User> {

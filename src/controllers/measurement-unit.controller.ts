@@ -13,19 +13,13 @@ import {
     MeasurementUnitResponseDto,
     MeasurementUnitQueryDto,
 } from "../dtos/measurement-unit.dto";
-import { parseBooleanQuery } from "../utils/query.util";
 
 export const getAll = async (
-    req: Request<{}, MeasurementUnitResponseDto[], {}, any>,
+    req: Request<{}, MeasurementUnitResponseDto[], {}, MeasurementUnitQueryDto>,
     res: Response<MeasurementUnitResponseDto[]>
 ) => {
-    const query: MeasurementUnitQueryDto = {
-        name: req.query.name,
-        activeOnly: parseBooleanQuery(req.query.activeOnly)
-    };
-    const { limit, offset } = req.pagination;
-    const [units, total] = await getAllMeasurementUnits(query, limit, offset);
-    res.setPaginationHeaders(total);
+    const [units, total] = await getAllMeasurementUnits(req.query);
+    res.set("X-Total-Count", total.toString());
     res.json(units);
 };
 

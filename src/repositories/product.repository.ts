@@ -27,8 +27,8 @@ async function restoreProduct(id: number): Promise<boolean> {
     return result.affected !== 0;
 }
 
-async function getAllProducts(filters: ProductQueryDTO = {}, limit: number = 20, offset: number = 0): Promise<[Product[], number]> {
-    const { name, activeOnly = true, brandId, categoryId, code } = filters;
+async function getAllProducts(filters: ProductQueryDTO = {}): Promise<[Product[], number]> {
+    const { name, activeOnly = true, brandId, categoryId, code, pageIndex, pageSize } = filters;
     const where: FindOptionsWhere<Product> = {};
 
     if (name) where.name = ILike(`%${name}%`);
@@ -36,14 +36,21 @@ async function getAllProducts(filters: ProductQueryDTO = {}, limit: number = 20,
     if (brandId) where.brand_id = brandId;
     if (categoryId) where.category_id = categoryId;
 
-    return await productRepository.findAndCount({
+    const dbQuery: any = {
         where,
         relations: ["category", "measurement_unit", "brand"],
         withDeleted: !activeOnly,
         order: { name: "ASC" },
-        take: limit,
-        skip: offset,
-    });
+    };
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        dbQuery.take = pageSize;
+        dbQuery.skip = (pageIndex - 1) * pageSize;
+        return await productRepository.findAndCount(dbQuery);
+    }
+
+    const results = await productRepository.find(dbQuery);
+    return [results, results.length];
 }
 
 export { getProductById, getProductByCode, saveProduct, deleteProduct, restoreProduct, getAllProducts };

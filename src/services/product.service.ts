@@ -5,8 +5,8 @@ import { getCategoryById } from "../repositories/product-category.repository";
 import { findMeasurementUnitById } from "../repositories/measurement-unit.repository";
 import { getBrandById } from "../repositories/product-brand.repository";
 
-async function getAllProducts(filters: ProductQueryDTO = {}, limit: number = 20, offset: number = 0): Promise<[ProductResponseDTO[], number]> {
-    const [allProducts, total] = await ProductRepository.getAllProducts(filters, limit, offset);
+async function getAllProducts(filters: ProductQueryDTO = {}): Promise<[ProductResponseDTO[], number]> {
+    const [allProducts, total] = await ProductRepository.getAllProducts(filters);
     return [allProducts.map(toProductResponseDTO), total];
 }
 

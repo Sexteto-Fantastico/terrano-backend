@@ -2,7 +2,6 @@ import { Router } from "express";
 import { z } from "zod";
 import { createProductBrand, getAllProductBrands, getProductBrandById, updateProductBrand, deleteProductBrand, restoreProductBrand } from "../controllers/product-brand.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { createRoute } from "../utils/route-builder";
 import {
     productBrandQuerySchema,
@@ -46,7 +45,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(ProductBrandResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getAllProductBrands);
 
 createRoute(router, {

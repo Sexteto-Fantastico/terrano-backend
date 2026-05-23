@@ -13,6 +13,7 @@ export const departmentQuerySchema = z.object({
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
+export type DepartmentQueryDto = z.infer<typeof departmentQuerySchema>["query"];
 
 export const CreateDepartmentBodySchema = registry.register(
     "CreateDepartmentDto",

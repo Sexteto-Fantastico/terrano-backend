@@ -19,8 +19,8 @@ async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCa
     return toProductCategoryResponseDTO(loaded!);
 }
 
-async function getAllCategories(filters: { activeOnly?: boolean; name?: string }, limit: number = 20, offset: number = 0): Promise<[ProductCategoryResponseDTO[], number]> {
-    const [categories, total] = await ProductCategoryRepository.getAllCategories(filters, limit, offset);
+async function getAllCategories(filters: { activeOnly?: boolean; name?: string; pageIndex?: number; pageSize?: number; } = {}): Promise<[ProductCategoryResponseDTO[], number]> {
+    const [categories, total] = await ProductCategoryRepository.getAllCategories(filters);
     return [toProductCategoryResponseDTOList(categories), total];
 }
 

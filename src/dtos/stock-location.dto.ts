@@ -14,6 +14,7 @@ export const stockLocationQuerySchema = z.object({
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
+export type StockLocationQueryDto = z.infer<typeof stockLocationQuerySchema>["query"];
 
 const AddressSchema = z.object({
     street: z.string().min(1, "Street is required").openapi({ example: "Main St" }),

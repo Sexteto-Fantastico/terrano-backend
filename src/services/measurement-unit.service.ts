@@ -15,14 +15,8 @@ import {
 } from "../dtos/measurement-unit.dto";
 import { NotFoundError, BadRequestError } from "../errors";
 
-export async function getAllMeasurementUnits(query: MeasurementUnitQueryDto, limit: number = 20, offset: number = 0): Promise<[MeasurementUnitResponseDto[], number]> {
-    const activeOnly = query.activeOnly !== undefined ? query.activeOnly : true;
-
-    const [units, total] = await findAllMeasurementUnits({
-        name: query.name,
-        activeOnly,
-    }, limit, offset);
-
+export async function getAllMeasurementUnits(query: MeasurementUnitQueryDto): Promise<[MeasurementUnitResponseDto[], number]> {
+    const [units, total] = await findAllMeasurementUnits(query);
     return [units.map(toMeasurementUnitResponseDto), total];
 }
 
