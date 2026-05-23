@@ -5,6 +5,7 @@ import {
     ProductBrandResponseDTO,
     toProductBrandResponseDTO,
     toProductBrandResponseDTOList,
+    ProductBrandQueryDTO,
 } from "../dtos/product-brand.dto";
 import * as ProductBrandRepository from "../repositories/product-brand.repository";
 
@@ -13,8 +14,8 @@ async function createBrand(data: CreateProductBrandDTO): Promise<ProductBrandRes
     return toProductBrandResponseDTO(brand);
 }
 
-async function getAllBrands(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[ProductBrandResponseDTO[], number]> {
-    const [brands, total] = await ProductBrandRepository.getAllBrands(activeOnly, limit, offset);
+async function getAllBrands(filters: ProductBrandQueryDTO = {}, limit: number = 20, offset: number = 0): Promise<[ProductBrandResponseDTO[], number]> {
+    const [brands, total] = await ProductBrandRepository.getAllBrands(filters, limit, offset);
     return [toProductBrandResponseDTOList(brands), total];
 }
 
