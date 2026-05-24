@@ -13,6 +13,7 @@ async function getAllBrands(filters: { name?: string; activeOnly?: boolean; page
     const { name, activeOnly = true, pageIndex, pageSize } = filters;
 
     const where: FindOptionsWhere<ProductBrand> = {} as FindOptionsWhere<ProductBrand>;
+
     if (name) where.name = ILike(`%${name}%`);
 
     const dbQuery: any = {

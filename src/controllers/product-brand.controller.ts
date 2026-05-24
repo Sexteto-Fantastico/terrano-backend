@@ -17,7 +17,7 @@ async function createProductBrand(
 }
 
 async function getAllProductBrands(
-    req: Request<ProductBrandResponseDTO[], {}, {}, ProductBrandQueryDTO>,
+    req: Request<{}, ProductBrandResponseDTO[], {}, ProductBrandQueryDTO>,
     res: Response<ProductBrandResponseDTO[]>
 ) {
     const [brands, total] = await ProductBrandService.getAllBrands(req.query);
