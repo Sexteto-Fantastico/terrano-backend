@@ -13,6 +13,7 @@ async function getAllBrands(filters: { name?: string; activeOnly?: boolean } = {
     const { name, activeOnly = true } = filters;
 
     const where: FindOptionsWhere<ProductBrand> = {} as FindOptionsWhere<ProductBrand>;
+
     if (name) where.name = ILike(`%${name}%`);
 
     return await productBrandRepository.findAndCount({

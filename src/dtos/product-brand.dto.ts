@@ -8,7 +8,8 @@ export const productBrandIdSchema = z.object({
 
 export const productBrandQuerySchema = z.object({
     query: z.object({
-        active: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        name: z.string().optional(),
+        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
 
@@ -40,8 +41,7 @@ export const ProductBrandResponseSchema = registry.register(
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "BrandX" }),
-        isActive: z.boolean().optional().openapi({ example: true }),
-        deletedAt: z.date().nullable().optional().openapi({ type: "string", format: "date-time" }),
+        isActive: z.boolean().optional().openapi({ example: true })
     })
 );
 
@@ -49,14 +49,12 @@ export class ProductBrandResponseDTO {
     id: number;
     name: string;
     isActive?: boolean;
-    deletedAt?: Date | null;
 }
 
 export const toProductBrandResponseDTO = (brand: any): ProductBrandResponseDTO => ({
     id: brand.id,
     name: brand.name,
-    isActive: brand.is_active,
-    deletedAt: brand.deleted_at,
+    isActive: !brand.deleted_at
 });
 
 export const toProductBrandResponseDTOList = (brands: any[]): ProductBrandResponseDTO[] =>
