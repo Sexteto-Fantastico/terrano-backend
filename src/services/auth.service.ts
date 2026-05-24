@@ -1,7 +1,8 @@
 import crypto from "crypto";
 import { hashPassword, verifyPassword } from "../utils/password.util";
 import { signJwt } from "../utils/jwt.util";
-import { sendResetPasswordEmail } from "../utils/email.util";
+import { sendEmail } from "./email.service";
+import { resetPasswordTemplate } from "../types/email/reset-password.template";
 import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors";
 import {
     getUserByEmail,
@@ -51,7 +52,10 @@ async function forgotPassword(email: string): Promise<void> {
     await repoUpdateUser(user);
 
     const resetLink = `${FRONTEND_URL}/defina-sua-senha?token=${token}`;
-    await sendResetPasswordEmail({ to: user.email, resetLink });
+    await sendEmail({
+        to: user.email,
+        template: resetPasswordTemplate({resetLink}),
+    });
 }
 
 async function resetPassword(token: string, password: string): Promise<void> {

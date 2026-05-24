@@ -1,5 +1,6 @@
 import { AppDataSource } from "./data-source";
 import { createAdminSeed } from "../seeds/admin.seed";
+import { createRoleSeed } from "../seeds/role.seed";
 
 export async function migrateDatabase(): Promise<void> {
     try {
@@ -11,7 +12,8 @@ export async function migrateDatabase(): Promise<void> {
         await AppDataSource.runMigrations();
 
         console.log("Migrations executed successfully");
-
+        
+        await createRoleSeed();
         await createAdminSeed();
     } catch (err) {
         console.error("Migration error:", err);

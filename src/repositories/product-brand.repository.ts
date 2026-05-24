@@ -1,5 +1,6 @@
 import { AppDataSource } from "../infra/config/data-source";
 import { ProductBrand } from "../infra/entities/product-brand.entity";
+import { FindOptionsWhere, ILike } from "typeorm";
 
 const productBrandRepository = AppDataSource.getRepository(ProductBrand);
 
@@ -8,9 +9,16 @@ async function createBrand(data: ProductBrand): Promise<ProductBrand> {
     return await productBrandRepository.save(brand);
 }
 
-async function getAllBrands(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[ProductBrand[], number]> {
+async function getAllBrands(filters: { name?: string; activeOnly?: boolean } = {}, limit: number = 20, offset: number = 0): Promise<[ProductBrand[], number]> {
+    const { name, activeOnly = true } = filters;
+
+    const where: FindOptionsWhere<ProductBrand> = {} as FindOptionsWhere<ProductBrand>;
+    if (name) where.name = ILike(`%${name}%`);
+
     return await productBrandRepository.findAndCount({
+        where,
         withDeleted: !activeOnly,
+        order: { name: "ASC" },
         take: limit,
         skip: offset,
     });

@@ -6,6 +6,8 @@ import {
     UpdateProductBrandDTO,
     ProductBrandResponseDTO,
 } from "../dtos/product-brand.dto";
+import { ProductBrandQueryDTO } from "../dtos/product-brand.dto";
+import { parseBooleanQuery } from "../utils/query.util";
 
 async function createProductBrand(
     req: Request<ProductBrandResponseDTO, CreateProductBrandDTO>,
@@ -16,12 +18,15 @@ async function createProductBrand(
 }
 
 async function getAllProductBrands(
-    req: Request<ProductBrandResponseDTO[], { active?: string }>,
+    req: Request<ProductBrandResponseDTO[], {}, {}, ProductBrandQueryDTO>,
     res: Response<ProductBrandResponseDTO[]>
 ) {
-    const activeOnly = req.query.active === "true";
+    const query: ProductBrandQueryDTO = {
+        name: (req.query as any).name,
+        activeOnly: parseBooleanQuery((req.query as any).active),
+    };
     const { limit, offset } = req.pagination;
-    const [brands, total] = await ProductBrandService.getAllBrands(activeOnly, limit, offset);
+    const [brands, total] = await ProductBrandService.getAllBrands(query, limit, offset);
     res.setPaginationHeaders(total);
     res.status(200).json(brands);
 }
