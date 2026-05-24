@@ -18,12 +18,12 @@ async function createProductBrand(
 }
 
 async function getAllProductBrands(
-    req: Request<ProductBrandResponseDTO[], {}, {}, ProductBrandQueryDTO>,
+    req: Request<{}, ProductBrandResponseDTO[], {}, ProductBrandQueryDTO>,
     res: Response<ProductBrandResponseDTO[]>
 ) {
     const query: ProductBrandQueryDTO = {
-        name: (req.query as any).name,
-        activeOnly: parseBooleanQuery((req.query as any).active),
+        name: req.query.name,
+        activeOnly: parseBooleanQuery(req.query.activeOnly),
     };
     const { limit, offset } = req.pagination;
     const [brands, total] = await ProductBrandService.getAllBrands(query, limit, offset);
