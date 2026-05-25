@@ -36,12 +36,14 @@ async function updateCategory(id: number, data: UpdateProductCategoryDTO): Promi
 
     if (data.name !== undefined) category.name = data.name;
     if (data.description !== undefined) category.description = data.description;
+    
     if (data.parentId !== undefined) {
         if (data.parentId === null) {
             category.parent_id = null as any;
             category.parent = null as any;
         } else {
             category.parent_id = data.parentId;
+            category.parent = { id: data.parentId } as any; 
         }
     }
 
