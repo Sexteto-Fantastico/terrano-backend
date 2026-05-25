@@ -7,7 +7,6 @@ import {
     ProductCategoryResponseDTO,
     ProductCategoryQueryDTO,
 } from "../dtos/product-category.dto";
-import { parseBooleanQuery } from "../utils/query.util";
 
 async function createProductCategory(req: Request<ProductCategoryResponseDTO, CreateProductCategoryDTO>, res: Response<ProductCategoryResponseDTO>) {
     const category = await ProductCategoyService.createCategory(req.body);
@@ -15,13 +14,8 @@ async function createProductCategory(req: Request<ProductCategoryResponseDTO, Cr
 }
 
 async function getAllProductCategories(req: Request<{}, ProductCategoryResponseDTO[], {}, ProductCategoryQueryDTO>, res: Response<ProductCategoryResponseDTO[]>) {
-    const query: ProductCategoryQueryDTO = {
-        name: req.query.name,
-        activeOnly: parseBooleanQuery(req.query.activeOnly)
-    };
-    const { limit, offset } = req.pagination;
-    const [categories, total] = await ProductCategoyService.getAllCategories(query, limit, offset);
-    res.setPaginationHeaders(total);
+    const [categories, total] = await ProductCategoyService.getAllCategories(req.query);
+    res.set("X-Total-Count", total.toString());
     res.status(200).json(categories);
 }
 

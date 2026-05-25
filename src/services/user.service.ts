@@ -86,12 +86,8 @@ async function createUser(request: CreateUserRequestDto): Promise<UserResponseDt
     return sanitizeUser(user);
 }
 
-async function getUsers(filters: GetUsersQueryDto, limit: number = 20, offset: number = 0): Promise<[UserResponseDto[], number]> {
-    const [users, total] = await getAllUsers({
-        onlyActive: filters.onlyActive === true,
-        name: filters.name,
-    }, limit, offset);
-
+async function getUsers(filters: GetUsersQueryDto): Promise<[UserResponseDto[], number]> {
+    const [users, total] = await getAllUsers(filters);
     return [users.map(sanitizeUser), total];
 }
 

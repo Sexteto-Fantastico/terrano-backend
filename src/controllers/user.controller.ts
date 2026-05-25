@@ -8,7 +8,6 @@ import {
     UpdateUserRequestDto,
     UserResponseDto,
 } from "../dtos/user.dto";
-import { parseBooleanQuery } from "../utils/query.util";
 
 async function createUser(req: Request<unknown, UserResponseDto, CreateUserRequestDto>, res: Response<UserResponseDto>) {
     const user = await UserService.createUser(req.body);
@@ -16,13 +15,8 @@ async function createUser(req: Request<unknown, UserResponseDto, CreateUserReque
 }
 
 async function getUsers(req: Request<unknown, UserResponseDto[], unknown, GetUsersQueryDto>, res: Response<UserResponseDto[]>) {
-    const query: GetUsersQueryDto = {
-        name: req.query.name,
-        onlyActive: parseBooleanQuery(req.query.onlyActive),
-    };
-    const { limit, offset } = req.pagination;
-    const [users, total] = await UserService.getUsers(query, limit, offset);
-    res.setPaginationHeaders(total);
+    const [users, total] = await UserService.getUsers(req.query);
+    res.set("X-Total-Count", total.toString());
     res.json(users);
 }
 

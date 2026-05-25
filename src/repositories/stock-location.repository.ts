@@ -3,12 +3,21 @@ import { StockLocation } from "../infra/entities/stock-location.entity";
 
 const repository = AppDataSource.getRepository(StockLocation);
 
-async function getAllStockLocations(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[StockLocation[], number]> {
-    return await repository.findAndCount({
+async function getAllStockLocations(filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[StockLocation[], number]> {
+    const { activeOnly = false, pageIndex, pageSize } = filters;
+
+    const dbQuery: any = {
         withDeleted: !activeOnly,
-        take: limit,
-        skip: offset,
-    });
+    };
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        dbQuery.take = pageSize;
+        dbQuery.skip = (pageIndex - 1) * pageSize;
+        return await repository.findAndCount(dbQuery);
+    }
+
+    const results = await repository.find(dbQuery);
+    return [results, results.length];
 }
 
 async function getStockLocationById(id: number): Promise<StockLocation | null> {

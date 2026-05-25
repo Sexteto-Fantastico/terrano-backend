@@ -12,12 +12,10 @@ import * as StockLocationRepository from "../repositories/stock-location.reposit
 import * as AddressRepository from "../repositories/address.repository";
 
 async function getAllStockLocations(
-    activeOnly: boolean = false,
-    limit: number = 20,
-    offset: number = 0
+    filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}
 ): Promise<[StockLocationResponseDto[], number]> {
 
-    const [locations, total] = await StockLocationRepository.getAllStockLocations(activeOnly, limit, offset);
+    const [locations, total] = await StockLocationRepository.getAllStockLocations(filters);
     return [toStockLocationResponseDtoList(locations), total];
 }
 

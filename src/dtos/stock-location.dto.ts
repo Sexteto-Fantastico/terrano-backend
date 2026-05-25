@@ -1,4 +1,5 @@
 import { z, registry } from "../infra/config/openapi";
+import { paginationFields } from "./common/pagination.dto";
 import { StockLocation } from "../infra/entities/stock-location.entity";
 
 export const stockLocationIdSchema = z.object({
@@ -9,9 +10,11 @@ export const stockLocationIdSchema = z.object({
 
 export const stockLocationQuerySchema = z.object({
     query: z.object({
+        ...paginationFields,
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
+export type StockLocationQueryDto = z.infer<typeof stockLocationQuerySchema>["query"];
 
 const AddressSchema = z.object({
     street: z.string().min(1, "Street is required").openapi({ example: "Main St" }),

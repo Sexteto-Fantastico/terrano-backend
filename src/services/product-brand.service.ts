@@ -14,8 +14,8 @@ async function createBrand(data: CreateProductBrandDTO): Promise<ProductBrandRes
     return toProductBrandResponseDTO(brand);
 }
 
-async function getAllBrands(filters: ProductBrandQueryDTO = {}, limit: number = 20, offset: number = 0): Promise<[ProductBrandResponseDTO[], number]> {
-    const [brands, total] = await ProductBrandRepository.getAllBrands(filters, limit, offset);
+async function getAllBrands(filters: ProductBrandQueryDTO = {}): Promise<[ProductBrandResponseDTO[], number]> {
+    const [brands, total] = await ProductBrandRepository.getAllBrands(filters);
     return [toProductBrandResponseDTOList(brands), total];
 }
 

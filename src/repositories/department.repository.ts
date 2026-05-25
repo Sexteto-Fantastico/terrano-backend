@@ -3,13 +3,22 @@ import { Department } from "../infra/entities/department.entity";
 
 const departmentRepository = AppDataSource.getRepository(Department);
 
-async function getAllDepartments(activeOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<[Department[], number]> {
-    return await departmentRepository.findAndCount({
+async function getAllDepartments(filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[Department[], number]> {
+    const { activeOnly = false, pageIndex, pageSize } = filters;
+
+    const dbQuery: any = {
         withDeleted: !activeOnly,
         relations: ["manager"],
-        take: limit,
-        skip: offset,
-    });
+    };
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        dbQuery.take = pageSize;
+        dbQuery.skip = (pageIndex - 1) * pageSize;
+        return await departmentRepository.findAndCount(dbQuery);
+    }
+
+    const results = await departmentRepository.find(dbQuery);
+    return [results, results.length];
 }
 
 async function getDepartmentById(id: number): Promise<Department | null> {
