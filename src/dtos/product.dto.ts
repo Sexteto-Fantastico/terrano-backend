@@ -1,4 +1,5 @@
 import { z, registry } from "../infra/config/openapi";
+import { paginationFields } from "./common/pagination.dto";
 import { ProductCategoryResponseDTO, toProductCategoryResponseDTO } from "./product-category.dto";
 import { Product } from "../infra/entities/product.entity";
 import { MeasurementUnitResponseDto, toMeasurementUnitResponseDto } from "./measurement-unit.dto";
@@ -44,6 +45,7 @@ export const ProductResponseSchema = registry.register(
 
 export const productQuerySchema = z.object({
     query: z.object({
+        ...paginationFields,
         name: z.string().optional(),
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
         brandId: z.coerce.number().int().positive().optional(),

@@ -1,19 +1,10 @@
 import { Request, Response } from "express";
 import * as ProductService from "../services/product.service";
 import { CreateProductRequestDTO, ProductResponseDTO, ProductQueryDTO } from "../dtos/product.dto";
-import { parseBooleanQuery } from "../utils/query.util";
 
 async function getAllProducts(req: Request<{}, ProductResponseDTO[], {}, ProductQueryDTO>, res: Response<ProductResponseDTO[]>) {
-    const filters: ProductQueryDTO = {
-        name: req.query.name,
-        activeOnly: parseBooleanQuery(req.query.activeOnly),
-        brandId: req.query.brandId ? Number(req.query.brandId) : undefined,
-        categoryId: req.query.categoryId ? Number(req.query.categoryId) : undefined,
-        code: req.query.code,
-    };
-    const { limit, offset } = req.pagination;
-    const [products, total] = await ProductService.getAllProducts(filters, limit, offset);
-    res.setPaginationHeaders(total);
+    const [products, total] = await ProductService.getAllProducts(req.query);
+    res.set("X-Total-Count", total.toString());
     res.status(200).json(products);
 }
 

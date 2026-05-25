@@ -10,7 +10,6 @@ import {
 } from "../controllers/stock-location.controller";
 import { getStockLocationLogs } from "../controllers/system-log.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { createRoute } from "../utils/route-builder";
 import {
     stockLocationQuerySchema,
@@ -54,7 +53,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(StockLocationResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getAllStockLocations);
 
 createRoute(router, {

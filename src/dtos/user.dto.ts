@@ -1,4 +1,5 @@
 import { z, registry } from "../infra/config/openapi";
+import { paginationFields } from "./common/pagination.dto";
 
 // ============ Reusable Schemas ============
 
@@ -120,6 +121,7 @@ export type DeleteUserRequestDto = z.infer<typeof deleteUserSchema>["body"];
 
 export const getUsersQuerySchema = z.object({
     query: z.object({
+        ...paginationFields,
         name: z.string().optional(),
         onlyActive: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })

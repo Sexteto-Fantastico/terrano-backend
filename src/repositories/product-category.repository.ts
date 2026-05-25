@@ -10,21 +10,28 @@ async function createCategory(data: IProductCategory): Promise<ProductCategory> 
     return await productCategoryRepository.save(category);
 }
 
-async function getAllCategories(filters: { activeOnly?: boolean; name?: string }, limit: number = 20, offset: number = 0): Promise<[ProductCategory[], number]> {
-    const { activeOnly = false, name } = filters;
+async function getAllCategories(filters: { activeOnly?: boolean; name?: string; pageIndex?: number; pageSize?: number; } = {}): Promise<[ProductCategory[], number]> {
+    const { activeOnly = false, name, pageIndex, pageSize } = filters;
     const where: any = {};
     
     if (name) {
         where.name = ILike(`%${name}%`);
     }
 
-    return await productCategoryRepository.findAndCount({
+    const dbQuery: any = {
         where,
         withDeleted: !activeOnly,
         relations: ["parent"],
-        take: limit,
-        skip: offset,
-    });
+    };
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        dbQuery.take = pageSize;
+        dbQuery.skip = (pageIndex - 1) * pageSize;
+        return await productCategoryRepository.findAndCount(dbQuery);
+    }
+
+    const results = await productCategoryRepository.find(dbQuery);
+    return [results, results.length];
 }
 
 async function getCategoryById(id: number, withDeleted: boolean = false): Promise<ProductCategory | null> {

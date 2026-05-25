@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { getProductLogs } from "../controllers/system-log.controller";
 import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct } from "../controllers/product.controller";
 import { createRoute } from "../utils/route-builder";
@@ -48,7 +47,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(ProductResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getAllProducts);
 
 createRoute(router, {

@@ -2,7 +2,6 @@ import { Router } from "express";
 import { z } from "zod";
 import { getAll, getById, create, update, remove, restore } from "../controllers/measurement-unit.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
-import { paginationMiddleware } from "../middlewares/pagination.middleware";
 import { createRoute } from "../utils/route-builder";
 import {
     measurementUnitQuerySchema,
@@ -29,7 +28,6 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(MeasurementUnitResponseSchema) } }
         }
     },
-    middlewares: [paginationMiddleware]
 }, getAll);
 
 createRoute(router, {
