@@ -1,30 +1,33 @@
+import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { MeasurementUnit } from "../infra/entities/measurement-unit.entity";
-import { ILike } from "typeorm";
+import { MeasurementUnitQueryDto } from "../dtos/measurement-unit.dto";
 
 const repository = AppDataSource.getRepository(MeasurementUnit);
 
-export async function findAllMeasurementUnits(filters: { name?: string; activeOnly?: boolean; pageIndex?: number; pageSize?: number; }): Promise<[MeasurementUnit[], number]> {
-    const { name, activeOnly = true, pageIndex, pageSize } = filters;
+export async function findAllMeasurementUnits(filters: MeasurementUnitQueryDto = {}): Promise<[MeasurementUnit[], number]> {
+    const { name, activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
-    const where: any = {};
-    if (name) {
-        where.name = ILike(`%${name}%`);
-    }
+    const where: FindOptionsWhere<MeasurementUnit> = {};
 
-    const dbQuery: any = {
+    if (name) where.name = ILike(`%${name}%`);
+
+    const options: FindManyOptions<MeasurementUnit> = {
         where,
         withDeleted: !activeOnly,
-        order: { name: "ASC" },
     };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return repository.findAndCount(dbQuery);
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
     }
 
-    const results = await repository.find(dbQuery);
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return repository.findAndCount(options);
+    }
+
+    const results = await repository.find(options);
     return [results, results.length];
 }
 

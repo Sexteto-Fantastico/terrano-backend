@@ -14,7 +14,7 @@ export const productBrandQuerySchema = z.object({
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
-
+export type ProductBrandQueryDTO = z.infer<typeof productBrandQuerySchema>["query"];
 export const CreateProductBrandBodySchema = registry.register(
     "CreateProductBrandDto",
     z.object({
@@ -61,8 +61,3 @@ export const toProductBrandResponseDTO = (brand: any): ProductBrandResponseDTO =
 
 export const toProductBrandResponseDTOList = (brands: any[]): ProductBrandResponseDTO[] =>
     brands.map(toProductBrandResponseDTO);
-
-export class ProductBrandQueryDTO {
-    name?: string;
-    activeOnly?: boolean;
-}

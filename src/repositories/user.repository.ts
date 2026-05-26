@@ -1,6 +1,7 @@
-import { FindOptionsWhere, ILike } from "typeorm";
+import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { User } from "../infra/entities/user.entity";
+import { GetUsersQueryDto } from "../dtos/user.dto";
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -30,28 +31,37 @@ async function getUserById(id: number, activeOnly: boolean = false): Promise<Use
     });
 }
 
-async function getAllUsers(filters: { onlyActive?: boolean; name?: string; pageIndex?: number; pageSize?: number; } = {}): Promise<[User[], number]> {
-    const { onlyActive, name, pageIndex, pageSize } = filters;
+async function getAllUsers(filters: GetUsersQueryDto = {}): Promise<[User[], number]> {
+    const { activeOnly = true, name, pageIndex, pageSize, sortBy, sortOrder } = filters;
+
     const where: FindOptionsWhere<User> = {};
 
-    if (onlyActive) where.is_active = true;
-    if (name) where.name = ILike(`%${name}%`);
-
-    const dbQuery: any = {
-        where,
-        relations: ["role", "department"],
-        order: { name: "ASC" },
-    };
-
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await userRepository.findAndCount(dbQuery);
+    if (activeOnly) {
+        where.is_active = true;
+    }
+    if (name) {
+        where.name = ILike(`%${name}%`);
     }
 
-    const results = await userRepository.find(dbQuery);
+    const options: FindManyOptions<User> = {
+        where,
+        relations: ["role", "department"],
+    };
+
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
+    }
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return await userRepository.findAndCount(options);
+    }
+
+    const results = await userRepository.find(options);
     return [results, results.length];
 }
+
 
 async function updateUser(user: User): Promise<User> {
     return await userRepository.save(user);

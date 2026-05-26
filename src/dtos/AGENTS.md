@@ -8,7 +8,7 @@ This layer defines the strict data contracts for input and output, and is the so
 - **OpenAPI Annotations:** Add `.openapi({ example: ... })` to schema fields for automatic Swagger documentation enrichment.
 - **Schema Registration:** Register reusable body/response schemas with `registry.register('ModelName', schema)` for `$ref` reuse in the generated OpenAPI spec.
 - **Type Inference:** Infer static types from schemas using `export type MyDto = z.infer<typeof mySchema>`.
-- **Naming Convention:** ALL property names in schemas and DTOs MUST use `camelCase` (e.g., `onlyActive`, `costCenterCode`, `managerId`).
+- **Naming Convention:** ALL property names in schemas and DTOs MUST use `camelCase` (e.g., `activeOnly`, `costCenterCode`, `managerId`).
 - **Mappers:** Response DTOs can continue as interfaces/classes of mapping or schemas, but export mapping functions (e.g., `toUserResponseDto(entity: User)`) at the bottom of the file to centralize transformation logic.
 - **Database Alignment:** The DTO layer is responsible for translating database `snake_case` or entity properties into `camelCase` for the frontend.
 - **Security & Privacy:** NEVER include sensitive fields (like `password` or `password_reset_token`) in Response DTOs.

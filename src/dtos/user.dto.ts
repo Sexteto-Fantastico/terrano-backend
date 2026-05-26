@@ -123,7 +123,7 @@ export const getUsersQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
-        onlyActive: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
 export type GetUsersQueryDto = z.infer<typeof getUsersQuerySchema>["query"];
