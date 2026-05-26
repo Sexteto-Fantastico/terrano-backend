@@ -1,119 +1,164 @@
 import { Router } from "express";
 import { z } from "zod";
-import { createProductBrand, getAllProductBrands, getProductBrandById, updateProductBrand, deleteProductBrand, restoreProductBrand } from "../controllers/product-brand.controller";
-import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
+import {
+  createProductBrand,
+  getAllProductBrands,
+  getProductBrandById,
+  updateProductBrand,
+  deleteProductBrand,
+  restoreProductBrand,
+} from "../controllers/product-brand.controller";
+import {
+  Endpoints,
+  HttpMethod,
+  ContentType,
+} from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
-    productBrandQuerySchema,
-    CreateProductBrandBodySchema,
-    UpdateProductBrandBodySchema,
-    productBrandIdSchema,
-    ProductBrandResponseSchema
+  productBrandQuerySchema,
+  CreateProductBrandBodySchema,
+  UpdateProductBrandBodySchema,
+  productBrandIdSchema,
+  ProductBrandResponseSchema,
 } from "../dtos/product-brand.dto";
 
 const router = Router();
 
-createRoute(router, {
+createRoute(
+  router,
+  {
     method: HttpMethod.POST,
     path: Endpoints.PRODUCT_BRANDS.CREATE,
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Create a new product brand",
     request: {
-        body: { content: { [ContentType.JSON]: { schema: CreateProductBrandBodySchema } } }
+      body: {
+        content: {
+          [ContentType.JSON]: { schema: CreateProductBrandBodySchema },
+        },
+      },
     },
     responses: {
-        201: {
-            description: "The created product brand",
-            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
-        }
-    }
-}, createProductBrand);
+      201: {
+        description: "The created product brand",
+        content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } },
+      },
+    },
+  },
+  createProductBrand
+);
 
-createRoute(router, {
+createRoute(
+  router,
+  {
     method: HttpMethod.GET,
     path: Endpoints.PRODUCT_BRANDS.GET_ALL,
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Returns the list of all product brands",
     request: {
-        query: productBrandQuerySchema.shape.query
+      query: productBrandQuerySchema.shape.query,
     },
     responses: {
-        200: {
-            description: "The list of product brands",
-            content: { [ContentType.JSON]: { schema: z.array(ProductBrandResponseSchema) } }
-        }
+      200: {
+        description: "The list of product brands",
+        content: {
+          [ContentType.JSON]: { schema: z.array(ProductBrandResponseSchema) },
+        },
+      },
     },
-}, getAllProductBrands);
+  },
+  getAllProductBrands
+);
 
-createRoute(router, {
+createRoute(
+  router,
+  {
     method: HttpMethod.GET,
     path: Endpoints.PRODUCT_BRANDS.GET_BY_ID,
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Get a product brand by id",
     request: {
-        params: productBrandIdSchema.shape.params
+      params: productBrandIdSchema.shape.params,
     },
     responses: {
-        200: {
-            description: "The product brand",
-            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
-        },
-        404: { description: "Product brand not found" }
-    }
-}, getProductBrandById);
+      200: {
+        description: "The product brand",
+        content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } },
+      },
+      404: { description: "Product brand not found" },
+    },
+  },
+  getProductBrandById
+);
 
-createRoute(router, {
+createRoute(
+  router,
+  {
     method: HttpMethod.PUT,
     path: Endpoints.PRODUCT_BRANDS.UPDATE,
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Update a product brand",
     request: {
-        params: productBrandIdSchema.shape.params,
-        body: { content: { [ContentType.JSON]: { schema: UpdateProductBrandBodySchema } } }
+      params: productBrandIdSchema.shape.params,
+      body: {
+        content: {
+          [ContentType.JSON]: { schema: UpdateProductBrandBodySchema },
+        },
+      },
     },
     responses: {
-        200: {
-            description: "The updated product brand",
-            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
-        },
-        404: { description: "Product brand not found" }
-    }
-}, updateProductBrand);
+      200: {
+        description: "The updated product brand",
+        content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } },
+      },
+      404: { description: "Product brand not found" },
+    },
+  },
+  updateProductBrand
+);
 
-createRoute(router, {
+createRoute(
+  router,
+  {
     method: HttpMethod.DELETE,
     path: Endpoints.PRODUCT_BRANDS.DELETE,
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Soft delete a product brand",
     request: {
-        params: productBrandIdSchema.shape.params
+      params: productBrandIdSchema.shape.params,
     },
     responses: {
-        200: { description: "Product brand deleted successfully" }
-    }
-}, deleteProductBrand);
+      200: { description: "Product brand deleted successfully" },
+    },
+  },
+  deleteProductBrand
+);
 
-createRoute(router, {
+createRoute(
+  router,
+  {
     method: HttpMethod.PATCH,
     path: Endpoints.PRODUCT_BRANDS.RESTORE,
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Restore a soft-deleted product brand",
     request: {
-        params: productBrandIdSchema.shape.params
+      params: productBrandIdSchema.shape.params,
     },
     responses: {
-        200: {
-            description: "The restored product brand",
-            content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
-        },
-        404: { description: "Product brand not found" }
-    }
-}, restoreProductBrand);
+      200: {
+        description: "The restored product brand",
+        content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } },
+      },
+      404: { description: "Product brand not found" },
+    },
+  },
+  restoreProductBrand
+);
 
 export default router;

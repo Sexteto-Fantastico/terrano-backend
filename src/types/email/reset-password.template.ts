@@ -1,16 +1,16 @@
 import { EmailTemplate } from "./email.type";
 
 interface ResetPasswordTemplateInput {
-    resetLink: string;
+  resetLink: string;
 }
 
 export function resetPasswordTemplate(
-    data: ResetPasswordTemplateInput,
+  data: ResetPasswordTemplateInput
 ): EmailTemplate {
-    return {
-        subject: "Redefinição de senha • Terrano",
+  return {
+    subject: "Redefinição de senha • Terrano",
 
-        text: `
+    text: `
 Você solicitou a redefinição da sua senha.
 
 Acesse o link abaixo para criar uma nova senha:
@@ -19,7 +19,7 @@ ${data.resetLink}
 Se você não solicitou essa alteração, ignore este email.
         `.trim(),
 
-        html: `
+    html: `
             <div style="
                 margin: 0;
                 padding: 40px 20px;
@@ -169,5 +169,5 @@ Se você não solicitou essa alteração, ignore este email.
                 </table>
             </div>
         `,
-    };
+  };
 }

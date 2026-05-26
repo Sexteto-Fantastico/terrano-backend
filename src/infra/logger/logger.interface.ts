@@ -1,28 +1,28 @@
 export enum LogLevel {
-    INFO = "INFO",
-    WARN = "WARN",
-    ERROR = "ERROR",
-    FATAL = "FATAL",
+  INFO = "INFO",
+  WARN = "WARN",
+  ERROR = "ERROR",
+  FATAL = "FATAL",
 }
 
 export interface LogEntry {
-    level: LogLevel;
+  level: LogLevel;
 
-    message: string;
+  message: string;
 
-    statusCode: number;
+  statusCode: number;
 
-    isOperational: boolean;
+  isOperational: boolean;
 
-    stack?: string;
+  stack?: string;
 
-    path?: string;
+  path?: string;
 
-    method?: string;
+  method?: string;
 
-    metadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ILogger {
-    log(entry: LogEntry): void;
+  log(entry: LogEntry): void;
 }

@@ -3,56 +3,64 @@ import { Department } from "../infra/entities/department.entity";
 
 const departmentRepository = AppDataSource.getRepository(Department);
 
-async function getAllDepartments(filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[Department[], number]> {
-    const { activeOnly = false, pageIndex, pageSize } = filters;
+async function getAllDepartments(
+  filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number } = {}
+): Promise<[Department[], number]> {
+  const { activeOnly = false, pageIndex, pageSize } = filters;
 
-    const dbQuery: any = {
-        withDeleted: !activeOnly,
-        relations: ["manager"],
-    };
+  const dbQuery: any = {
+    withDeleted: !activeOnly,
+    relations: ["manager"],
+  };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await departmentRepository.findAndCount(dbQuery);
-    }
+  if (pageIndex !== undefined && pageSize !== undefined) {
+    dbQuery.take = pageSize;
+    dbQuery.skip = (pageIndex - 1) * pageSize;
+    return await departmentRepository.findAndCount(dbQuery);
+  }
 
-    const results = await departmentRepository.find(dbQuery);
-    return [results, results.length];
+  const results = await departmentRepository.find(dbQuery);
+  return [results, results.length];
 }
 
 async function getDepartmentById(id: number): Promise<Department | null> {
-    return await departmentRepository.findOne({
-        where: { id },
-        withDeleted: true,
-        relations: ["manager"],
-    });
+  return await departmentRepository.findOne({
+    where: { id },
+    withDeleted: true,
+    relations: ["manager"],
+  });
 }
 
 async function saveDepartment(data: Partial<Department>): Promise<Department> {
-    const department = departmentRepository.create(data);
-    return await departmentRepository.save(department);
+  const department = departmentRepository.create(data);
+  return await departmentRepository.save(department);
 }
 
 async function deleteDepartment(id: number): Promise<boolean> {
-    const department = await departmentRepository.findOne({ where: { id } });
-    if (!department) return false;
+  const department = await departmentRepository.findOne({ where: { id } });
+  if (!department) return false;
 
-    await departmentRepository.softRemove(department);
-    return true;
+  await departmentRepository.softRemove(department);
+  return true;
 }
 
 async function restoreDepartment(id: number): Promise<Department | null> {
-    const department = await departmentRepository.findOne({
-        where: { id },
-        withDeleted: true,
-        relations: ["manager"],
-    });
+  const department = await departmentRepository.findOne({
+    where: { id },
+    withDeleted: true,
+    relations: ["manager"],
+  });
 
-    if (!department || !department.deleted_at) return null;
+  if (!department || !department.deleted_at) return null;
 
-    await departmentRepository.recover(department);
-    return department;
+  await departmentRepository.recover(department);
+  return department;
 }
 
-export { getAllDepartments, getDepartmentById, saveDepartment, deleteDepartment, restoreDepartment };
+export {
+  getAllDepartments,
+  getDepartmentById,
+  saveDepartment,
+  deleteDepartment,
+  restoreDepartment,
+};

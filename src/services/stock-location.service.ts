@@ -1,9 +1,9 @@
 import {
-    CreateStockLocationDto,
-    UpdateStockLocationDto,
-    StockLocationResponseDto,
-    toStockLocationResponseDto,
-    toStockLocationResponseDtoList
+  CreateStockLocationDto,
+  UpdateStockLocationDto,
+  StockLocationResponseDto,
+  toStockLocationResponseDto,
+  toStockLocationResponseDtoList,
 } from "../dtos/stock-location.dto";
 
 import { NotFoundError } from "../errors/app-error";
@@ -12,131 +12,110 @@ import * as StockLocationRepository from "../repositories/stock-location.reposit
 import * as AddressRepository from "../repositories/address.repository";
 
 async function getAllStockLocations(
-    filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}
+  filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number } = {}
 ): Promise<[StockLocationResponseDto[], number]> {
-
-    const [locations, total] = await StockLocationRepository.getAllStockLocations(filters);
-    return [toStockLocationResponseDtoList(locations), total];
+  const [locations, total] =
+    await StockLocationRepository.getAllStockLocations(filters);
+  return [toStockLocationResponseDtoList(locations), total];
 }
 
 async function getStockLocationById(
-    id: number
+  id: number
 ): Promise<StockLocationResponseDto> {
+  const entity = await StockLocationRepository.getStockLocationById(id);
 
-    const entity = await StockLocationRepository
-        .getStockLocationById(id);
+  if (!entity) {
+    throw new NotFoundError("Stock location not found");
+  }
 
-    if (!entity) {
-        throw new NotFoundError("Stock location not found");
-    }
-
-    return toStockLocationResponseDto(entity);
+  return toStockLocationResponseDto(entity);
 }
 
 async function createStockLocation(
-    data: CreateStockLocationDto
+  data: CreateStockLocationDto
 ): Promise<StockLocationResponseDto> {
+  const { address, ...stockLocationData } = data;
 
-    const { address, ...stockLocationData } = data;
+  const saved =
+    await StockLocationRepository.saveStockLocation(stockLocationData);
 
-    const saved = await StockLocationRepository
-        .saveStockLocation(stockLocationData);
+  if (address) {
+    await AddressRepository.saveAddress({
+      ...address,
+      stock_location: saved,
+    });
+  }
 
-    if (address) {
-        await AddressRepository.saveAddress({
-            ...address,
-            stock_location: saved
-        });
-    }
-
-    return toStockLocationResponseDto(saved);
+  return toStockLocationResponseDto(saved);
 }
 
 async function updateStockLocation(
-    id: number,
-    data: UpdateStockLocationDto
+  id: number,
+  data: UpdateStockLocationDto
 ): Promise<StockLocationResponseDto> {
+  const existing = await StockLocationRepository.getStockLocationById(id);
 
-    const existing = await StockLocationRepository
-        .getStockLocationById(id);
+  if (!existing) {
+    throw new NotFoundError("Stock location not found");
+  }
 
-    if (!existing) {
-        throw new NotFoundError("Stock location not found");
+  const { address, ...stockLocationData } = data;
+
+  const updated = Object.assign(existing, stockLocationData);
+
+  const saved = await StockLocationRepository.saveStockLocation(updated);
+
+  if (address) {
+    const addresses = await AddressRepository.getAllAddresses();
+
+    const existingAddress = addresses.find(
+      (a) => a.stock_location?.id === saved.id
+    );
+
+    if (existingAddress) {
+      const updatedAddress = Object.assign(existingAddress, address);
+
+      await AddressRepository.saveAddress(updatedAddress);
+    } else {
+      await AddressRepository.saveAddress({
+        ...address,
+        stock_location: saved,
+      });
     }
+  }
 
-    const { address, ...stockLocationData } = data;
-
-    const updated = Object.assign(existing, stockLocationData);
-
-    const saved = await StockLocationRepository
-        .saveStockLocation(updated);
-
-    if (address) {
-
-        const addresses = await AddressRepository.getAllAddresses();
-
-        const existingAddress = addresses.find(
-            a => a.stock_location?.id === saved.id
-        );
-
-        if (existingAddress) {
-
-            const updatedAddress = Object.assign(
-                existingAddress,
-                address
-            );
-
-            await AddressRepository.saveAddress(updatedAddress);
-
-        } else {
-
-            await AddressRepository.saveAddress({
-                ...address,
-                stock_location: saved
-            });
-        }
-    }
-
-    return toStockLocationResponseDto(saved);
+  return toStockLocationResponseDto(saved);
 }
 
-async function deleteStockLocation(
-    id: number
-): Promise<boolean> {
+async function deleteStockLocation(id: number): Promise<boolean> {
+  const existing = await StockLocationRepository.getStockLocationById(id);
 
-    const existing = await StockLocationRepository
-        .getStockLocationById(id);
+  if (!existing) {
+    throw new NotFoundError("Stock location not found");
+  }
 
-    if (!existing) {
-        throw new NotFoundError("Stock location not found");
-    }
+  await StockLocationRepository.deleteStockLocation(id);
 
-    await StockLocationRepository.deleteStockLocation(id);
-
-    return true;
+  return true;
 }
 
 async function restoreStockLocation(
-    id: number
+  id: number
 ): Promise<StockLocationResponseDto> {
+  const restored = await StockLocationRepository.restoreStockLocation(id);
 
-    const restored = await StockLocationRepository
-        .restoreStockLocation(id);
+  if (!restored) {
+    throw new NotFoundError("Stock location not found or not deleted");
+  }
 
-    if (!restored) {
-        throw new NotFoundError(
-            "Stock location not found or not deleted"
-        );
-    }
-
-    return toStockLocationResponseDto(restored);
+  return toStockLocationResponseDto(restored);
 }
 
 export {
-    getAllStockLocations,
-    getStockLocationById,
-    createStockLocation,
-    updateStockLocation,
-    deleteStockLocation,
-    restoreStockLocation
+  getAllStockLocations,
+  getStockLocationById,
+  createStockLocation,
+  updateStockLocation,
+  deleteStockLocation,
+  restoreStockLocation,
 };

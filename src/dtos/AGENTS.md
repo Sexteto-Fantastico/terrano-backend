@@ -3,6 +3,7 @@
 This layer defines the strict data contracts for input and output, and is the source of truth for validation.
 
 ## Implementation Rules
+
 - **Strictly Dumb & Data-Focused:** The DTO layer must be strictly dumb and focused on data. It should ONLY contain Zod Schema definitions (`z.object`), type inference (`z.infer`), and mapping functions. Route registrations MUST NEVER be done here.
 - **Structure:** Use **Zod schemas** (`z.object({...})`) to define input DTOs (Request Body, Query, Params). Import `z` and `registry` from `../infra/config/openapi` instead of directly from `zod`.
 - **OpenAPI Annotations:** Add `.openapi({ example: ... })` to schema fields for automatic Swagger documentation enrichment.
@@ -13,5 +14,5 @@ This layer defines the strict data contracts for input and output, and is the so
 - **Database Alignment:** The DTO layer is responsible for translating database `snake_case` or entity properties into `camelCase` for the frontend.
 - **Security & Privacy:** NEVER include sensitive fields (like `password` or `password_reset_token`) in Response DTOs.
 - **Audit Fields Policy:** - **Prohibited:** Purely internal audit fields such as `createdAt`, `updatedAt`, `createdBy`, and `updatedBy` MUST NOT be returned in API responses.
-    - **Allowed:** Fields with associated functional logic, such as `deletedAt` (used to handle `activeOnly` filters and soft-delete state), SHOULD be included in Response DTOs when relevant to the frontend's state management.
+  - **Allowed:** Fields with associated functional logic, such as `deletedAt` (used to handle `activeOnly` filters and soft-delete state), SHOULD be included in Response DTOs when relevant to the frontend's state management.
 - **Typing:** Do not use `any`. Rely on Zod to generate static types for requests, and specify explicit types for responses.

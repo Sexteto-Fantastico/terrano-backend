@@ -19,11 +19,13 @@ import { requestContextMiddleware } from "./utils/request-context";
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
     exposedHeaders: ["X-Total-Count", "X-Total-Pages", "X-Page", "X-Limit"],
-}));
+  })
+);
 app.use(express.json());
 
 setupSwagger(app);
@@ -40,18 +42,18 @@ app.use(Endpoints.DEPARTMENTS.BASE, departmentRoutes);
 app.use(Endpoints.STOCK_LOCATIONS.BASE, stockLocationRoutes);
 app.use(Endpoints.MEASUREMENT_UNITS.BASE, measurementUnitRoutes);
 
-
 app.use(globalErrorMiddleware);
 
-
 migrateDatabase()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
-        });
-    })
-    .catch((error) => {
-        console.error("Database initialization failed:", error);
-        process.exit(1);
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(
+        `Swagger docs available at http://localhost:${PORT}/api-docs`
+      );
     });
+  })
+  .catch((error) => {
+    console.error("Database initialization failed:", error);
+    process.exit(1);
+  });

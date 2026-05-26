@@ -4,50 +4,65 @@ import { ILike } from "typeorm";
 
 const repository = AppDataSource.getRepository(MeasurementUnit);
 
-export async function findAllMeasurementUnits(filters: { name?: string; activeOnly?: boolean; pageIndex?: number; pageSize?: number; }): Promise<[MeasurementUnit[], number]> {
-    const { name, activeOnly = true, pageIndex, pageSize } = filters;
+export async function findAllMeasurementUnits(filters: {
+  name?: string;
+  activeOnly?: boolean;
+  pageIndex?: number;
+  pageSize?: number;
+}): Promise<[MeasurementUnit[], number]> {
+  const { name, activeOnly = true, pageIndex, pageSize } = filters;
 
-    const where: any = {};
-    if (name) {
-        where.name = ILike(`%${name}%`);
-    }
+  const where: any = {};
+  if (name) {
+    where.name = ILike(`%${name}%`);
+  }
 
-    const dbQuery: any = {
-        where,
-        withDeleted: !activeOnly,
-        order: { name: "ASC" },
-    };
+  const dbQuery: any = {
+    where,
+    withDeleted: !activeOnly,
+    order: { name: "ASC" },
+  };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return repository.findAndCount(dbQuery);
-    }
+  if (pageIndex !== undefined && pageSize !== undefined) {
+    dbQuery.take = pageSize;
+    dbQuery.skip = (pageIndex - 1) * pageSize;
+    return repository.findAndCount(dbQuery);
+  }
 
-    const results = await repository.find(dbQuery);
-    return [results, results.length];
+  const results = await repository.find(dbQuery);
+  return [results, results.length];
 }
 
-export async function findMeasurementUnitById(id: number): Promise<MeasurementUnit | null> {
-    return repository.findOne({
-        where: { id },
-        withDeleted: true,
-    });
+export async function findMeasurementUnitById(
+  id: number
+): Promise<MeasurementUnit | null> {
+  return repository.findOne({
+    where: { id },
+    withDeleted: true,
+  });
 }
 
-export async function createMeasurementUnit(data: Partial<MeasurementUnit>): Promise<MeasurementUnit> {
-    const newUnit = repository.create(data);
-    return repository.save(newUnit);
+export async function createMeasurementUnit(
+  data: Partial<MeasurementUnit>
+): Promise<MeasurementUnit> {
+  const newUnit = repository.create(data);
+  return repository.save(newUnit);
 }
 
-export async function updateMeasurementUnit(unit: MeasurementUnit): Promise<MeasurementUnit> {
-    return repository.save(unit);
+export async function updateMeasurementUnit(
+  unit: MeasurementUnit
+): Promise<MeasurementUnit> {
+  return repository.save(unit);
 }
 
-export async function softDeleteMeasurementUnit(unit: MeasurementUnit): Promise<MeasurementUnit> {
-    return repository.softRemove(unit);
+export async function softDeleteMeasurementUnit(
+  unit: MeasurementUnit
+): Promise<MeasurementUnit> {
+  return repository.softRemove(unit);
 }
 
-export async function restoreMeasurementUnit(unit: MeasurementUnit): Promise<MeasurementUnit> {
-    return repository.recover(unit);
+export async function restoreMeasurementUnit(
+  unit: MeasurementUnit
+): Promise<MeasurementUnit> {
+  return repository.recover(unit);
 }

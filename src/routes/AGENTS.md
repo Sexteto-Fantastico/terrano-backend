@@ -3,6 +3,7 @@
 This layer is strictly responsible for mapping HTTP endpoints to Controller functions, applying middlewares, and registering the API documentation.
 
 ## Implementation Rules
+
 - **Single Source of Truth:** Route files are the single source of truth for endpoints and their OpenAPI documentation.
 - **Route Builder (`createRoute`):** It is MANDATORY to use the `createRoute` utility from `../utils/route-builder` to define routes. This function handles both Express router registration and OpenAPI documentation.
 - **Endpoint Constants:** Combine the literal strings from `../utils/constants/endpoints` with the endpoint documentation. Pass the specific path (e.g. `Endpoints.USERS.GET_BY_ID`) and its `basePath` to `createRoute`.
