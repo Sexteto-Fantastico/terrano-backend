@@ -6,3 +6,13 @@ export const paginationFields = {
     sortBy: z.string().optional().openapi({ example: "name" }),
     sortOrder: z.enum(["asc", "desc"]).transform(v => v.toUpperCase() as "ASC" | "DESC").optional().openapi({ example: "asc" }),
 };
+
+export const activeOnlyField = z.enum(["true", "false", ""]).transform(v => v === "true").optional();
+
+export const idParamSchema = z.object({
+    params: z.object({
+        id: z.coerce.number().int().positive()
+    })
+});
+
+export type IdParam = z.infer<typeof idParamSchema>["params"];

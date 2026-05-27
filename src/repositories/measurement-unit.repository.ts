@@ -1,11 +1,11 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { MeasurementUnit } from "../infra/entities/measurement-unit.entity";
-import { MeasurementUnitQueryDto } from "../dtos/measurement-unit.dto";
+import { MeasurementUnitQuery } from "../dtos/measurement-unit.dto";
 
 const repository = AppDataSource.getRepository(MeasurementUnit);
 
-export async function findAllMeasurementUnits(filters: MeasurementUnitQueryDto = {}): Promise<[MeasurementUnit[], number]> {
+export async function findAllMeasurementUnits(filters: MeasurementUnitQuery = {}): Promise<[MeasurementUnit[], number]> {
     const { name, activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<MeasurementUnit> = {};

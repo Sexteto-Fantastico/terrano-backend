@@ -1,29 +1,29 @@
 import {
-    CreateDepartmentDto,
-    UpdateDepartmentDto,
-    DepartmentResponseDto,
-    DepartmentQueryDto,
-    toDepartmentResponseDto,
-    toDepartmentResponseDtoList,
+    CreateDepartment,
+    UpdateDepartment,
+    DepartmentResponse,
+    DepartmentQuery,
+    toDepartmentResponse,
+    toDepartmentResponseList,
 } from "../dtos/department.dto";
 import { NotFoundError, BadRequestError } from "../errors/app-error";
 import * as DepartmentRepository from "../repositories/department.repository";
 import * as UserRepository from "../repositories/user.repository";
 
-async function getAllDepartments(filters: DepartmentQueryDto = {}): Promise<[DepartmentResponseDto[], number]> {
+async function getAllDepartments(filters: DepartmentQuery = {}): Promise<[DepartmentResponse[], number]> {
     const [allDepartments, total] = await DepartmentRepository.getAllDepartments(filters);
-    return [toDepartmentResponseDtoList(allDepartments), total];
+    return [toDepartmentResponseList(allDepartments), total];
 }
 
-async function getDepartmentById(id: number): Promise<DepartmentResponseDto> {
+async function getDepartmentById(id: number): Promise<DepartmentResponse> {
     const department = await DepartmentRepository.getDepartmentById(id);
     if (!department) {
         throw new NotFoundError("Department not found");
     }
-    return toDepartmentResponseDto(department);
+    return toDepartmentResponse(department);
 }
 
-async function createDepartment(data: CreateDepartmentDto): Promise<DepartmentResponseDto> {
+async function createDepartment(data: CreateDepartment): Promise<DepartmentResponse> {
     const { managerId, costCenterCode, ...rest } = data;
 
     const manager = await UserRepository.getUserById(managerId);
@@ -40,10 +40,10 @@ async function createDepartment(data: CreateDepartmentDto): Promise<DepartmentRe
     };
 
     const saved = await DepartmentRepository.saveDepartment(departmentData);
-    return toDepartmentResponseDto(saved);
+    return toDepartmentResponse(saved);
 }
 
-async function updateDepartment(id: number, data: UpdateDepartmentDto): Promise<DepartmentResponseDto> {
+async function updateDepartment(id: number, data: UpdateDepartment): Promise<DepartmentResponse> {
     const existingDepartment = await DepartmentRepository.getDepartmentById(id);
 
     if (!existingDepartment) {
@@ -63,19 +63,19 @@ async function updateDepartment(id: number, data: UpdateDepartmentDto): Promise<
 
     const saved = await DepartmentRepository.saveDepartment(existingDepartment);
     
-    return toDepartmentResponseDto(saved);
+    return toDepartmentResponse(saved);
 }
 
 async function deleteDepartment(id: number): Promise<boolean> {
     return DepartmentRepository.deleteDepartment(id);
 }
 
-async function restoreDepartment(id: number): Promise<DepartmentResponseDto> {
+async function restoreDepartment(id: number): Promise<DepartmentResponse> {
     const restored = await DepartmentRepository.restoreDepartment(id);
     if (!restored) {
         throw new NotFoundError("Department not found or not deleted");
     }
-    return toDepartmentResponseDto(restored);
+    return toDepartmentResponse(restored);
 }
 
 export { getAllDepartments, getDepartmentById, createDepartment, updateDepartment, deleteDepartment, restoreDepartment };

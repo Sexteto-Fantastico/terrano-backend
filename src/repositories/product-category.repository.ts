@@ -1,7 +1,7 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { ProductCategory, IProductCategory } from "../infra/entities/product-category.entity";
-import { ProductCategoryQueryDTO } from "../dtos/product-category.dto";
+import { ProductCategoryQuery } from "../dtos/product-category.dto";
 
 const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
 
@@ -10,7 +10,7 @@ async function createCategory(data: IProductCategory): Promise<ProductCategory> 
     return await productCategoryRepository.save(category);
 }
 
-async function getAllCategories(filters: ProductCategoryQueryDTO = {}): Promise<[ProductCategory[], number]> {
+async function getAllCategories(filters: ProductCategoryQuery = {}): Promise<[ProductCategory[], number]> {
     const { activeOnly = true, name, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<ProductCategory> = {};

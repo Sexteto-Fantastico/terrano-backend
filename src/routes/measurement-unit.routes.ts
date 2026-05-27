@@ -4,10 +4,10 @@ import { getAll, getById, create, update, remove, restore } from "../controllers
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
-    measurementUnitQuerySchema,
+    MeasurementUnitQuerySchema,
     CreateMeasurementUnitBodySchema,
     UpdateMeasurementUnitBodySchema,
-    measurementUnitIdSchema,
+    MeasurementUnitIdSchema,
     MeasurementUnitResponseSchema
 } from "../dtos/measurement-unit.dto";
 
@@ -20,7 +20,7 @@ createRoute(router, {
     tags: ["Measurement Units"],
     summary: "Retrieve a list of measurement units",
     request: {
-        query: measurementUnitQuerySchema.shape.query
+        query: MeasurementUnitQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -37,7 +37,7 @@ createRoute(router, {
     tags: ["Measurement Units"],
     summary: "Get a measurement unit by ID",
     request: {
-        params: measurementUnitIdSchema.shape.params
+        params: MeasurementUnitIdSchema.shape.params
     },
     responses: {
         200: {
@@ -73,7 +73,7 @@ createRoute(router, {
     tags: ["Measurement Units"],
     summary: "Update an existing measurement unit",
     request: {
-        params: measurementUnitIdSchema.shape.params,
+        params: MeasurementUnitIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateMeasurementUnitBodySchema } } }
     },
     responses: {
@@ -93,7 +93,7 @@ createRoute(router, {
     tags: ["Measurement Units"],
     summary: "Deactivate a measurement unit (soft delete)",
     request: {
-        params: measurementUnitIdSchema.shape.params
+        params: MeasurementUnitIdSchema.shape.params
     },
     responses: {
         204: { description: "Successfully deactivated" },
@@ -103,13 +103,13 @@ createRoute(router, {
 }, remove);
 
 createRoute(router, {
-    method: HttpMethod.POST,
+    method: HttpMethod.PATCH,
     path: Endpoints.MEASUREMENT_UNITS.RESTORE,
     basePath: Endpoints.MEASUREMENT_UNITS.BASE,
     tags: ["Measurement Units"],
     summary: "Restore a deactivated measurement unit",
     request: {
-        params: measurementUnitIdSchema.shape.params
+        params: MeasurementUnitIdSchema.shape.params
     },
     responses: {
         200: {

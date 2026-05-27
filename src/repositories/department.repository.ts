@@ -1,11 +1,11 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { Department } from "../infra/entities/department.entity";
-import { DepartmentQueryDto } from "../dtos/department.dto";
+import { DepartmentQuery } from "../dtos/department.dto";
 
 const departmentRepository = AppDataSource.getRepository(Department);
 
-async function getAllDepartments(filters: DepartmentQueryDto = {}): Promise<[Department[], number]> {
+async function getAllDepartments(filters: DepartmentQuery = {}): Promise<[Department[], number]> {
     const { activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<Department> = {};

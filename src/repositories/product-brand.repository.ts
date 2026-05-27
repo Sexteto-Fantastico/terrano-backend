@@ -1,7 +1,7 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { ProductBrand } from "../infra/entities/product-brand.entity";
-import { ProductBrandQueryDTO } from "../dtos/product-brand.dto";
+import { ProductBrandQuery } from "../dtos/product-brand.dto";
 
 const productBrandRepository = AppDataSource.getRepository(ProductBrand);
 
@@ -10,7 +10,7 @@ async function createBrand(data: ProductBrand): Promise<ProductBrand> {
     return await productBrandRepository.save(brand);
 }
 
-async function getAllBrands(filters: ProductBrandQueryDTO = {}): Promise<[ProductBrand[], number]> {
+async function getAllBrands(filters: ProductBrandQuery = {}): Promise<[ProductBrand[], number]> {
     const { name, activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<ProductBrand> = {};

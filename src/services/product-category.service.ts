@@ -1,15 +1,15 @@
 import { ProductCategory, IProductCategory } from "../infra/entities/product-category.entity";
 import {
-    ProductCategoryResponseDTO,
-    CreateProductCategoryDTO,
-    UpdateProductCategoryDTO,
-    ProductCategoryQueryDTO,
-    toProductCategoryResponseDTO,
-    toProductCategoryResponseDTOList,
+    ProductCategoryResponse,
+    CreateProductCategory,
+    UpdateProductCategory,
+    ProductCategoryQuery,
+    toProductCategoryResponse,
+    toProductCategoryResponseList,
 } from "../dtos/product-category.dto";
 import * as ProductCategoryRepository from "../repositories/product-category.repository";
 
-async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCategoryResponseDTO> {
+async function createCategory(data: CreateProductCategory): Promise<ProductCategoryResponse> {
     const entityData: IProductCategory = {
         name: data.name,
         description: data.description,
@@ -17,21 +17,21 @@ async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCa
     };
     const category = await ProductCategoryRepository.createCategory(entityData);
     const loaded = await ProductCategoryRepository.getCategoryById(category.id);
-    return toProductCategoryResponseDTO(loaded!);
+    return toProductCategoryResponse(loaded!);
 }
 
-async function getAllCategories(filters: ProductCategoryQueryDTO = {}): Promise<[ProductCategoryResponseDTO[], number]> {
+async function getAllCategories(filters: ProductCategoryQuery = {}): Promise<[ProductCategoryResponse[], number]> {
     const [categories, total] = await ProductCategoryRepository.getAllCategories(filters);
-    return [toProductCategoryResponseDTOList(categories), total];
+    return [toProductCategoryResponseList(categories), total];
 }
 
-async function getCategoryById(id: number): Promise<ProductCategoryResponseDTO | null> {
+async function getCategoryById(id: number): Promise<ProductCategoryResponse | null> {
     const category = await ProductCategoryRepository.getCategoryById(id, true);
     if (!category) return null;
-    return toProductCategoryResponseDTO(category);
+    return toProductCategoryResponse(category);
 }
 
-async function updateCategory(id: number, data: UpdateProductCategoryDTO): Promise<ProductCategoryResponseDTO | null> {
+async function updateCategory(id: number, data: UpdateProductCategory): Promise<ProductCategoryResponse | null> {
     const category = await ProductCategoryRepository.getCategoryById(id, true);
     if (!category) return null;
 
@@ -51,7 +51,7 @@ async function updateCategory(id: number, data: UpdateProductCategoryDTO): Promi
     await ProductCategoryRepository.updateCategory(category);
 
     const loaded = await ProductCategoryRepository.getCategoryById(id, true);
-    return toProductCategoryResponseDTO(loaded!);
+    return toProductCategoryResponse(loaded!);
 }
 
 async function deleteCategory(id: number): Promise<boolean> {
@@ -61,14 +61,14 @@ async function deleteCategory(id: number): Promise<boolean> {
     return true;
 }
 
-async function restoreCategory(id: number): Promise<ProductCategoryResponseDTO | null> {
+async function restoreCategory(id: number): Promise<ProductCategoryResponse | null> {
     const category = await ProductCategoryRepository.getCategoryById(id, true);
 
     if (!category) return null;
     if (!category.deleted_at) return null;
 
     await ProductCategoryRepository.restoreCategory(category);
-    return toProductCategoryResponseDTO(category);
+    return toProductCategoryResponse(category);
 }
 
 export { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory, restoreCategory };

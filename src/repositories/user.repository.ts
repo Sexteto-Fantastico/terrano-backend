@@ -1,7 +1,7 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { User } from "../infra/entities/user.entity";
-import { GetUsersQueryDto } from "../dtos/user.dto";
+import { UserQuery } from "../dtos/user.dto";
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -31,7 +31,7 @@ async function getUserById(id: number, activeOnly: boolean = false): Promise<Use
     });
 }
 
-async function getAllUsers(filters: GetUsersQueryDto = {}): Promise<[User[], number]> {
+async function getAllUsers(filters: UserQuery = {}): Promise<[User[], number]> {
     const { activeOnly = true, name, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<User> = {};

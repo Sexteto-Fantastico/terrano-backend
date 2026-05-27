@@ -1,24 +1,20 @@
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 import { MeasurementUnit, MeasurementUnitSymbol, MeasurementUnitType } from "../infra/entities/measurement-unit.entity";
 
-export const measurementUnitIdSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
+export const MeasurementUnitIdSchema = idParamSchema;
 
-export const measurementUnitQuerySchema = z.object({
+export const MeasurementUnitQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
-        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: activeOnlyField,
     })
 });
-export type MeasurementUnitQueryDto = z.infer<typeof measurementUnitQuerySchema>["query"];
+export type MeasurementUnitQuery = z.infer<typeof MeasurementUnitQuerySchema>["query"];
 
 export const CreateMeasurementUnitBodySchema = registry.register(
-    "CreateMeasurementUnitDto",
+    "CreateMeasurementUnit",
     z.object({
         name: z.string().min(1, "Measurement unit name is required").openapi({ example: "Kilogram" }),
         symbol: z.enum(MeasurementUnitSymbol, { message: "Invalid measurement unit symbol" }).openapi({ example: MeasurementUnitSymbol.KG }),
@@ -27,10 +23,10 @@ export const CreateMeasurementUnitBodySchema = registry.register(
 );
 
 export const createMeasurementUnitSchema = z.object({ body: CreateMeasurementUnitBodySchema });
-export type CreateMeasurementUnitDto = z.infer<typeof createMeasurementUnitSchema>["body"];
+export type CreateMeasurementUnit = z.infer<typeof createMeasurementUnitSchema>["body"];
 
 export const UpdateMeasurementUnitBodySchema = registry.register(
-    "UpdateMeasurementUnitDto",
+    "UpdateMeasurementUnit",
     z.object({
         name: z.string().min(1, "Measurement unit name cannot be empty").optional().openapi({ example: "Meter" }),
         symbol: z.enum(MeasurementUnitSymbol, { message: "Invalid measurement unit symbol" }).optional().openapi({ example: MeasurementUnitSymbol.M }),
@@ -39,13 +35,13 @@ export const UpdateMeasurementUnitBodySchema = registry.register(
 );
 
 export const updateMeasurementUnitSchema = z.object({
-    params: measurementUnitIdSchema.shape.params,
+    params: MeasurementUnitIdSchema.shape.params,
     body: UpdateMeasurementUnitBodySchema,
 });
-export type UpdateMeasurementUnitDto = z.infer<typeof updateMeasurementUnitSchema>["body"];
+export type UpdateMeasurementUnit = z.infer<typeof updateMeasurementUnitSchema>["body"];
 
 export const MeasurementUnitResponseSchema = registry.register(
-    "MeasurementUnitResponseDto",
+    "MeasurementUnitResponse",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Kilogram" }),
@@ -55,15 +51,9 @@ export const MeasurementUnitResponseSchema = registry.register(
     })
 );
 
-export interface MeasurementUnitResponseDto {
-    id: number;
-    name: string;
-    symbol: MeasurementUnitSymbol;
-    type: MeasurementUnitType;
-    deletedAt: Date | null;
-}
+export type MeasurementUnitResponse = z.infer<typeof MeasurementUnitResponseSchema>;
 
-export function toMeasurementUnitResponseDto(entity: MeasurementUnit): MeasurementUnitResponseDto {
+export function toMeasurementUnitResponse(entity: MeasurementUnit): MeasurementUnitResponse {
     return {
         id: entity.id,
         name: entity.name,

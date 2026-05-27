@@ -10,7 +10,7 @@ import {
     ResetPasswordBodySchema,
     DefinePasswordBodySchema,
     MeResponseSchema
-} from "../dtos/user.dto";
+} from "../dtos/auth.dto";
 
 const router = Router();
 

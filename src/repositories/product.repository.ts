@@ -1,7 +1,7 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { Product } from "../infra/entities/product.entity";
-import { ProductQueryDTO } from "../dtos/product.dto";
+import { ProductQuery } from "../dtos/product.dto";
 
 const productRepository = AppDataSource.getRepository(Product);
 
@@ -27,7 +27,7 @@ async function restoreProduct(id: number): Promise<boolean> {
     return result.affected !== 0;
 }
 
-async function getAllProducts(filters: ProductQueryDTO = {}): Promise<[Product[], number]> {
+async function getAllProducts(filters: ProductQuery = {}): Promise<[Product[], number]> {
     const { name, activeOnly = true, brandId, categoryId, code, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<Product> = {};

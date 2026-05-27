@@ -12,10 +12,10 @@ import { getStockLocationLogs } from "../controllers/system-log.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
-    stockLocationQuerySchema,
+    StockLocationQuerySchema,
     CreateStockLocationBodySchema,
     UpdateStockLocationBodySchema,
-    stockLocationIdSchema,
+    StockLocationIdSchema,
     StockLocationResponseSchema
 } from "../dtos/stock-location.dto";
 
@@ -45,7 +45,7 @@ createRoute(router, {
     tags: ["Stock Locations"],
     summary: "Returns the list of all stock locations",
     request: {
-        query: stockLocationQuerySchema.shape.query
+        query: StockLocationQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -62,7 +62,7 @@ createRoute(router, {
     tags: ["Stock Locations"],
     summary: "Get a stock location by id",
     request: {
-        params: stockLocationIdSchema.shape.params
+        params: StockLocationIdSchema.shape.params
     },
     responses: {
         200: {
@@ -80,7 +80,7 @@ createRoute(router, {
     tags: ["Stock Locations"],
     summary: "Get logs for a stock location",
     request: {
-        params: stockLocationIdSchema.shape.params
+        params: StockLocationIdSchema.shape.params
     },
     responses: {
         200: { description: "List of stock location logs" }
@@ -94,7 +94,7 @@ createRoute(router, {
     tags: ["Stock Locations"],
     summary: "Update a stock location",
     request: {
-        params: stockLocationIdSchema.shape.params,
+        params: StockLocationIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateStockLocationBodySchema } } }
     },
     responses: {
@@ -113,10 +113,10 @@ createRoute(router, {
     tags: ["Stock Locations"],
     summary: "Soft delete a stock location",
     request: {
-        params: stockLocationIdSchema.shape.params
+        params: StockLocationIdSchema.shape.params
     },
     responses: {
-        200: { description: "Stock location deleted successfully" }
+        204: { description: "Stock location deleted successfully" }
     }
 }, deleteStockLocation);
 
@@ -127,7 +127,7 @@ createRoute(router, {
     tags: ["Stock Locations"],
     summary: "Restore a soft-deleted stock location",
     request: {
-        params: stockLocationIdSchema.shape.params
+        params: StockLocationIdSchema.shape.params
     },
     responses: {
         200: {

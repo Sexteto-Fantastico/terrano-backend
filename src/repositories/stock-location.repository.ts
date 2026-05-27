@@ -1,11 +1,11 @@
 import { FindOptionsWhere, FindManyOptions, FindOptionsOrder } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { StockLocation } from "../infra/entities/stock-location.entity";
-import { StockLocationQueryDto } from "../dtos/stock-location.dto";
+import { StockLocationQuery } from "../dtos/stock-location.dto";
 
 const repository = AppDataSource.getRepository(StockLocation);
 
-async function getAllStockLocations(filters: StockLocationQueryDto = {}): Promise<[StockLocation[], number]> {
+async function getAllStockLocations(filters: StockLocationQuery = {}): Promise<[StockLocation[], number]> {
     const { activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<StockLocation> = {};

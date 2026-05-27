@@ -1,22 +1,18 @@
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 
-export const departmentIdSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
+export const DepartmentIdSchema = idParamSchema;
 
-export const departmentQuerySchema = z.object({
+export const DepartmentQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
-        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: activeOnlyField,
     })
 });
-export type DepartmentQueryDto = z.infer<typeof departmentQuerySchema>["query"];
+export type DepartmentQuery = z.infer<typeof DepartmentQuerySchema>["query"];
 
 export const CreateDepartmentBodySchema = registry.register(
-    "CreateDepartmentDto",
+    "CreateDepartment",
     z.object({
         name: z.string().min(1, "Department name is required").openapi({ example: "Engineering" }),
         costCenterCode: z.string().min(1, "Cost center code is required").openapi({ example: "CC-ENG-01" }),
@@ -25,10 +21,10 @@ export const CreateDepartmentBodySchema = registry.register(
 );
 
 export const createDepartmentSchema = z.object({ body: CreateDepartmentBodySchema });
-export type CreateDepartmentDto = z.infer<typeof createDepartmentSchema>["body"];
+export type CreateDepartment = z.infer<typeof createDepartmentSchema>["body"];
 
 export const UpdateDepartmentBodySchema = registry.register(
-    "UpdateDepartmentDto",
+    "UpdateDepartment",
     z.object({
         name: z.string().min(1, "Department name cannot be empty").optional().openapi({ example: "Engineering v2" }),
         costCenterCode: z.string().min(1, "Cost center code cannot be empty").optional().openapi({ example: "CC-ENG-02" }),
@@ -37,31 +33,25 @@ export const UpdateDepartmentBodySchema = registry.register(
 );
 
 export const updateDepartmentSchema = z.object({
-    params: departmentIdSchema.shape.params,
+    params: DepartmentIdSchema.shape.params,
     body: UpdateDepartmentBodySchema,
 });
-export type UpdateDepartmentDto = z.infer<typeof updateDepartmentSchema>["body"];
+export type UpdateDepartment = z.infer<typeof updateDepartmentSchema>["body"];
 
 export const DepartmentResponseSchema = registry.register(
-    "DepartmentResponseDto",
+    "DepartmentResponse",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Engineering" }),
         costCenterCode: z.string().openapi({ example: "CC-ENG-01" }),
         managerId: z.number().int().optional().openapi({ example: 1 }),
-        deletedAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
+        deletedAt: z.date().nullable().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
     })
 );
 
-export class DepartmentResponseDto {
-    id: number;
-    name: string;
-    costCenterCode: string;
-    managerId?: number;
-    deletedAt?: Date;
-}
+export type DepartmentResponse = z.infer<typeof DepartmentResponseSchema>;
 
-export const toDepartmentResponseDto = (dept: any): DepartmentResponseDto => ({
+export const toDepartmentResponse = (dept: any): DepartmentResponse => ({
     id: dept.id,
     name: dept.name,
     costCenterCode: dept.cost_center_code,
@@ -69,5 +59,5 @@ export const toDepartmentResponseDto = (dept: any): DepartmentResponseDto => ({
     deletedAt: dept.deleted_at,
 });
 
-export const toDepartmentResponseDtoList = (list: any[]) =>
-    list.map(toDepartmentResponseDto);
+export const toDepartmentResponseList = (list: any[]) =>
+    list.map(toDepartmentResponse);

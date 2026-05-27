@@ -2,18 +2,18 @@ import { User } from "../infra/entities/user.entity";
 import { hashPassword } from "../utils/password.util";
 import { formatCpf, isValidCpf, cleanCpf } from "../utils/cpf.util";
 import {
-    ChangePasswordRequestDto,
-    CreateUserRequestDto,
-    GetUsersQueryDto,
-    UpdateUserRequestDto,
-    UserResponseDto,
+    ChangePasswordBody,
+    CreateUserBody,
+    UserQuery,
+    UpdateUserBody,
+    UserResponse,
 } from "../dtos/user.dto";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { createUser as repoCreateUser, getUserByUsername, getUserByEmail, getUserById as repoGetUserById, getAllUsers, updateUser as repoUpdateUser } from "../repositories/user.repository";
 import { getRoleById } from "../repositories/role.repository";
 import { getDepartmentById } from "../repositories/department.repository";
 
-function sanitizeUser(user: User): UserResponseDto {
+function sanitizeUser(user: User): UserResponse {
     return {
         id: user.id,
         name: user.name,
@@ -38,7 +38,7 @@ function sanitizeUser(user: User): UserResponseDto {
     };
 }
 
-async function createUser(request: CreateUserRequestDto): Promise<UserResponseDto> {
+async function createUser(request: CreateUserBody): Promise<UserResponse> {
     const existingUser = await getUserByUsername(request.username);
     if (existingUser) {
         throw new ConflictError("Username already exists.");
@@ -86,12 +86,12 @@ async function createUser(request: CreateUserRequestDto): Promise<UserResponseDt
     return sanitizeUser(user);
 }
 
-async function getUsers(filters: GetUsersQueryDto): Promise<[UserResponseDto[], number]> {
+async function getUsers(filters: UserQuery): Promise<[UserResponse[], number]> {
     const [users, total] = await getAllUsers(filters);
     return [users.map(sanitizeUser), total];
 }
 
-async function getUserById(id: number): Promise<UserResponseDto> {
+async function getUserById(id: number): Promise<UserResponse> {
     const user = await repoGetUserById(id, true);
 
     if (!user) {
@@ -101,7 +101,7 @@ async function getUserById(id: number): Promise<UserResponseDto> {
     return sanitizeUser(user);
 }
 
-async function updateUser(id: number, request: UpdateUserRequestDto): Promise<UserResponseDto> {
+async function updateUser(id: number, request: UpdateUserBody): Promise<UserResponse> {
     const user = await repoGetUserById(id, true);
     if (!user) {
         throw new NotFoundError("User not found.");
@@ -173,7 +173,7 @@ async function updateUser(id: number, request: UpdateUserRequestDto): Promise<Us
     return sanitizeUser(user);
 }
 
-async function changePassword(id: number, request: ChangePasswordRequestDto): Promise<UserResponseDto> {
+async function changePassword(id: number, request: ChangePasswordBody): Promise<UserResponse> {
     const user = await repoGetUserById(id, true);
     if (!user) {
         throw new NotFoundError("User not found.");
@@ -191,7 +191,7 @@ async function changePassword(id: number, request: ChangePasswordRequestDto): Pr
     return sanitizeUser(user);
 }
 
-async function deleteUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
+async function deleteUser(id: number, updatedBy?: number): Promise<UserResponse> {
     const user = await repoGetUserById(id, true);
     if (!user) {
         throw new NotFoundError("User not found.");
@@ -206,7 +206,7 @@ async function deleteUser(id: number, updatedBy?: number): Promise<UserResponseD
     return sanitizeUser(user);
 }
 
-async function restoreUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
+async function restoreUser(id: number, updatedBy?: number): Promise<UserResponse> {
     const user = await repoGetUserById(id);
     if (!user) {
         throw new NotFoundError("User not found.");
