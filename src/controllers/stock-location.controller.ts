@@ -3,11 +3,12 @@ import * as StockLocationService from "../services/stock-location.service";
 import {
     CreateStockLocationDto,
     UpdateStockLocationDto,
-    StockLocationResponseDto
+    StockLocationResponseDto,
+    StockLocationQueryDto
 } from "../dtos/stock-location.dto";
 
 async function getAllStockLocations(
-    req: Request<StockLocationResponseDto[]>,
+    req: Request<{}, StockLocationResponseDto[], {}, StockLocationQueryDto>,
     res: Response<StockLocationResponseDto[]>
 ) {
     const [data, total] = await StockLocationService.getAllStockLocations(req.query);

@@ -3,6 +3,7 @@ import {
     ProductCategoryResponseDTO,
     CreateProductCategoryDTO,
     UpdateProductCategoryDTO,
+    ProductCategoryQueryDTO,
     toProductCategoryResponseDTO,
     toProductCategoryResponseDTOList,
 } from "../dtos/product-category.dto";
@@ -19,7 +20,7 @@ async function createCategory(data: CreateProductCategoryDTO): Promise<ProductCa
     return toProductCategoryResponseDTO(loaded!);
 }
 
-async function getAllCategories(filters: { activeOnly?: boolean; name?: string; pageIndex?: number; pageSize?: number; } = {}): Promise<[ProductCategoryResponseDTO[], number]> {
+async function getAllCategories(filters: ProductCategoryQueryDTO = {}): Promise<[ProductCategoryResponseDTO[], number]> {
     const [categories, total] = await ProductCategoryRepository.getAllCategories(filters);
     return [toProductCategoryResponseDTOList(categories), total];
 }

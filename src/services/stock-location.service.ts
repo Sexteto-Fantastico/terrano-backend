@@ -2,6 +2,7 @@ import {
     CreateStockLocationDto,
     UpdateStockLocationDto,
     StockLocationResponseDto,
+    StockLocationQueryDto,
     toStockLocationResponseDto,
     toStockLocationResponseDtoList
 } from "../dtos/stock-location.dto";
@@ -12,7 +13,7 @@ import * as StockLocationRepository from "../repositories/stock-location.reposit
 import * as AddressRepository from "../repositories/address.repository";
 
 async function getAllStockLocations(
-    filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}
+    filters: StockLocationQueryDto = {}
 ): Promise<[StockLocationResponseDto[], number]> {
 
     const [locations, total] = await StockLocationRepository.getAllStockLocations(filters);

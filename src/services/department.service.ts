@@ -2,6 +2,7 @@ import {
     CreateDepartmentDto,
     UpdateDepartmentDto,
     DepartmentResponseDto,
+    DepartmentQueryDto,
     toDepartmentResponseDto,
     toDepartmentResponseDtoList,
 } from "../dtos/department.dto";
@@ -9,7 +10,7 @@ import { NotFoundError, BadRequestError } from "../errors/app-error";
 import * as DepartmentRepository from "../repositories/department.repository";
 import * as UserRepository from "../repositories/user.repository";
 
-async function getAllDepartments(filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[DepartmentResponseDto[], number]> {
+async function getAllDepartments(filters: DepartmentQueryDto = {}): Promise<[DepartmentResponseDto[], number]> {
     const [allDepartments, total] = await DepartmentRepository.getAllDepartments(filters);
     return [toDepartmentResponseDtoList(allDepartments), total];
 }

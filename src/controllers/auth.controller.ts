@@ -5,7 +5,9 @@ import {
     ForgotPasswordRequestDto,
     LoginRequestDto,
     LoginResponseDto,
+    MeResponseDto,
     ResetPasswordRequestDto,
+    toMeResponseDto,
 } from "../dtos/user.dto";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
@@ -34,4 +36,14 @@ async function definePassword(req: AuthenticatedRequest, res: Response) {
     res.json({ message: "Password has been updated successfully." });
 }
 
-export { login, forgotPassword, resetPassword, definePassword };
+async function getMe(req: AuthenticatedRequest, res: Response<MeResponseDto>) {
+    const user = req.user;
+    if (!user) {
+        throw new Error("Authenticated user not found");
+    }
+
+    const result = await AuthService.getMe(user.id);
+    res.json(toMeResponseDto(result));
+}
+
+export { login, forgotPassword, resetPassword, definePassword, getMe };

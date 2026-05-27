@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { definePassword, forgotPassword, login, resetPassword } from "../controllers/auth.controller";
+import { definePassword, forgotPassword, getMe, login, resetPassword } from "../controllers/auth.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -8,7 +8,8 @@ import {
     LoginResponseSchema,
     ForgotPasswordBodySchema,
     ResetPasswordBodySchema,
-    DefinePasswordBodySchema
+    DefinePasswordBodySchema,
+    MeResponseSchema
 } from "../dtos/user.dto";
 
 const router = Router();
@@ -76,5 +77,22 @@ createRoute(router, {
     },
     middlewares: [authMiddleware]
 }, definePassword);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.AUTH.ME,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Get current logged-in user profile",
+    security: [{ bearerAuth: [] }],
+    responses: {
+        200: {
+            description: "Current user profile",
+            content: { [ContentType.JSON]: { schema: MeResponseSchema } }
+        },
+        401: { description: "Unauthorized" }
+    },
+    middlewares: [authMiddleware]
+}, getMe);
 
 export default router;

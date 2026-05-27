@@ -1,3 +1,4 @@
+import { User } from "../infra/entities/user.entity";
 import { z, registry } from "../infra/config/openapi";
 import { paginationFields } from "./common/pagination.dto";
 
@@ -214,4 +215,48 @@ export class LoginResponseDto {
     token!: string;
     expiresAt!: string;
     mustResetPassword?: boolean;
+}
+
+export const MeResponseSchema = registry.register(
+    "MeResponseDto",
+    z.object({
+        id: z.number().int().openapi({ example: 1 }),
+        name: z.string().openapi({ example: "John Doe" }),
+        phone: z.string().optional().openapi({ example: "+1234567890" }),
+        cpf: z.string().optional().openapi({ example: "123.456.789-00" }),
+        email: z.string().openapi({ example: "john@terrano.com" }),
+        username: z.string().openapi({ example: "johndoe" }),
+        role: RoleResponseSchema.optional(),
+        department: DepartmentResponseSchema.optional(),
+        isActive: z.boolean().openapi({ example: true }),
+        requiresPasswordReset: z.boolean().optional().openapi({ example: false }),
+    })
+);
+
+export class MeResponseDto {
+    id!: number;
+    name!: string;
+    phone?: string;
+    cpf?: string;
+    email!: string;
+    username!: string;
+    role?: RoleDto;
+    department?: DepartmentDto;
+    isActive!: boolean;
+    requiresPasswordReset?: boolean;
+}
+
+export function toMeResponseDto(user: User): MeResponseDto {
+    return {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        cpf: user.cpf,
+        email: user.email,
+        username: user.username,
+        role: user.role ? { id: user.role.id, name: user.role.name } : undefined,
+        department: user.department ? { id: user.department.id, name: user.department.name } : undefined,
+        isActive: user.is_active ?? true,
+        requiresPasswordReset: user.requires_password_reset,
+    };
 }

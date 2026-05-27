@@ -207,7 +207,7 @@ async function deleteUser(id: number, updatedBy?: number): Promise<UserResponseD
 }
 
 async function restoreUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
-    const user = await repoGetUserById(id, true);
+    const user = await repoGetUserById(id);
     if (!user) {
         throw new NotFoundError("User not found.");
     }
