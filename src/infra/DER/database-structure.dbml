@@ -13,7 +13,6 @@ Table user {
   password_reset_token_expires_at datetime
   role_id int
   department_id int
-  is_active boolean [default: true]
   created_by int
   updated_by int
   created_at datetime
@@ -74,8 +73,6 @@ Table address {
   state varchar(100)
   country varchar(100)
   complement varchar(255)
-  supplier_id int
-  stock_location_id int
   created_by int
   updated_by int
   created_at datetime
@@ -90,6 +87,7 @@ Table supplier {
   cnpj varchar(14) [unique]
   email varchar(255) [unique]
   phone varchar(20)
+  address_id int
   created_by int
   updated_by int
   created_at datetime
@@ -100,7 +98,6 @@ Table supplier {
 Table product_brand {
   id int [pk, increment]
   name varchar(100) [unique]
-  is_active boolean [default: true]
   created_by int
   updated_by int
   created_at datetime
@@ -141,7 +138,6 @@ Table product {
   brand_id int
   measurement_unit_id int
   min_stock int
-  max_stock int
   created_by int
   updated_by int
   created_at datetime
@@ -153,34 +149,7 @@ Table stock_location {
   id int [pk, increment]
   name varchar(100)
   description text
-  created_by int
-  updated_by int
-  created_at datetime
-  updated_at datetime
-  deleted_at datetime
-}
-
-Table stock_location_product {
-  id int [pk, increment]
-  product_id int
-  location_id int
-  quantity int [default: 0]
-  created_by int
-  updated_by int
-  created_at datetime
-  updated_at datetime
-  deleted_at datetime
-}
-
-Table stock_movement {
-  id int [pk, increment]
-  product_id int
-  location_id int
-  movement_type varchar(20)
-  purchase_order_id int
-  requisition_id int
-  quantity int
-  unit_cost float
+  address_id int
   created_by int
   updated_by int
   created_at datetime
@@ -191,7 +160,7 @@ Table stock_movement {
 Table stock_balance {
   id int [pk, increment]
   product_id int
-  location_id int
+  stock_location_id int
   quantity int [default: 0]
   created_by int
   updated_by int
@@ -200,13 +169,16 @@ Table stock_balance {
   deleted_at datetime
 }
 
-Table purchase_order {
+Table purchase {
   id int [pk, increment]
-  order_number varchar(50) [unique]
-  order_date date
-  status varchar(20)
+  used_nf_xml_document boolean
+  total float
   supplier_id int
-  total float [default: 0]
+  estimated_delivery_date datetime
+  purchase_date datetime
+  nf_number int
+  nf_serie int
+  internal_notes varchar
   created_by int
   updated_by int
   created_at datetime
@@ -214,13 +186,13 @@ Table purchase_order {
   deleted_at datetime
 }
 
-Table purchase_order_item {
+Table purchase_item {
   id int [pk, increment]
-  purchase_order_id int
   product_id int
   quantity int
   unit_price float
-  subtotal float
+  total float
+  purchase_id int
   created_by int
   updated_by int
   created_at datetime
@@ -228,13 +200,11 @@ Table purchase_order_item {
   deleted_at datetime
 }
 
-Table stock_requisition {
+Table purchase_payment {
   id int [pk, increment]
-  company_name varchar(200)
-  status varchar(20)
-  declared_at date
-  total_value float [default: 0]
-  department_id int
+  payment_method int [enum: 0, 1, 2, 3],
+  total float
+  purchase_id int
   created_by int
   updated_by int
   created_at datetime
@@ -242,14 +212,74 @@ Table stock_requisition {
   deleted_at datetime
 }
 
-Table stock_requisition_item {
+Table movement_entry {
   id int [pk, increment]
-  item varchar(200)
-  declared_at date
+  entryDate datetime
+  entryMovementCategory [enum: 0,1,2,3]
+  purchase int [optional]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table movement_exit {
+  id int [pk, increment]
+  exitDate datetime
+  exitMovementCategory [enum: 0,1,2,3]
+  purchase int [optional]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table movement {
+  id int [pk, increment]
   product_id int
   quantity int
-  delivered int [default: 0]
-  requisition_id int
+  movement_exit_id int
+  movement_entry_id int
+  stock_location_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table materials_request {
+  id int [pk, increment]
+  status varchar(20)
+  requester_justification varchar
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table materials_request_item {
+  id int [pk, increment]
+  product_id int
+  quantity int
+  delivered boolean
+  materials_request_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table materials_status_log {
+  id int [pk, increment]
+  materials_request_id int
+  previous_status varchar(20)
+  current_status varchar(20)
+  change_justification varchar
   created_by int
   updated_by int
   created_at datetime
@@ -299,14 +329,14 @@ Ref: stock_location_product.location_id > stock_location.id
 Ref: stock_movement.product_id > product.id
 Ref: stock_movement.location_id > stock_location.id
 Ref: stock_movement.purchase_order_id > purchase_order.id
-Ref: stock_movement.requisition_id > stock_requisition.id
+Ref: stock_movement.requisition_id > materials_request.id
 Ref: stock_balance.product_id > product.id
 Ref: stock_balance.location_id > stock_location.id
 Ref: purchase_order.supplier_id > supplier.id
 Ref: purchase_order_item.purchase_order_id > purchase_order.id
 Ref: purchase_order_item.product_id > product.id
-Ref: stock_requisition.department_id > department.id
-Ref: stock_requisition_item.product_id > product.id
-Ref: stock_requisition_item.requisition_id > stock_requisition.id
+Ref: materials_request.department_id > department.id
+Ref: materials_request_item.product_id > product.id
+Ref: materials_request_item.requisition_id > materials_request.id
 Ref: system_log.user_id > user.id
 Ref: product_category.parent_id > product_category.id
