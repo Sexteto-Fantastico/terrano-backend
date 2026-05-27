@@ -1,0 +1,312 @@
+// DBML schema for Terrano database structure
+
+Table user {
+  id int [pk, increment]
+  name varchar(100)
+  phone varchar(20)
+  cpf varchar(14)
+  email varchar(300) [unique]
+  username varchar(50) [unique]
+  password varchar(100)
+  requires_password_reset boolean [default: false]
+  password_reset_token varchar(255)
+  password_reset_token_expires_at datetime
+  role_id int
+  department_id int
+  is_active boolean [default: true]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table role {
+  id int [pk, increment]
+  name varchar(50) [unique]
+  description text
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table policy {
+  id int [pk, increment]
+  name varchar(100) [unique]
+  description text
+  resource varchar(50)
+  action varchar(50)
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table role_policies {
+  role_id int
+  policy_id int
+  Indexes {
+    (role_id, policy_id) [unique]
+  }
+}
+
+Table department {
+  id int [pk, increment]
+  name varchar(100)
+  cost_center_code varchar(50)
+  manager_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table address {
+  id int [pk, increment]
+  street varchar(255)
+  number varchar(20)
+  neighborhood varchar(100)
+  city varchar(100)
+  state varchar(100)
+  country varchar(100)
+  complement varchar(255)
+  supplier_id int
+  stock_location_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table supplier {
+  id int [pk, increment]
+  corporate_name varchar(255)
+  trade_name varchar(255)
+  cnpj varchar(14) [unique]
+  email varchar(255) [unique]
+  phone varchar(20)
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table product_brand {
+  id int [pk, increment]
+  name varchar(100) [unique]
+  is_active boolean [default: true]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table product_category {
+  id int [pk, increment]
+  name varchar(200)
+  description text
+  parent_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table measurement_unit {
+  id int [pk, increment]
+  name varchar(100) [unique]
+  symbol varchar(20)
+  type varchar(20)
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table product {
+  id int [pk, increment]
+  name varchar(200)
+  code varchar(50) [unique]
+  description text
+  category_id int
+  brand_id int
+  measurement_unit_id int
+  min_stock int
+  max_stock int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table stock_location {
+  id int [pk, increment]
+  name varchar(100)
+  description text
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table stock_location_product {
+  id int [pk, increment]
+  product_id int
+  location_id int
+  quantity int [default: 0]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table stock_movement {
+  id int [pk, increment]
+  product_id int
+  location_id int
+  movement_type varchar(20)
+  purchase_order_id int
+  requisition_id int
+  quantity int
+  unit_cost float
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table stock_balance {
+  id int [pk, increment]
+  product_id int
+  location_id int
+  quantity int [default: 0]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table purchase_order {
+  id int [pk, increment]
+  order_number varchar(50) [unique]
+  order_date date
+  status varchar(20)
+  supplier_id int
+  total float [default: 0]
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table purchase_order_item {
+  id int [pk, increment]
+  purchase_order_id int
+  product_id int
+  quantity int
+  unit_price float
+  subtotal float
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table stock_requisition {
+  id int [pk, increment]
+  company_name varchar(200)
+  status varchar(20)
+  declared_at date
+  total_value float [default: 0]
+  department_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table stock_requisition_item {
+  id int [pk, increment]
+  item varchar(200)
+  declared_at date
+  product_id int
+  quantity int
+  delivered int [default: 0]
+  requisition_id int
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Table error_log {
+  id int [pk, increment]
+  level varchar(50)
+  message varchar(1000)
+  status_code int
+  is_operational boolean [default: true]
+  stack text
+  path varchar(500)
+  method varchar(10)
+  metadata json
+  created_at datetime
+}
+
+Table system_log {
+  id int [pk, increment]
+  entity_name varchar(100)
+  entity_id int
+  action varchar(50)
+  user_id int
+  metadata json
+  created_by int
+  updated_by int
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+Ref: user.role_id > role.id
+Ref: user.department_id > department.id
+Ref: department.manager_id > user.id
+Ref: role_policies.role_id > role.id
+Ref: role_policies.policy_id > policy.id
+Ref: address.supplier_id > supplier.id
+Ref: address.stock_location_id > stock_location.id
+Ref: product.category_id > product_category.id
+Ref: product.brand_id > product_brand.id
+Ref: product.measurement_unit_id > measurement_unit.id
+Ref: stock_location_product.product_id > product.id
+Ref: stock_location_product.location_id > stock_location.id
+Ref: stock_movement.product_id > product.id
+Ref: stock_movement.location_id > stock_location.id
+Ref: stock_movement.purchase_order_id > purchase_order.id
+Ref: stock_movement.requisition_id > stock_requisition.id
+Ref: stock_balance.product_id > product.id
+Ref: stock_balance.location_id > stock_location.id
+Ref: purchase_order.supplier_id > supplier.id
+Ref: purchase_order_item.purchase_order_id > purchase_order.id
+Ref: purchase_order_item.product_id > product.id
+Ref: stock_requisition.department_id > department.id
+Ref: stock_requisition_item.product_id > product.id
+Ref: stock_requisition_item.requisition_id > stock_requisition.id
+Ref: system_log.user_id > user.id
+Ref: product_category.parent_id > product_category.id
