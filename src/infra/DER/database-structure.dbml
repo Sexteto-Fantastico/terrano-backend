@@ -1,4 +1,33 @@
-// DBML schema for Terrano database structure
+Enum payment_method {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  PIX
+}
+
+Enum entry_movement_category {
+  PURCHASE
+  ADJUSTMENT
+}
+
+Enum exit_movement_category {
+  MATERIAL_REQUEST
+  STOCK_LOCATION_TRANSFER
+  DEFECTIVE
+  RETURN
+  ADJUSTMENT
+}
+
+Enum material_request_status {
+  PENDING
+  CANCELLED
+  REJECTED
+  APPROVED
+  WAITING_PURCHASE
+  WAITING_DELIVERY
+  DELIVERED
+}
 
 Table user {
   id int [pk, increment]
@@ -13,9 +42,9 @@ Table user {
   password_reset_token_expires_at datetime
   role_id int
   department_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -24,9 +53,9 @@ Table role {
   id int [pk, increment]
   name varchar(50) [unique]
   description text
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -37,29 +66,25 @@ Table policy {
   description text
   resource varchar(50)
   action varchar(50)
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
 Table role_policies {
-  role_id int
-  policy_id int
-  Indexes {
-    (role_id, policy_id) [unique]
-  }
+  role_id int [ref: > role.id]
+  policy_id int [ref: > policy.id]
 }
 
 Table department {
   id int [pk, increment]
   name varchar(100)
-  cost_center_code varchar(50)
-  manager_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  manager_id int [ref: > user.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -73,9 +98,9 @@ Table address {
   state varchar(100)
   country varchar(100)
   complement varchar(255)
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -87,10 +112,10 @@ Table supplier {
   cnpj varchar(14) [unique]
   email varchar(255) [unique]
   phone varchar(20)
-  address_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  address_id int [ref: > address.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -98,9 +123,9 @@ Table supplier {
 Table product_brand {
   id int [pk, increment]
   name varchar(100) [unique]
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -109,10 +134,10 @@ Table product_category {
   id int [pk, increment]
   name varchar(200)
   description text
-  parent_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  parent_id int [ref: > product_category.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -122,9 +147,9 @@ Table measurement_unit {
   name varchar(100) [unique]
   symbol varchar(20)
   type varchar(20)
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -134,13 +159,13 @@ Table product {
   name varchar(200)
   code varchar(50) [unique]
   description text
-  category_id int
-  brand_id int
-  measurement_unit_id int
+  category_id int [ref: > product_category.id]
+  brand_id int [ref: > product_brand.id]
+  measurement_unit_id int [ref: > measurement_unit.id]
   min_stock int
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -149,22 +174,22 @@ Table stock_location {
   id int [pk, increment]
   name varchar(100)
   description text
-  address_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  address_id int [ref: > address.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
 Table stock_balance {
   id int [pk, increment]
-  product_id int
-  stock_location_id int
+  product_id int [ref: > product.id]
+  stock_location_id int [ref: > stock_location.id]
   quantity int [default: 0]
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -173,41 +198,41 @@ Table purchase {
   id int [pk, increment]
   used_nf_xml_document boolean
   total float
-  supplier_id int
+  supplier_id int [ref: > supplier.id]
   estimated_delivery_date datetime
   purchase_date datetime
   nf_number int
   nf_serie int
   internal_notes varchar
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
 Table purchase_item {
   id int [pk, increment]
-  product_id int
+  product_id int [ref: > product.id]
   quantity int
   unit_price float
   total float
-  purchase_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  purchase_id int [ref: > purchase.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
 Table purchase_payment {
   id int [pk, increment]
-  payment_method int [enum: 0, 1, 2, 3],
+  payment_method payment_method
   total float
-  purchase_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  purchase_id int [ref: > purchase.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -215,11 +240,11 @@ Table purchase_payment {
 Table movement_entry {
   id int [pk, increment]
   entryDate datetime
-  entryMovementCategory [enum: 0,1,2,3]
-  purchase int [optional]
-  created_by int
-  updated_by int
-  created_at datetime
+  entry_movement_category entry_movement_category
+  purchase_id int [ref: > purchase.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -227,62 +252,64 @@ Table movement_entry {
 Table movement_exit {
   id int [pk, increment]
   exitDate datetime
-  exitMovementCategory [enum: 0,1,2,3]
-  purchase int [optional]
-  created_by int
-  updated_by int
-  created_at datetime
+  exit_movement_category exit_movement_category
+  purchase_id int [ref: > purchase.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
 Table movement {
   id int [pk, increment]
-  product_id int
+  product_id int [ref: > product.id]
   quantity int
-  movement_exit_id int
-  movement_entry_id int
-  stock_location_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  movement_exit_id int [ref: > movement_exit.id]
+  movement_entry_id int [ref: > movement_entry.id]
+  stock_location_id int [ref: > stock_location.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
+
+  Note: 'CRITICAL RULE: Exactly one of (movement_exit_id, movement_entry_id) must be NOT NULL.'
 }
 
-Table materials_request {
+Table material_request {
   id int [pk, increment]
-  status varchar(20)
+  status material_request_status
   requester_justification varchar
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
-Table materials_request_item {
+Table material_request_item {
   id int [pk, increment]
-  product_id int
+  product_id int [ref: > product.id]
   quantity int
   delivered boolean
-  materials_request_id int
-  created_by int
-  updated_by int
-  created_at datetime
+  material_request_id int [ref: > material_request.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
 
-Table materials_status_log {
+Table material_request_status_log {
   id int [pk, increment]
-  materials_request_id int
-  previous_status varchar(20)
-  current_status varchar(20)
-  change_justification varchar
-  created_by int
-  updated_by int
-  created_at datetime
+  material_request_id int [ref: > material_request.id]
+  previous_status material_request_status
+  current_status material_request_status
+  change_justification varchar(255)
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
@@ -297,7 +324,7 @@ Table error_log {
   path varchar(500)
   method varchar(10)
   metadata json
-  created_at datetime
+  created_at datetime [not null, default: `now()`]
 }
 
 Table system_log {
@@ -305,38 +332,11 @@ Table system_log {
   entity_name varchar(100)
   entity_id int
   action varchar(50)
-  user_id int
+  user_id int [ref: > user.id]
   metadata json
-  created_by int
-  updated_by int
-  created_at datetime
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
   updated_at datetime
   deleted_at datetime
 }
-
-Ref: user.role_id > role.id
-Ref: user.department_id > department.id
-Ref: department.manager_id > user.id
-Ref: role_policies.role_id > role.id
-Ref: role_policies.policy_id > policy.id
-Ref: address.supplier_id > supplier.id
-Ref: address.stock_location_id > stock_location.id
-Ref: product.category_id > product_category.id
-Ref: product.brand_id > product_brand.id
-Ref: product.measurement_unit_id > measurement_unit.id
-Ref: stock_location_product.product_id > product.id
-Ref: stock_location_product.location_id > stock_location.id
-Ref: stock_movement.product_id > product.id
-Ref: stock_movement.location_id > stock_location.id
-Ref: stock_movement.purchase_order_id > purchase_order.id
-Ref: stock_movement.requisition_id > materials_request.id
-Ref: stock_balance.product_id > product.id
-Ref: stock_balance.location_id > stock_location.id
-Ref: purchase_order.supplier_id > supplier.id
-Ref: purchase_order_item.purchase_order_id > purchase_order.id
-Ref: purchase_order_item.product_id > product.id
-Ref: materials_request.department_id > department.id
-Ref: materials_request_item.product_id > product.id
-Ref: materials_request_item.requisition_id > materials_request.id
-Ref: system_log.user_id > user.id
-Ref: product_category.parent_id > product_category.id
