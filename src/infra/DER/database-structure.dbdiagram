@@ -1,0 +1,159 @@
+{
+  "version": "2.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "currentViewName": null,
+  "defaultView": {
+    "detailLevel": "All",
+    "tablePositions": [
+      {
+        "name": "user",
+        "schemaName": "public",
+        "x": 331.01025390625,
+        "y": 32
+      },
+      {
+        "name": "role",
+        "schemaName": "public",
+        "x": 399.0854440303474,
+        "y": -577.0632526626908
+      },
+      {
+        "name": "policy",
+        "schemaName": "public",
+        "x": -1.6679141295669524,
+        "y": -490.04068915819363
+      },
+      {
+        "name": "role_policies",
+        "schemaName": "public",
+        "x": 28.9900908906759,
+        "y": -665.6023336705125
+      },
+      {
+        "name": "department",
+        "schemaName": "public",
+        "x": 378.11579156849143,
+        "y": 705.8110399122022
+      },
+      {
+        "name": "address",
+        "schemaName": "public",
+        "x": 375.05744195911643,
+        "y": 1120.0302176560424
+      },
+      {
+        "name": "supplier",
+        "schemaName": "public",
+        "x": 1362.2485454087043,
+        "y": -415.6040920722123
+      },
+      {
+        "name": "product_brand",
+        "schemaName": "public",
+        "x": 1368.3493800450237,
+        "y": 714.6595526818533
+      },
+      {
+        "name": "product_category",
+        "schemaName": "public",
+        "x": 1375.3392641989758,
+        "y": 1008.6998428899092
+      },
+      {
+        "name": "measurement_unit",
+        "schemaName": "public",
+        "x": 1013.1116903945191,
+        "y": 1011.2209437018428
+      },
+      {
+        "name": "product",
+        "schemaName": "public",
+        "x": 1764.8113224554206,
+        "y": 701.2997581599534
+      },
+      {
+        "name": "stock_location",
+        "schemaName": "public",
+        "x": 1934.4575874673915,
+        "y": 118.65186386134144
+      },
+      {
+        "name": "stock_balance",
+        "schemaName": "public",
+        "x": 1940.5032699497476,
+        "y": -244.81194735314267
+      },
+      {
+        "name": "purchase",
+        "schemaName": "public",
+        "x": 2549.775021994657,
+        "y": -166.86654546388274
+      },
+      {
+        "name": "purchase_item",
+        "schemaName": "public",
+        "x": 2928.9687810804753,
+        "y": 80.9422090929858
+      },
+      {
+        "name": "purchase_payment",
+        "schemaName": "public",
+        "x": 2933.6822191760984,
+        "y": -454.94082118320136
+      },
+      {
+        "name": "movement_entry",
+        "schemaName": "public",
+        "x": 3237.6704753906174,
+        "y": 765.2997581599534
+      },
+      {
+        "name": "movement_exit",
+        "schemaName": "public",
+        "x": 2735.365416350991,
+        "y": 754.69182977687
+      },
+      {
+        "name": "movement",
+        "schemaName": "public",
+        "x": 3094.9100845200264,
+        "y": 1159.5403401750934
+      },
+      {
+        "name": "material_request",
+        "schemaName": "public",
+        "x": 2493.4390656244077,
+        "y": 1801.5720810079818
+      },
+      {
+        "name": "material_request_item",
+        "schemaName": "public",
+        "x": 2095.5901518922274,
+        "y": 1560.0752321999075
+      },
+      {
+        "name": "material_request_status_log",
+        "schemaName": "public",
+        "x": 2009.1815460383846,
+        "y": 2013.7723584104597
+      },
+      {
+        "name": "error_log",
+        "schemaName": "public",
+        "x": -127.79768307903983,
+        "y": 42.28968560793908
+      },
+      {
+        "name": "system_log",
+        "schemaName": "public",
+        "x": 797.508840805611,
+        "y": -677.3315716165442
+      }
+    ],
+    "tableGroupCollapseStates": [],
+    "stickyNoteLayouts": [],
+    "referencePaths": []
+  },
+  "views": {}
+}
