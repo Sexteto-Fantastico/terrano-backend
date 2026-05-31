@@ -10,6 +10,7 @@ export const departmentIdSchema = z.object({
 export const departmentQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
+        name: z.string().optional(),
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
     })
 });
@@ -19,8 +20,8 @@ export const CreateDepartmentBodySchema = registry.register(
     "CreateDepartmentDto",
     z.object({
         name: z.string().min(1, "Department name is required").openapi({ example: "Engineering" }),
-        costCenterCode: z.string().min(1, "Cost center code is required").openapi({ example: "CC-ENG-01" }),
         managerId: z.number().int().positive("Manager ID is required").openapi({ example: 1 }),
+        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
@@ -31,8 +32,8 @@ export const UpdateDepartmentBodySchema = registry.register(
     "UpdateDepartmentDto",
     z.object({
         name: z.string().min(1, "Department name cannot be empty").optional().openapi({ example: "Engineering v2" }),
-        costCenterCode: z.string().min(1, "Cost center code cannot be empty").optional().openapi({ example: "CC-ENG-02" }),
         managerId: z.number().int().positive().optional().openapi({ example: 2 }),
+        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
@@ -47,25 +48,45 @@ export const DepartmentResponseSchema = registry.register(
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Engineering" }),
-        costCenterCode: z.string().openapi({ example: "CC-ENG-01" }),
         managerId: z.number().int().optional().openapi({ example: 1 }),
+        isActive: z.boolean().openapi({ example: true }),
+        createdAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
+        updatedAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
         deletedAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
     })
 );
 
+export class DepartmentManagerResponseDto {
+    managerId: number;
+    name: string;
+    email: string;
+    username: string;
+}
+
 export class DepartmentResponseDto {
     id: number;
     name: string;
-    costCenterCode: string;
-    managerId?: number;
+    manager?: DepartmentManagerResponseDto;
+    isActive: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
     deletedAt?: Date;
 }
+
+export const toDepartmentManagerResponseDto = (manager: any): DepartmentManagerResponseDto => ({
+    managerId: manager.id,
+    name: manager.name,
+    email: manager.email,
+    username: manager.username,
+});
 
 export const toDepartmentResponseDto = (dept: any): DepartmentResponseDto => ({
     id: dept.id,
     name: dept.name,
-    costCenterCode: dept.cost_center_code,
-    managerId: dept.manager?.id || dept.manager_id,
+    manager: dept.manager ? toDepartmentManagerResponseDto(dept.manager) : undefined,
+    isActive: dept.is_active,
+    createdAt: dept.created_at,
+    updatedAt: dept.updated_at,
     deletedAt: dept.deleted_at,
 });
 

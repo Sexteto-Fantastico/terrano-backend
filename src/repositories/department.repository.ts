@@ -1,14 +1,20 @@
 import { AppDataSource } from "../infra/config/data-source";
 import { Department } from "../infra/entities/department.entity";
+import {FindOptionsWhere, ILike} from "typeorm";
 
 const departmentRepository = AppDataSource.getRepository(Department);
 
-async function getAllDepartments(filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[Department[], number]> {
-    const { activeOnly = false, pageIndex, pageSize } = filters;
+async function getAllDepartments(filters: { name?: string, activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[Department[], number]> {
+    const { name, activeOnly = true, pageIndex, pageSize } = filters;
+    const where: FindOptionsWhere<Department> = {};
+
+    if (activeOnly) where.is_active = true;
+    if (name) where.name = ILike(`%${name}%`);
 
     const dbQuery: any = {
-        withDeleted: !activeOnly,
+        where,
         relations: ["manager"],
+        order: {id: "ASC"}
     };
 
     if (pageIndex !== undefined && pageSize !== undefined) {
