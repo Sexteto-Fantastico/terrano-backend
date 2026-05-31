@@ -19,7 +19,6 @@ export const CreateDepartmentBodySchema = registry.register(
     z.object({
         name: z.string().min(1, "Department name is required").openapi({ example: "Engineering" }),
         managerId: z.number().int().positive("Manager ID is required").openapi({ example: 1 }),
-        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
@@ -31,7 +30,6 @@ export const UpdateDepartmentBodySchema = registry.register(
     z.object({
         name: z.string().min(1, "Department name cannot be empty").optional().openapi({ example: "Engineering v2" }),
         managerId: z.number().int().positive().optional().openapi({ example: 2 }),
-        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
@@ -60,7 +58,7 @@ export const toDepartmentResponse = (dept: Department): DepartmentResponse => ({
     id: dept.id,
     name: dept.name,
     manager: dept.manager ? toUserResponse(dept.manager) : undefined,
-    isActive: dept.is_active,
+    isActive: !dept.deleted_at,
     createdAt: dept.created_at,
     updatedAt: dept.updated_at,
     deletedAt: dept.deleted_at,

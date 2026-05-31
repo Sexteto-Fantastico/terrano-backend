@@ -10,11 +10,11 @@ async function createUser(user: User): Promise<User> {
 }
 
 async function getUserByUsername(username: string): Promise<User | null> {
-  return await userRepository.findOne({ where: { username } });
+  return await userRepository.findOne({ where: { username }, withDeleted: true });
 }
 
 async function getUserByEmail(email: string): Promise<User | null> {
-  return await userRepository.findOne({ where: { email } });
+  return await userRepository.findOne({ where: { email }, withDeleted: true });
 }
 
 async function getUserByPasswordResetToken(
@@ -27,13 +27,11 @@ async function getUserByPasswordResetToken(
 
 async function getUserById(
   id: number,
-  activeOnly: boolean = false,
+  withDeleted: boolean = false,
 ): Promise<User | null> {
-  const where: FindOptionsWhere<User> = { id };
-  if (activeOnly) where.is_active = true;
-
   return await userRepository.findOne({
-    where,
+    where: { id },
+    withDeleted,
     relations: ["role", "department"],
   });
 }
@@ -43,9 +41,6 @@ async function getAllUsers(filters: UserQuery = {}): Promise<[User[], number]> {
 
   const where: FindOptionsWhere<User> = {};
 
-  if (activeOnly) {
-    where.is_active = true;
-  }
   if (filters.name) {
     where.name = ILike(`%${filters.name}%`);
   }
@@ -58,6 +53,7 @@ async function getAllUsers(filters: UserQuery = {}): Promise<[User[], number]> {
 
   const options: FindManyOptions<User> = {
     where,
+    withDeleted: !activeOnly,
     relations: ["role", "department"],
   };
 
@@ -79,6 +75,14 @@ async function updateUser(user: User): Promise<User> {
   return await userRepository.save(user);
 }
 
+async function deleteUser(user: User): Promise<User> {
+  return await userRepository.softRemove(user);
+}
+
+async function recoverUser(user: User): Promise<User> {
+  return await userRepository.recover(user);
+}
+
 export {
   createUser,
   getUserByUsername,
@@ -87,4 +91,6 @@ export {
   getUserById,
   getAllUsers,
   updateUser,
+  deleteUser,
+  recoverUser,
 };

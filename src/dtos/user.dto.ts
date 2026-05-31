@@ -153,7 +153,7 @@ export function toUserResponse(user: User): UserResponse {
         role: user.role ? { id: user.role.id, name: user.role.name } : undefined,
         department: user.department ? { id: user.department.id, name: user.department.name } : undefined,
         managedDepartments: user.managed_departments?.map(d => ({ id: d.id, name: d.name })),
-        isActive: user.is_active,
+        isActive: !user.deleted_at,
         requiresPasswordReset: user.requires_password_reset,
     };
 }

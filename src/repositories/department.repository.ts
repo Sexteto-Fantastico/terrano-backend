@@ -7,10 +7,9 @@ const departmentRepository = AppDataSource.getRepository(Department);
 
 async function getAllDepartments(filters: DepartmentQuery = {}): Promise<[Department[], number]> {
     const { activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
-    
+
     const where: FindOptionsWhere<Department> = {};
-    
-    if (activeOnly) where.is_active = true;
+
     if (filters.name) where.name = ILike(`%${filters.name}%`);
 
     const options: FindManyOptions<Department> = {

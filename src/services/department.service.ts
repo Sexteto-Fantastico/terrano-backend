@@ -24,10 +24,10 @@ async function getDepartmentById(id: number): Promise<DepartmentResponse> {
 }
 
 async function createDepartment(data: CreateDepartment): Promise<DepartmentResponse> {
-    const { managerId,  isActive ,...rest } = data;
+    const { managerId, ...rest } = data;
 
     const manager = await UserRepository.getUserById(managerId);
-    
+
     if (!manager) {
         throw new NotFoundError("Manager not found");
     }
@@ -36,7 +36,6 @@ async function createDepartment(data: CreateDepartment): Promise<DepartmentRespo
         ...rest,
         manager_id: managerId,
         manager,
-        is_active: isActive ?? true,
         created_at: new Date(),
     };
 
@@ -60,8 +59,6 @@ async function updateDepartment(id: number, data: UpdateDepartment): Promise<Dep
     }
 
     if (data.name !== undefined) existingDepartment.name = data.name;
-
-    if (data.isActive !== undefined) existingDepartment.is_active = data.isActive;
 
     existingDepartment.updated_at = new Date();
 

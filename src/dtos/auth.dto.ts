@@ -85,7 +85,7 @@ export function toMeResponse(user: User): MeResponse {
         username: user.username,
         role: user.role ? { id: user.role.id, name: user.role.name } : undefined,
         department: user.department ? { id: user.department.id, name: user.department.name } : undefined,
-        isActive: user.is_active ?? true,
+        isActive: !user.deleted_at,
         requiresPasswordReset: user.requires_password_reset,
     };
 }
