@@ -5,7 +5,7 @@ import {
     ManyToOne,
     JoinColumn,
 } from "typeorm";
-import { StockMovement } from "./stock-movement.entity";
+import { Movement } from "./movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
 import { StockRequisitionItem } from "./stock-requisition-item.entity";
 import { PurchaseItem } from "./purchase-item.entity";
@@ -27,7 +27,7 @@ export interface IProduct extends ITerranoBaseEntity {
     min_stock?: number;
     max_stock?: number;
     deleted_at?: Date;
-    stock_movements?: StockMovement[];
+    stock_movements?: Movement[];
     stock_location_products?: StockLocationProduct[];
     requisition_items?: StockRequisitionItem[];
     purchase_items?: PurchaseItem[];
@@ -71,8 +71,8 @@ export class Product extends TerranoBaseEntity implements IProduct {
     @Column({ type: "int" })
     measurement_unit_id: number;
 
-    @OneToMany(() => StockMovement, (movement) => movement.product)
-    stock_movements?: StockMovement[];
+    @OneToMany(() => Movement, (movement) => movement.product)
+    stock_movements?: Movement[];
 
     @OneToMany(() => StockLocationProduct, (slp) => slp.product)
     stock_location_products?: StockLocationProduct[];

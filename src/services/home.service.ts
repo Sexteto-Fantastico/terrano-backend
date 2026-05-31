@@ -1,6 +1,6 @@
 import * as PurchaseRepository from "../repositories/purchase.repository";
-import * as StockMovementRepository from "../repositories/stock-movement.repository";
-import { MovementType } from "../infra/entities/stock-movement.entity";
+import * as MovementRepository from "../repositories/movement.repository";
+import { MovementType } from "../infra/entities/movement.entity";
 import { HomeResponseDTO, toHomeResponseDTO } from "../dtos/home.dto";
 import { formatDateToYYYYMMDD, formatDateToStartOfDay } from "../utils/date.util";
 
@@ -41,12 +41,12 @@ async function getHomeSummary(): Promise<HomeResponseDTO> {
         PurchaseRepository.getGrandTotalPurchases(),
         PurchaseRepository.getPurchasesTotalByDateRange(currentMonthStartStr, nextMonthStartStr),
         PurchaseRepository.getPurchasesTotalByDateRange(previousMonthStartStr, currentMonthStartStr),
-        StockMovementRepository.getGrandTotalQuantity(MovementType.IN),
-        StockMovementRepository.getTotalQuantityByDateRange(MovementType.IN, currentMonthStartDateTimeStr, nextMonthStartDateTimeStr),
-        StockMovementRepository.getTotalQuantityByDateRange(MovementType.IN, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr),
-        StockMovementRepository.getGrandTotalQuantity(MovementType.OUT),
-        StockMovementRepository.getTotalQuantityByDateRange(MovementType.OUT, currentMonthStartDateTimeStr, nextMonthStartDateTimeStr),
-        StockMovementRepository.getTotalQuantityByDateRange(MovementType.OUT, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr)
+        MovementRepository.getGrandTotalQuantity(MovementType.IN),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.IN, currentMonthStartDateTimeStr, nextMonthStartDateTimeStr),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.IN, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr),
+        MovementRepository.getGrandTotalQuantity(MovementType.OUT),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, currentMonthStartDateTimeStr, nextMonthStartDateTimeStr),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr)
     ]);
 
     return toHomeResponseDTO({

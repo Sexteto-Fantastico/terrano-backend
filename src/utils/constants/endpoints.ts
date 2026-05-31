@@ -75,6 +75,11 @@ export const Endpoints = {
         ...CRUD_ROUTES,
     },
 
+    MOVEMENTS: {
+        BASE: `${API_PREFIX}/movements`,
+        EXIT: "/exit",
+    },
+
     HOME: {
         BASE: `${API_PREFIX}/home`,
         SUMMARY: "/summary",
