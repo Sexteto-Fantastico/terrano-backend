@@ -9,16 +9,16 @@ import { Purchase } from "../infra/entities/purchase.entity";
 import { PurchaseItem } from "../infra/entities/purchase-item.entity";
 import { PurchasePayment } from "../infra/entities/purchase-payment.entity";
 import { Supplier } from "../infra/entities/supplier.entity";
-import { toPurchaseResponseDto, toPurchaseResponseDtoList } from "../dtos/purchase.dto";
+import { toPurchaseResponse, toPurchaseResponseList } from "../dtos/purchase.dto";
 import { getSupplierById } from "../repositories/supplier.repository";
 import { getProductById } from "./product.service";
 
-type CreatePurchaseDto = any;
-type UpdatePurchaseDto = any;
+type CreatePurchaseBody = any;
+type UpdatePurchaseBody = any;
 
 async function getAllPurchases(filters: any = {}) {
     const [list, total] = await PurchaseRepository.getAllPurchases(filters);
-    return [toPurchaseResponseDtoList(list), total];
+    return [toPurchaseResponseList(list), total];
 }
 
 async function getPurchaseById(id: number) {
@@ -33,10 +33,10 @@ async function getPurchaseById(id: number) {
     (purchase as any).items = items;
     (purchase as any).payments = payments;
 
-    return toPurchaseResponseDto(purchase);
+    return toPurchaseResponse(purchase);
 }
 
-async function createPurchase(data: CreatePurchaseDto) {
+async function createPurchase(data: CreatePurchaseBody) {
     await validatePurchaseData(data);
 
     return await AppDataSource.manager.transaction(async (manager) => {
@@ -85,11 +85,11 @@ async function createPurchase(data: CreatePurchaseDto) {
             }
         }
 
-        return toPurchaseResponseDto(savedPurchase);
+        return toPurchaseResponse(savedPurchase);
     });
 }
 
-async function updatePurchase(id: number, data: UpdatePurchaseDto) {
+async function updatePurchase(id: number, data: UpdatePurchaseBody) {
 
     await validatePurchaseData(data);
 
@@ -174,7 +174,7 @@ async function updatePurchase(id: number, data: UpdatePurchaseDto) {
             }
         }
 
-        return toPurchaseResponseDto(savedPurchase);
+        return toPurchaseResponse(savedPurchase);
     });
 }
 
@@ -192,10 +192,10 @@ async function restorePurchase(id: number) {
     if (!purchase.deleted_at) throw new BadRequestError("Purchase is not deleted");
     await PurchaseRepository.restorePurchase(purchase);
     const restored = await PurchaseRepository.getPurchaseById(id, true);
-    return toPurchaseResponseDto(restored!);
+    return toPurchaseResponse(restored!);
 }
 
-async function validatePurchaseData(data: CreatePurchaseDto | UpdatePurchaseDto) {
+async function validatePurchaseData(data: CreatePurchaseBody | UpdatePurchaseBody) {
     console.log("Validating purchase data:", data);
     if (data.supplierId) {
         const supplier = await SupplierRepository.getSupplierById(data.supplierId);

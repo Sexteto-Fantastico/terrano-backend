@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import * as PurchaseService from "../services/purchase.service";
-import { PurchaseQueryDto, CreatePurchaseDto, UpdatePurchaseDto } from "../dtos/purchase.dto";
+import { PurchaseQuery, CreatePurchaseBody, UpdatePurchaseBody } from "../dtos/purchase.dto";
 
-async function getAllPurchases(req: Request<{}, any[], {}, PurchaseQueryDto>, res: Response) {
+async function getAllPurchases(req: Request<{}, any[], {}, PurchaseQuery>, res: Response) {
 	const [purchases, total] = await PurchaseService.getAllPurchases(req.query);
 	res.set("X-Total-Count", total.toString());
 	res.status(200).json(purchases);
@@ -14,12 +14,12 @@ async function getPurchaseById(req: Request<{ id: string }>, res: Response) {
 	res.status(200).json(purchase);
 }
 
-async function createPurchase(req: Request<{}, any, CreatePurchaseDto>, res: Response) {
+async function createPurchase(req: Request<{}, any, CreatePurchaseBody>, res: Response) {
 	const created = await PurchaseService.createPurchase(req.body);
 	res.status(201).json(created);
 }
 
-async function updatePurchase(req: Request<{ id: string }, any, UpdatePurchaseDto>, res: Response) {
+async function updatePurchase(req: Request<{ id: string }, any, UpdatePurchaseBody>, res: Response) {
 	const id = Number(req.params.id);
 	const updated = await PurchaseService.updatePurchase(id, req.body);
 	res.status(200).json(updated);

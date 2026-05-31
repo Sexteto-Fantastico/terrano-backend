@@ -16,7 +16,7 @@ export const HomeAlertSchema = z.object({
 });
 
 export const HomeResponseSchema = registry.register(
-    "HomeResponseDto",
+    "HomeResponse",
     z.object({
         purchases: HomeIndicatorSchema,
         entries: HomeIndicatorIntegerSchema,
@@ -27,31 +27,7 @@ export const HomeResponseSchema = registry.register(
 
 export type HomeResponse = z.infer<typeof HomeResponseSchema>;
 
-export class HomeResponseDTO {
-    purchases: {
-        total: number;
-        percentage: number;
-    };
-    entries: {
-        total: number;
-        percentage: number;
-    };
-    exits: {
-        total: number;
-        percentage: number;
-    };
-    alerts: {
-        total: number;
-        newCount: number;
-    };
-}
-
-export const toHomeResponseDTO = (data: {
-    purchases: { total: number; percentage: number };
-    entries: { total: number; percentage: number };
-    exits: { total: number; percentage: number };
-    alerts: { total: number; newCount: number };
-}): HomeResponseDTO => ({
+export const toHomeResponse = (data: HomeResponse): HomeResponse => ({
     purchases: data.purchases,
     entries: data.entries,
     exits: data.exits,
