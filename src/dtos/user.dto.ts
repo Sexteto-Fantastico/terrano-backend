@@ -78,6 +78,8 @@ export const UserQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
+        cpf: z.string().optional(),
+        departmentId: z.coerce.number().int().positive().optional(),
         activeOnly: activeOnlyField,
     })
 });
