@@ -5,7 +5,7 @@ import {
 } from "typeorm";
 import { Product } from "./product.entity";
 import { StockLocation } from "./stock-location.entity";
-import { PurchaseOrder } from "./purchase-order.entity";
+import { Purchase } from "./purchase.entity";
 import { StockRequisition } from "./stock-requisition.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
@@ -36,8 +36,8 @@ export class StockMovement extends TerranoBaseEntity implements IStockMovement {
     @Column({ type: "simple-enum", enum: MovementType })
     movement_type: MovementType;
 
-    @ManyToOne(() => PurchaseOrder, (po) => po.stock_movements, { nullable: true })
-    purchase_order: PurchaseOrder | null;
+    @ManyToOne(() => Purchase, (po) => (po as any).stock_movements, { nullable: true })
+    purchase_order: Purchase | null;
 
     @ManyToOne(() => StockRequisition, (req) => req.stock_movements, { nullable: true })
     requisition: StockRequisition | null;
