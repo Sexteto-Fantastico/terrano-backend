@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import * as DepartmentService from "../services/department.service";
-import { CreateDepartmentDto, DepartmentResponseDto, UpdateDepartmentDto } from "../dtos/department.dto";
+import {
+    CreateDepartmentDto,
+    DepartmentQueryDto,
+    DepartmentResponseDto,
+    UpdateDepartmentDto
+} from "../dtos/department.dto";
 
 async function getAllDepartments(
-    req: Request<DepartmentResponseDto[]>,
+    req: Request<unknown, DepartmentResponseDto[], unknown, DepartmentQueryDto>,
     res: Response<DepartmentResponseDto[]>
 ) {
     const [departments, total] = await DepartmentService.getAllDepartments(req.query);
