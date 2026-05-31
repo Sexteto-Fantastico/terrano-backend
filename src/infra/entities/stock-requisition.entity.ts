@@ -1,18 +1,13 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     OneToMany,
     ManyToOne,
     JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
-    DeleteDateColumn,
 } from "typeorm";
 import { StockRequisitionItem } from "./stock-requisition-item.entity";
 import { Department } from "./department.entity";
-import { StockMovement } from "./stock-movement.entity";
+import { StockMovementOutput } from "./stock-movement-output.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 
 export enum RequisitionStatus {
@@ -30,9 +25,10 @@ export interface IStockRequisition extends ITerranoBaseEntity {
     total_value: number;
     department: Department;
     items: StockRequisitionItem[];
-    stock_movements: StockMovement[];
+    stock_movement_outputs: StockMovementOutput[];
     updated_by?: number;
 }
+
 @Entity("stock_requisition")
 export class StockRequisition extends TerranoBaseEntity implements IStockRequisition {
 
@@ -59,13 +55,14 @@ export class StockRequisition extends TerranoBaseEntity implements IStockRequisi
     @OneToMany(() => StockRequisitionItem, (item) => item.requisition)
     items: StockRequisitionItem[];
 
-    @OneToMany(() => StockMovement, (movement) => movement.requisition)
-    stock_movements: StockMovement[];
+    @OneToMany(
+        () => StockMovementOutput,
+        (output) => output.requisition
+    )
+    stock_movement_outputs: StockMovementOutput[];
 
     constructor(requisition: IStockRequisition) {
         super(requisition);
         Object.assign(this, requisition);
     }
 }
-
-

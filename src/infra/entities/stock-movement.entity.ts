@@ -1,25 +1,20 @@
 import {
     Entity,
     Column,
-    ManyToOne
+    ManyToOne,
+    JoinColumn,
 } from "typeorm";
 import { Product } from "./product.entity";
 import { StockLocation } from "./stock-location.entity";
-import { Purchase } from "./purchase.entity";
-import { StockRequisition } from "./stock-requisition.entity";
+import { StockMovementEntry } from "./stock-movement-entry.entity";
+import { StockMovementOutput } from "./stock-movement-output.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
-
-export enum MovementType {
-    IN = "IN",
-    OUT = "OUT",
-    TRANSFER = "TRANSFER",
-    ADJUSTMENT = "ADJUSTMENT",
-}
 
 export interface IStockMovement extends ITerranoBaseEntity {
     product: Product;
     location: StockLocation;
-    movement_type: MovementType;
+    movement_entry?: StockMovementEntry;
+    movement_output?: StockMovementOutput;
     quantity: number;
     unit_cost: number;
 }
@@ -28,19 +23,20 @@ export interface IStockMovement extends ITerranoBaseEntity {
 export class StockMovement extends TerranoBaseEntity implements IStockMovement {
 
     @ManyToOne(() => Product, (product) => product.stock_movements)
+    @JoinColumn({ name: "product_id" })
     product: Product;
 
     @ManyToOne(() => StockLocation, (location) => location.stock_movements)
+    @JoinColumn({ name: "location_id" })
     location: StockLocation;
 
-    @Column({ type: "simple-enum", enum: MovementType })
-    movement_type: MovementType;
+    @ManyToOne(() => StockMovementEntry, (entry) => entry.stock_movements, { nullable: true })
+    @JoinColumn({ name: "movement_entry_id" })
+    movement_entry?: StockMovementEntry;
 
-    @ManyToOne(() => Purchase, (po) => (po as any).stock_movements, { nullable: true })
-    purchase_order: Purchase | null;
-
-    @ManyToOne(() => StockRequisition, (req) => req.stock_movements, { nullable: true })
-    requisition: StockRequisition | null;
+    @ManyToOne(() => StockMovementOutput, (output) => output.stock_movements, { nullable: true })
+    @JoinColumn({ name: "movement_output_id" })
+    movement_output?: StockMovementOutput;
 
     @Column({ type: "int" })
     quantity: number;

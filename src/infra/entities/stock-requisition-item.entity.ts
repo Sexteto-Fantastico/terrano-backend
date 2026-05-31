@@ -1,13 +1,8 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     ManyToOne,
     JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
-    DeleteDateColumn,
 } from "typeorm";
 import { Product } from "./product.entity";
 import { StockRequisition } from "./stock-requisition.entity";
@@ -51,5 +46,3 @@ export class StockRequisitionItem extends TerranoBaseEntity implements IStockReq
         Object.assign(this, item);
     }
 }
-
-
