@@ -1,11 +1,14 @@
 import { z, registry } from "../infra/config/openapi";
 import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
+import { UserResponseSchema, toUserResponse } from "./user.dto";
+import { Department } from "../infra/entities/department.entity";
 
 export const DepartmentIdSchema = idParamSchema;
 
 export const DepartmentQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
+        name: z.string().optional(),
         activeOnly: activeOnlyField,
     })
 });
@@ -15,8 +18,8 @@ export const CreateDepartmentBodySchema = registry.register(
     "CreateDepartment",
     z.object({
         name: z.string().min(1, "Department name is required").openapi({ example: "Engineering" }),
-        costCenterCode: z.string().min(1, "Cost center code is required").openapi({ example: "CC-ENG-01" }),
         managerId: z.number().int().positive("Manager ID is required").openapi({ example: 1 }),
+        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
@@ -27,8 +30,8 @@ export const UpdateDepartmentBodySchema = registry.register(
     "UpdateDepartment",
     z.object({
         name: z.string().min(1, "Department name cannot be empty").optional().openapi({ example: "Engineering v2" }),
-        costCenterCode: z.string().min(1, "Cost center code cannot be empty").optional().openapi({ example: "CC-ENG-02" }),
         managerId: z.number().int().positive().optional().openapi({ example: 2 }),
+        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
@@ -43,21 +46,25 @@ export const DepartmentResponseSchema = registry.register(
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Engineering" }),
-        costCenterCode: z.string().openapi({ example: "CC-ENG-01" }),
-        managerId: z.number().int().optional().openapi({ example: 1 }),
-        deletedAt: z.date().nullable().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
+        manager: UserResponseSchema.optional(),
+        isActive: z.boolean().openapi({ example: true }),
+        createdAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
+        updatedAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
+        deletedAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
     })
 );
 
 export type DepartmentResponse = z.infer<typeof DepartmentResponseSchema>;
 
-export const toDepartmentResponse = (dept: any): DepartmentResponse => ({
+export const toDepartmentResponse = (dept: Department): DepartmentResponse => ({
     id: dept.id,
     name: dept.name,
-    costCenterCode: dept.cost_center_code,
-    managerId: dept.manager?.id || dept.manager_id,
+    manager: dept.manager ? toUserResponse(dept.manager) : undefined,
+    isActive: dept.is_active,
+    createdAt: dept.created_at,
+    updatedAt: dept.updated_at,
     deletedAt: dept.deleted_at,
 });
 
-export const toDepartmentResponseList = (list: any[]) =>
+export const toDepartmentResponseList = (list: Department[]): DepartmentResponse[] =>
     list.map(toDepartmentResponse);

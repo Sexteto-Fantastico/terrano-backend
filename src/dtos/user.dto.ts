@@ -139,3 +139,25 @@ export type Role = z.infer<typeof RoleResponseSchema>;
 export type Department = z.infer<typeof DepartmentResponseSchema>;
 
 export type UserResponse = z.infer<typeof UserResponseSchema>;
+
+// ============ Mapper Functions ============
+
+export function toUserResponse(user: User): UserResponse {
+    return {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        cpf: user.cpf,
+        email: user.email,
+        username: user.username,
+        role: user.role ? { id: user.role.id, name: user.role.name } : undefined,
+        department: user.department ? { id: user.department.id, name: user.department.name } : undefined,
+        managedDepartments: user.managed_departments?.map(d => ({ id: d.id, name: d.name })),
+        isActive: user.is_active,
+        requiresPasswordReset: user.requires_password_reset,
+    };
+}
+
+export function toUserResponseList(users: User[]): UserResponse[] {
+    return users.map(toUserResponse);
+}

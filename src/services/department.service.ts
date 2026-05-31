@@ -24,7 +24,7 @@ async function getDepartmentById(id: number): Promise<DepartmentResponse> {
 }
 
 async function createDepartment(data: CreateDepartment): Promise<DepartmentResponse> {
-    const { managerId, costCenterCode, ...rest } = data;
+    const { managerId,  isActive ,...rest } = data;
 
     const manager = await UserRepository.getUserById(managerId);
     
@@ -34,9 +34,10 @@ async function createDepartment(data: CreateDepartment): Promise<DepartmentRespo
 
     const departmentData = {
         ...rest,
-        cost_center_code: costCenterCode,
         manager_id: managerId,
         manager,
+        is_active: isActive ?? true,
+        created_at: new Date(),
     };
 
     const saved = await DepartmentRepository.saveDepartment(departmentData);
@@ -59,7 +60,10 @@ async function updateDepartment(id: number, data: UpdateDepartment): Promise<Dep
     }
 
     if (data.name !== undefined) existingDepartment.name = data.name;
-    if (data.costCenterCode !== undefined) existingDepartment.cost_center_code = data.costCenterCode;
+
+    if (data.isActive !== undefined) existingDepartment.is_active = data.isActive;
+
+    existingDepartment.updated_at = new Date();
 
     const saved = await DepartmentRepository.saveDepartment(existingDepartment);
     
