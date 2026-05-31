@@ -64,4 +64,30 @@ async function getAllPurchases(filters: any = {}): Promise<[Purchase[], number]>
     return await qb.getManyAndCount();
 }
 
-export { getPurchaseById, savePurchase, deletePurchase, restorePurchase, getAllPurchases };
+async function getGrandTotalPurchases(): Promise<number> {
+    const result = await purchaseRepository
+        .createQueryBuilder("purchase")
+        .select("SUM(purchase.total)", "total")
+        .getRawOne();
+    return Number(result?.total || 0);
+}
+
+async function getPurchasesTotalByDateRange(startDate: string, endDate: string): Promise<number> {
+    const result = await purchaseRepository
+        .createQueryBuilder("purchase")
+        .select("SUM(purchase.total)", "total")
+        .where("purchase.purchase_date >= :startDate", { startDate })
+        .andWhere("purchase.purchase_date < :endDate", { endDate })
+        .getRawOne();
+    return Number(result?.total || 0);
+}
+
+export {
+    getPurchaseById,
+    savePurchase,
+    deletePurchase,
+    restorePurchase,
+    getAllPurchases,
+    getGrandTotalPurchases,
+    getPurchasesTotalByDateRange,
+};
