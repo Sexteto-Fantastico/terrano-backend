@@ -70,4 +70,19 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/measurement-units`,
         ...CRUD_ROUTES,
     },
+
+    PURCHASES: {
+        BASE: `${API_PREFIX}/purchases`,
+        ...CRUD_ROUTES,
+    },
+
+    MOVEMENTS: {
+        BASE: `${API_PREFIX}/movements`,
+        EXIT: "/exit",
+    },
+
+    HOME: {
+        BASE: `${API_PREFIX}/home`,
+        SUMMARY: "/summary",
+    },
 } as const;
