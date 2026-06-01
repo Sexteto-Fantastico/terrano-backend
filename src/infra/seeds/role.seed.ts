@@ -2,40 +2,46 @@ import { AppDataSource } from "../config/data-source";
 import { Role } from "../entities/role.entity";
 
 export async function createRoleSeed(): Promise<void> {
-    const roleRepository = AppDataSource.getRepository(Role);
+    const repository = AppDataSource.getRepository(Role);
 
     const roles = [
         {
             name: "ADMIN",
-            description: "System administrator",
+            description: "Administrador do sistema",
         },
         {
-            name: "READER",
-            description: "Read-only access",
+            name: "MANAGER",
+            description: "Gestor",
+        },
+        {
+            name: "WAREHOUSE",
+            description: "Almoxarife",
+        },
+        {
+            name: "PURCHASING",
+            description: "Comprador",
+        },
+        {
+            name: "EMPLOYEE",
+            description: "Colaborador",
         },
     ];
 
     for (const roleData of roles) {
-        const existingRole = await roleRepository.findOne({
+        const exists = await repository.findOne({
             where: {
                 name: roleData.name,
             },
         });
 
-        if (existingRole) {
-            console.log(`Role ${roleData.name} already exists`);
+        if (exists) {
             continue;
         }
 
-        const role = new Role({
-            ...roleData,
-            policies: [],
-        });
+        const role = repository.create(roleData);
 
-        const savedRole = await roleRepository.save(role);
-
-        console.log(`Role created successfully -> ID: ${savedRole.id} | Name: ${savedRole.name}`);
+        await repository.save(role);
     }
 
-    console.log("Role seed completed successfully");
+    console.log("Role seed completed");
 }

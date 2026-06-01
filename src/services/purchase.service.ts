@@ -12,6 +12,11 @@ import { Supplier } from "../infra/entities/supplier.entity";
 import { toPurchaseResponse, toPurchaseResponseList } from "../dtos/purchase.dto";
 import { getSupplierById } from "../repositories/supplier.repository";
 import { getProductById } from "./product.service";
+import { MovementEntry, EntryMovementCategory } from "../infra/entities/movement-entry.entity";
+import { Movement } from "../infra/entities/movement.entity";
+import { StockBalance } from "../infra/entities/stock-balance.entity";
+import { StockLocation } from "../infra/entities/stock-location.entity";
+import { ReceivePurchaseBody } from "../dtos/purchase.dto"; // Ajuste o import
 
 type CreatePurchaseBody = any;
 type UpdatePurchaseBody = any;
@@ -40,7 +45,6 @@ async function createPurchase(data: CreatePurchaseBody) {
     await validatePurchaseData(data);
 
     return await AppDataSource.manager.transaction(async (manager) => {
-        
         const supplier = await getSupplierById(data.supplierId);
 
         const purchase = new Purchase({
@@ -271,4 +275,79 @@ async function validatePurchaseData(data: CreatePurchaseBody | UpdatePurchaseBod
         }
     }
 }
-export { getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase };
+
+async function receivePurchase(purchaseId: number, data: ReceivePurchaseBody) {
+    return await AppDataSource.manager.transaction(async (manager) => {
+        
+        const purchase = await manager.findOne(Purchase, { where: { id: purchaseId } });
+        if (!purchase) throw new NotFoundError("Purchase not found");
+
+        const existingEntry = await manager.findOne(MovementEntry, {
+            where: { purchase: { id: purchaseId } }
+        });
+        
+        if (existingEntry) {
+            throw new BadRequestError("This purchase has already been received into stock.");
+        }
+
+        const dbItems = await manager.find(PurchaseItem, {
+            where: { purchase: { id: purchaseId } },
+            relations: ["product"]
+        });
+
+        if (!dbItems || dbItems.length === 0) {
+            throw new BadRequestError("Cannot receive a purchase with no items.");
+        }
+
+        if (dbItems.length !== data.items.length) {
+            throw new BadRequestError("You must provide a stock location for every item in the purchase.");
+        }
+
+        const movementEntry = new MovementEntry({
+            entryDate: new Date(),
+            entryMovementCategory: EntryMovementCategory.PURCHASE,
+            purchase: purchase
+        });
+        const savedEntry = await manager.save(movementEntry);
+
+        for (const payloadItem of data.items) {
+            const dbItem = dbItems.find(i => i.id === payloadItem.purchaseItemId);
+            
+            if (!dbItem) {
+                throw new BadRequestError(`Purchase Item ID ${payloadItem.purchaseItemId} does not belong to this purchase.`);
+            }
+
+            const product = dbItem.product;
+
+            const location = await manager.findOne(StockLocation, { where: { id: payloadItem.stockLocationId } });
+            if (!location) throw new NotFoundError(`Stock location ID ${payloadItem.stockLocationId} not found.`);
+
+            let balance = await manager.findOne(StockBalance, {
+                where: { 
+                    product: { id: product.id }, 
+                    location: { id: location.id } 
+                }
+            });
+
+            if (!balance) {
+                balance = new StockBalance({ product, location, quantity: 0 });
+            }
+
+            const movement = new Movement({
+                product,
+                quantity: dbItem.quantity,
+                movement_exit: null,
+                movement_entry: savedEntry,
+                stock_location: location
+            });
+            await manager.save(movement);
+
+            balance.quantity += dbItem.quantity;
+            await manager.save(balance);
+        }
+
+        return savedEntry;
+    });
+}
+
+export { receivePurchase, getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase };

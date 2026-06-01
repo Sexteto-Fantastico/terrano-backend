@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as PurchaseService from "../services/purchase.service";
-import { PurchaseQuery, CreatePurchaseBody, UpdatePurchaseBody } from "../dtos/purchase.dto";
+import { PurchaseQuery, CreatePurchaseBody, UpdatePurchaseBody, ReceivePurchaseBody } from "../dtos/purchase.dto";
+import { toMovementEntryResponse } from "../dtos/movement.dto";
 
 async function getAllPurchases(req: Request<{}, any[], {}, PurchaseQuery>, res: Response) {
 	const [purchases, total] = await PurchaseService.getAllPurchases(req.query);
@@ -37,5 +38,10 @@ async function restorePurchase(req: Request<{ id: string }>, res: Response) {
 	res.status(200).json(restored);
 }
 
-export { getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase };
+async function receivePurchase(req: Request<{ id: string }, any, ReceivePurchaseBody>, res: Response) {
+    const id = Number(req.params.id);
+    const entry = await PurchaseService.receivePurchase(id, req.body);
+    res.status(201).json(toMovementEntryResponse(entry));
+}
 
+export { getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase, receivePurchase };

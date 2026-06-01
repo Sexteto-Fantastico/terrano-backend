@@ -19,6 +19,7 @@ import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
 import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
 import { requestContextMiddleware } from "./utils/request-context";
+import supplierRoutes from "./routes/supplier.routes";
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -45,6 +46,7 @@ app.use(Endpoints.MEASUREMENT_UNITS.BASE, measurementUnitRoutes);
 app.use(Endpoints.PURCHASES.BASE, purchaseRoutes);
 app.use(Endpoints.MOVEMENTS.BASE, movementRoutes);
 app.use(Endpoints.HOME.BASE, homeRoutes);
+app.use(Endpoints.SUPPLIERS.BASE, supplierRoutes);
 
 
 app.use(globalErrorMiddleware);
