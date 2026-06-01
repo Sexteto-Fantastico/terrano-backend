@@ -1,6 +1,7 @@
+import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { ProductBrand } from "../infra/entities/product-brand.entity";
-import { FindOptionsWhere, ILike } from "typeorm";
+import { ProductBrandQuery } from "../dtos/product-brand.dto";
 
 const productBrandRepository = AppDataSource.getRepository(ProductBrand);
 
@@ -9,26 +10,29 @@ async function createBrand(data: ProductBrand): Promise<ProductBrand> {
     return await productBrandRepository.save(brand);
 }
 
-async function getAllBrands(filters: { name?: string; activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[ProductBrand[], number]> {
-    const { name, activeOnly = true, pageIndex, pageSize } = filters;
+async function getAllBrands(filters: ProductBrandQuery = {}): Promise<[ProductBrand[], number]> {
+    const { name, activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
-    const where: FindOptionsWhere<ProductBrand> = {} as FindOptionsWhere<ProductBrand>;
+    const where: FindOptionsWhere<ProductBrand> = {};
 
     if (name) where.name = ILike(`%${name}%`);
 
-    const dbQuery: any = {
+    const options: FindManyOptions<ProductBrand> = {
         where,
         withDeleted: !activeOnly,
-        order: { name: "ASC" },
     };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await productBrandRepository.findAndCount(dbQuery);
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
     }
 
-    const results = await productBrandRepository.find(dbQuery);
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return await productBrandRepository.findAndCount(options);
+    }
+
+    const results = await productBrandRepository.find(options);
     return [results, results.length];
 }
 

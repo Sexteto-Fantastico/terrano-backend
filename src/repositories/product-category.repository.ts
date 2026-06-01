@@ -1,7 +1,7 @@
+import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { ProductCategory, IProductCategory } from "../infra/entities/product-category.entity";
-
-import { ILike } from "typeorm";
+import { ProductCategoryQuery } from "../dtos/product-category.dto";
 
 const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
 
@@ -10,27 +10,30 @@ async function createCategory(data: IProductCategory): Promise<ProductCategory> 
     return await productCategoryRepository.save(category);
 }
 
-async function getAllCategories(filters: { activeOnly?: boolean; name?: string; pageIndex?: number; pageSize?: number; } = {}): Promise<[ProductCategory[], number]> {
-    const { activeOnly = false, name, pageIndex, pageSize } = filters;
-    const where: any = {};
-    
-    if (name) {
-        where.name = ILike(`%${name}%`);
-    }
+async function getAllCategories(filters: ProductCategoryQuery = {}): Promise<[ProductCategory[], number]> {
+    const { activeOnly = true, name, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
-    const dbQuery: any = {
+    const where: FindOptionsWhere<ProductCategory> = {};
+
+    if (name) where.name = ILike(`%${name}%`);
+
+    const options: FindManyOptions<ProductCategory> = {
         where,
         withDeleted: !activeOnly,
         relations: ["parent"],
     };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await productCategoryRepository.findAndCount(dbQuery);
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
     }
 
-    const results = await productCategoryRepository.find(dbQuery);
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return await productCategoryRepository.findAndCount(options);
+    }
+
+    const results = await productCategoryRepository.find(options);
     return [results, results.length];
 }
 

@@ -11,8 +11,8 @@ import {
     DeleteUserBodySchema,
     RestoreUserBodySchema,
     UserResponseSchema,
-    userIdParamsSchema,
-    getUsersQuerySchema
+    UserIdParamsSchema,
+    UserQuerySchema
 } from "../dtos/user.dto";
 
 const router = Router();
@@ -43,7 +43,7 @@ createRoute(router, {
     tags: ["Users"],
     summary: "List users",
     request: {
-        query: getUsersQuerySchema.shape.query
+        query: UserQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -60,7 +60,7 @@ createRoute(router, {
     tags: ["Users"],
     summary: "Get a user by ID",
     request: {
-        params: userIdParamsSchema.shape.params
+        params: UserIdParamsSchema.shape.params
     },
     responses: {
         200: {
@@ -78,7 +78,7 @@ createRoute(router, {
     tags: ["Users"],
     summary: "Get logs for a user",
     request: {
-        params: userIdParamsSchema.shape.params
+        params: UserIdParamsSchema.shape.params
     },
     responses: {
         200: { description: "List of user logs" }
@@ -92,7 +92,7 @@ createRoute(router, {
     tags: ["Users"],
     summary: "Change user password",
     request: {
-        params: userIdParamsSchema.shape.params,
+        params: UserIdParamsSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: ChangePasswordBodySchema } } }
     },
     responses: {
@@ -111,7 +111,7 @@ createRoute(router, {
     tags: ["Users"],
     summary: "Update user details",
     request: {
-        params: userIdParamsSchema.shape.params,
+        params: UserIdParamsSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateUserBodySchema } } }
     },
     responses: {
@@ -131,7 +131,7 @@ createRoute(router, {
     tags: ["Users"],
     summary: "Delete a user",
     request: {
-        params: userIdParamsSchema.shape.params,
+        params: UserIdParamsSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: DeleteUserBodySchema } } }
     },
     responses: {
@@ -141,13 +141,13 @@ createRoute(router, {
 }, deleteUser);
 
 createRoute(router, {
-    method: HttpMethod.POST,
+    method: HttpMethod.PATCH,
     path: Endpoints.USERS.RESTORE,
     basePath: Endpoints.USERS.BASE,
     tags: ["Users"],
     summary: "Restore a deleted user",
     request: {
-        params: userIdParamsSchema.shape.params,
+        params: UserIdParamsSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: RestoreUserBodySchema } } }
     },
     responses: {

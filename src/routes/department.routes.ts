@@ -14,8 +14,8 @@ import {
     CreateDepartmentBodySchema,
     UpdateDepartmentBodySchema,
     DepartmentResponseSchema,
-    departmentIdSchema,
-    departmentQuerySchema
+    DepartmentIdSchema,
+    DepartmentQuerySchema
 } from "../dtos/department.dto";
 
 const router = Router();
@@ -44,7 +44,7 @@ createRoute(router, {
     tags: ["Departments"],
     summary: "Returns the list of all departments",
     request: {
-        query: departmentQuerySchema.shape.query
+        query: DepartmentQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -61,7 +61,7 @@ createRoute(router, {
     tags: ["Departments"],
     summary: "Get a department by id",
     request: {
-        params: departmentIdSchema.shape.params
+        params: DepartmentIdSchema.shape.params
     },
     responses: {
         200: {
@@ -79,7 +79,7 @@ createRoute(router, {
     tags: ["Departments"],
     summary: "Update a department",
     request: {
-        params: departmentIdSchema.shape.params,
+        params: DepartmentIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateDepartmentBodySchema } } }
     },
     responses: {
@@ -98,10 +98,10 @@ createRoute(router, {
     tags: ["Departments"],
     summary: "Soft delete a department",
     request: {
-        params: departmentIdSchema.shape.params
+        params: DepartmentIdSchema.shape.params
     },
     responses: {
-        200: { description: "Department deleted successfully" }
+        204: { description: "Department deleted successfully" }
     }
 }, deleteDepartment);
 
@@ -112,7 +112,7 @@ createRoute(router, {
     tags: ["Departments"],
     summary: "Restore a soft-deleted department",
     request: {
-        params: departmentIdSchema.shape.params
+        params: DepartmentIdSchema.shape.params
     },
     responses: {
         200: {

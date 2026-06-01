@@ -7,38 +7,38 @@ import {
     restoreMeasurementUnit as restoreMeasurementUnitRepo,
 } from "../repositories/measurement-unit.repository";
 import {
-    CreateMeasurementUnitDto,
-    UpdateMeasurementUnitDto,
-    MeasurementUnitResponseDto,
-    toMeasurementUnitResponseDto,
-    MeasurementUnitQueryDto,
+    CreateMeasurementUnit,
+    UpdateMeasurementUnit,
+    MeasurementUnitResponse,
+    toMeasurementUnitResponse,
+    MeasurementUnitQuery,
 } from "../dtos/measurement-unit.dto";
 import { NotFoundError, BadRequestError } from "../errors";
 
-export async function getAllMeasurementUnits(query: MeasurementUnitQueryDto): Promise<[MeasurementUnitResponseDto[], number]> {
+export async function getAllMeasurementUnits(query: MeasurementUnitQuery): Promise<[MeasurementUnitResponse[], number]> {
     const [units, total] = await findAllMeasurementUnits(query);
-    return [units.map(toMeasurementUnitResponseDto), total];
+    return [units.map(toMeasurementUnitResponse), total];
 }
 
-export async function getMeasurementUnitById(id: number): Promise<MeasurementUnitResponseDto> {
+export async function getMeasurementUnitById(id: number): Promise<MeasurementUnitResponse> {
     const unit = await findMeasurementUnitById(id);
     if (!unit) {
         throw new NotFoundError("Measurement Unit not found");
     }
-    return toMeasurementUnitResponseDto(unit);
+    return toMeasurementUnitResponse(unit);
 }
 
-export async function createNewMeasurementUnit(data: CreateMeasurementUnitDto): Promise<MeasurementUnitResponseDto> {
+export async function createNewMeasurementUnit(data: CreateMeasurementUnit): Promise<MeasurementUnitResponse> {
     const unit = await createMeasurementUnit({
         name: data.name,
         symbol: data.symbol,
         type: data.type,
     });
 
-    return toMeasurementUnitResponseDto(unit);
+    return toMeasurementUnitResponse(unit);
 }
 
-export async function updateExistingMeasurementUnit(id: number, data: UpdateMeasurementUnitDto): Promise<MeasurementUnitResponseDto> {
+export async function updateExistingMeasurementUnit(id: number, data: UpdateMeasurementUnit): Promise<MeasurementUnitResponse> {
     const unit = await findMeasurementUnitById(id);
     if (!unit) {
         throw new NotFoundError("Measurement Unit not found");
@@ -57,7 +57,7 @@ export async function updateExistingMeasurementUnit(id: number, data: UpdateMeas
     }
 
     const updatedUnit = await updateMeasurementUnit(unit);
-    return toMeasurementUnitResponseDto(updatedUnit);
+    return toMeasurementUnitResponse(updatedUnit);
 }
 
 export async function removeMeasurementUnit(id: number): Promise<void> {
@@ -73,7 +73,7 @@ export async function removeMeasurementUnit(id: number): Promise<void> {
     await softDeleteMeasurementUnit(unit);
 }
 
-export async function restoreMeasurementUnit(id: number): Promise<MeasurementUnitResponseDto> {
+export async function restoreMeasurementUnit(id: number): Promise<MeasurementUnitResponse> {
     const unit = await findMeasurementUnitById(id);
     if (!unit) {
         throw new NotFoundError("Measurement Unit not found");
@@ -84,5 +84,5 @@ export async function restoreMeasurementUnit(id: number): Promise<MeasurementUni
     }
 
     const restoredUnit = await restoreMeasurementUnitRepo(unit);
-    return toMeasurementUnitResponseDto(restoredUnit);
+    return toMeasurementUnitResponse(restoredUnit);
 }

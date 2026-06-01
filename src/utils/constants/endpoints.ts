@@ -33,6 +33,7 @@ export const Endpoints = {
         FORGOT_PASSWORD: "/forgot-password",
         RESET_PASSWORD: "/reset-password",
         DEFINE_PASSWORD: "/define-password",
+        ME: "/me",
     },
     USERS: {
         BASE: `${API_PREFIX}/users`,
@@ -44,7 +45,10 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/product-categories`,
         ...CRUD_ROUTES,
     },
-
+    SUPPLIERS: {
+        BASE: `${API_PREFIX}/suppliers`,
+        ...CRUD_ROUTES,
+    },
     PRODUCTS: {
         BASE: `${API_PREFIX}/products`,
         ...CRUD_ROUTES,
@@ -73,4 +77,23 @@ export const Endpoints = {
     BASE: `${API_PREFIX}/material-requests`,
     ...CRUD_ROUTES,
 },
+    },
+
+    PURCHASES: {
+        BASE: `${API_PREFIX}/purchases`,
+        ...CRUD_ROUTES,
+        RECEIVE: "/:id/receive",
+    },
+
+    MOVEMENTS: {
+        BASE: `${API_PREFIX}/movements`,
+        EXIT: "/exit",
+        ENTRY: "/entry",
+        ENTRY_GET_BY_ID: "/entry/:id",
+    },
+
+    HOME: {
+        BASE: `${API_PREFIX}/home`,
+        SUMMARY: "/summary",
+    },
 } as const;

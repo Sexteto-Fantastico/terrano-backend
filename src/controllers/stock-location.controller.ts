@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import * as StockLocationService from "../services/stock-location.service";
 import {
-    CreateStockLocationDto,
-    UpdateStockLocationDto,
-    StockLocationResponseDto
+    CreateStockLocation,
+    UpdateStockLocation,
+    StockLocationResponse,
+    StockLocationQuery
 } from "../dtos/stock-location.dto";
 
 async function getAllStockLocations(
-    req: Request<StockLocationResponseDto[]>,
-    res: Response<StockLocationResponseDto[]>
+    req: Request<{}, StockLocationResponse[], {}, StockLocationQuery>,
+    res: Response<StockLocationResponse[]>
 ) {
     const [data, total] = await StockLocationService.getAllStockLocations(req.query);
     res.set("X-Total-Count", total.toString());
@@ -16,8 +17,8 @@ async function getAllStockLocations(
 }
 
 async function getStockLocationById(
-    req: Request<{ id: string }, StockLocationResponseDto>,
-    res: Response<StockLocationResponseDto>
+    req: Request<{ id: string }, StockLocationResponse>,
+    res: Response<StockLocationResponse>
 ) {
     const id = Number(req.params.id);
     const data = await StockLocationService.getStockLocationById(id);
@@ -25,16 +26,16 @@ async function getStockLocationById(
 }
 
 async function createStockLocation(
-    req: Request<StockLocationResponseDto, CreateStockLocationDto>,
-    res: Response<StockLocationResponseDto>
+    req: Request<StockLocationResponse, CreateStockLocation>,
+    res: Response<StockLocationResponse>
 ) {
     const data = await StockLocationService.createStockLocation(req.body);
     res.status(201).json(data);
 }
 
 async function updateStockLocation(
-    req: Request<{ id: string }, StockLocationResponseDto, UpdateStockLocationDto>,
-    res: Response<StockLocationResponseDto>
+    req: Request<{ id: string }, StockLocationResponse, UpdateStockLocation>,
+    res: Response<StockLocationResponse>
 ) {
     const id = Number(req.params.id);
     const data = await StockLocationService.updateStockLocation(id, req.body);
@@ -43,16 +44,16 @@ async function updateStockLocation(
 
 async function deleteStockLocation(
     req: Request<{ id: string }>,
-    res: Response<{ message: string }>
+    res: Response
 ) {
     const id = Number(req.params.id);
     await StockLocationService.deleteStockLocation(id);
-    res.status(200).json({ message: "Stock location deleted successfully" });
+    res.status(204).send();
 }
 
 async function restoreStockLocation(
-    req: Request<{ id: string }, StockLocationResponseDto>,
-    res: Response<StockLocationResponseDto>
+    req: Request<{ id: string }, StockLocationResponse>,
+    res: Response<StockLocationResponse>
 ) {
     const id = Number(req.params.id);
     const data = await StockLocationService.restoreStockLocation(id);

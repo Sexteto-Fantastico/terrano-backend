@@ -1,45 +1,41 @@
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 
-export const productBrandIdSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
+export const ProductBrandIdSchema = idParamSchema;
 
-export const productBrandQuerySchema = z.object({
+export const ProductBrandQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
-        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: activeOnlyField,
     })
 });
-
+export type ProductBrandQuery = z.infer<typeof ProductBrandQuerySchema>["query"];
 export const CreateProductBrandBodySchema = registry.register(
-    "CreateProductBrandDto",
+    "CreateProductBrand",
     z.object({
         name: z.string().min(1, "Brand name is required").openapi({ example: "BrandX" }),
     })
 );
 
 export const createProductBrandSchema = z.object({ body: CreateProductBrandBodySchema });
-export type CreateProductBrandDTO = z.infer<typeof createProductBrandSchema>["body"];
+export type CreateProductBrand = z.infer<typeof createProductBrandSchema>["body"];
 
 export const UpdateProductBrandBodySchema = registry.register(
-    "UpdateProductBrandDto",
+    "UpdateProductBrand",
     z.object({
         name: z.string().min(1, "Brand name cannot be empty").optional().openapi({ example: "BrandY" }),
     })
 );
 
 export const updateProductBrandSchema = z.object({
-    params: productBrandIdSchema.shape.params,
+    params: ProductBrandIdSchema.shape.params,
     body: UpdateProductBrandBodySchema,
 });
-export type UpdateProductBrandDTO = z.infer<typeof updateProductBrandSchema>["body"];
+export type UpdateProductBrand = z.infer<typeof updateProductBrandSchema>["body"];
 
 export const ProductBrandResponseSchema = registry.register(
-    "ProductBrandResponseDto",
+    "ProductBrandResponse",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "BrandX" }),
@@ -47,22 +43,13 @@ export const ProductBrandResponseSchema = registry.register(
     })
 );
 
-export class ProductBrandResponseDTO {
-    id: number;
-    name: string;
-    isActive?: boolean;
-}
+export type ProductBrandResponse = z.infer<typeof ProductBrandResponseSchema>;
 
-export const toProductBrandResponseDTO = (brand: any): ProductBrandResponseDTO => ({
+export const toProductBrandResponse = (brand: any): ProductBrandResponse => ({
     id: brand.id,
     name: brand.name,
     isActive: !brand.deleted_at
 });
 
-export const toProductBrandResponseDTOList = (brands: any[]): ProductBrandResponseDTO[] =>
-    brands.map(toProductBrandResponseDTO);
-
-export class ProductBrandQueryDTO {
-    name?: string;
-    activeOnly?: boolean;
-}
+export const toProductBrandResponseList = (brands: any[]): ProductBrandResponse[] =>
+    brands.map(toProductBrandResponse);

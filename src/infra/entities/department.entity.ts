@@ -11,7 +11,6 @@ import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-en
 
 export interface IDepartment extends ITerranoBaseEntity {
     name: string;
-    cost_center_code: string;
     manager: User;
     updated_by?: number;
 }
@@ -21,9 +20,6 @@ export class Department extends TerranoBaseEntity implements IDepartment {
 
     @Column({ type: "varchar", length: 100 })
     name: string;
-
-    @Column({ type: "varchar", name: "cost_center_code", length: 50 })
-    cost_center_code: string;
 
     @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: "manager_id" })

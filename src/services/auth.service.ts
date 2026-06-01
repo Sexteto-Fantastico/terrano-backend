@@ -22,7 +22,7 @@ interface LoginResult {
 
 async function login(email: string, password: string): Promise<LoginResult> {
     const user = await getUserByEmail(email);
-    if (!user || !user.is_active) {
+    if (!user || user.deleted_at) {
         throw new UnauthorizedError("Invalid credentials.");
     }
 
@@ -30,7 +30,7 @@ async function login(email: string, password: string): Promise<LoginResult> {
         throw new UnauthorizedError("Invalid credentials.");
     }
 
-    const token = signJwt({ userId: user.id, email: user.email });
+    const token = signJwt({ userId: user.id });
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
     return {
@@ -42,7 +42,7 @@ async function login(email: string, password: string): Promise<LoginResult> {
 
 async function forgotPassword(email: string): Promise<void> {
     const user = await getUserByEmail(email);
-    if (!user || !user.is_active) {
+    if (!user || user.deleted_at) {
         return;
     }
 
@@ -72,7 +72,7 @@ async function resetPassword(token: string, password: string): Promise<void> {
 }
 
 async function definePassword(userId: number, password: string): Promise<void> {
-    const user = await repoGetUserById(userId, true);
+    const user = await repoGetUserById(userId);
     if (!user) {
         throw new NotFoundError("User not found.");
     }
@@ -84,4 +84,12 @@ async function definePassword(userId: number, password: string): Promise<void> {
     await repoUpdateUser(user);
 }
 
-export { login, forgotPassword, resetPassword, definePassword };
+async function getMe(userId: number) {
+    const user = await repoGetUserById(userId);
+    if (!user) {
+        throw new NotFoundError("User not found.");
+    }
+    return user;
+}
+
+export { login, forgotPassword, resetPassword, definePassword, getMe };

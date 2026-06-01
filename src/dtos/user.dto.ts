@@ -1,60 +1,15 @@
+import { User } from "../infra/entities/user.entity";
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 
 // ============ Reusable Schemas ============
 
-export const userIdParamsSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
-
-// ============ Auth Schemas ============
-
-export const LoginBodySchema = registry.register(
-    "LoginRequestDto",
-    z.object({
-        email: z.email("Invalid email format").openapi({ example: "user@email.com" }),
-        password: z.string().min(1, "Password is required").openapi({ example: "password123" }),
-    })
-);
-
-export const loginSchema = z.object({ body: LoginBodySchema });
-export type LoginRequestDto = z.infer<typeof loginSchema>["body"];
-
-export const ForgotPasswordBodySchema = registry.register(
-    "ForgotPasswordRequestDto",
-    z.object({
-        email: z.email("Invalid email format").openapi({ example: "user@email.com" }),
-    })
-);
-
-export const forgotPasswordSchema = z.object({ body: ForgotPasswordBodySchema });
-export type ForgotPasswordRequestDto = z.infer<typeof forgotPasswordSchema>["body"];
-
-export const ResetPasswordBodySchema = registry.register(
-    "ResetPasswordRequestDto",
-    z.object({
-        token: z.string().min(1, "Token is required").openapi({ example: "token123" }),
-        password: z.string().min(1, "Password is required").openapi({ example: "newpassword123" }),
-    })
-);
-export const resetPasswordSchema = z.object({ body: ResetPasswordBodySchema });
-export type ResetPasswordRequestDto = z.infer<typeof resetPasswordSchema>["body"];
-
-export const DefinePasswordBodySchema = registry.register(
-    "DefinePasswordRequestDto",
-    z.object({
-        password: z.string().min(1, "Password is required").openapi({ example: "newpassword123" }),
-    })
-);
-export const definePasswordSchema = z.object({ body: DefinePasswordBodySchema });
-export type DefinePasswordRequestDto = z.infer<typeof definePasswordSchema>["body"];
+export const UserIdParamsSchema = idParamSchema;
 
 // ============ User Schemas ============
 
 export const CreateUserBodySchema = registry.register(
-    "CreateUserRequestDto",
+    "CreateUserBody",
     z.object({
         name: z.string().min(1, "Name is required").openapi({ example: "John Doe" }),
         phone: z.string().optional().openapi({ example: "+1234567890" }),
@@ -70,10 +25,10 @@ export const CreateUserBodySchema = registry.register(
 );
 
 export const createUserSchema = z.object({ body: CreateUserBodySchema });
-export type CreateUserRequestDto = z.infer<typeof createUserSchema>["body"];
+export type CreateUserBody = z.infer<typeof createUserSchema>["body"];
 
 export const UpdateUserBodySchema = registry.register(
-    "UpdateUserRequestDto",
+    "UpdateUserBody",
     z.object({
         name: z.string().min(1, "Name cannot be empty").optional().openapi({ example: "John Doe" }),
         phone: z.string().optional().openapi({ example: "+1234567890" }),
@@ -87,13 +42,13 @@ export const UpdateUserBodySchema = registry.register(
 );
 
 export const updateUserSchema = z.object({
-    params: userIdParamsSchema.shape.params,
+    params: UserIdParamsSchema.shape.params,
     body: UpdateUserBodySchema,
 });
-export type UpdateUserRequestDto = z.infer<typeof updateUserSchema>["body"];
+export type UpdateUserBody = z.infer<typeof updateUserSchema>["body"];
 
 export const ChangePasswordBodySchema = registry.register(
-    "ChangePasswordRequestDto",
+    "ChangePasswordBody",
     z.object({
         password: z.string().min(1, "Password is required").openapi({ example: "password123" }),
         updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
@@ -101,49 +56,51 @@ export const ChangePasswordBodySchema = registry.register(
 );
 
 export const changePasswordSchema = z.object({
-    params: userIdParamsSchema.shape.params,
+    params: UserIdParamsSchema.shape.params,
     body: ChangePasswordBodySchema,
 });
-export type ChangePasswordRequestDto = z.infer<typeof changePasswordSchema>["body"];
+export type ChangePasswordBody = z.infer<typeof changePasswordSchema>["body"];
 
 export const DeleteUserBodySchema = registry.register(
-    "DeleteUserRequestDto",
+    "DeleteUserBody",
     z.object({
         updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
     }).optional()
 );
 
 export const deleteUserSchema = z.object({
-    params: userIdParamsSchema.shape.params,
+    params: UserIdParamsSchema.shape.params,
     body: DeleteUserBodySchema,
 });
-export type DeleteUserRequestDto = z.infer<typeof deleteUserSchema>["body"];
+export type DeleteUserBody = z.infer<typeof deleteUserSchema>["body"];
 
-export const getUsersQuerySchema = z.object({
+export const UserQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
-        onlyActive: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        cpf: z.string().optional(),
+        departmentId: z.coerce.number().int().positive().optional(),
+        activeOnly: activeOnlyField,
     })
 });
-export type GetUsersQueryDto = z.infer<typeof getUsersQuerySchema>["query"];
+export type UserQuery = z.infer<typeof UserQuerySchema>["query"];
 
 export const RestoreUserBodySchema = registry.register(
-    "RestoreUserRequestDto",
+    "RestoreUserBody",
     z.object({
         updatedBy: z.number().int().positive().optional(),
     }).optional()
 );
 
 export const restoreUserSchema = z.object({
-    params: userIdParamsSchema.shape.params,
+    params: UserIdParamsSchema.shape.params,
     body: RestoreUserBodySchema,
 });
 
 // ============ Response Schemas ============
 
 export const RoleResponseSchema = registry.register(
-    "RoleDto",
+    "Role",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Admin" }),
@@ -151,7 +108,7 @@ export const RoleResponseSchema = registry.register(
 );
 
 export const DepartmentResponseSchema = registry.register(
-    "DepartmentDto",
+    "Department",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "IT" }),
@@ -159,7 +116,7 @@ export const DepartmentResponseSchema = registry.register(
 );
 
 export const UserResponseSchema = registry.register(
-    "UserResponseDto",
+    "UserResponse",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "John Doe" }),
@@ -175,43 +132,32 @@ export const UserResponseSchema = registry.register(
     })
 );
 
-export const LoginResponseSchema = registry.register(
-    "LoginResponseDto",
-    z.object({
-        token: z.string().openapi({ example: "token123" }),
-        expiresAt: z.string().openapi({ example: "2022-01-01T00:00:00.000Z" }),
-        mustResetPassword: z.boolean().optional().openapi({ example: false }),
-    })
-);
+// ============ Inferred Types ============
 
-// ============ Classes for Runtime ============
+export type Role = z.infer<typeof RoleResponseSchema>;
 
-export class RoleDto {
-    id!: number;
-    name!: string;
+export type Department = z.infer<typeof DepartmentResponseSchema>;
+
+export type UserResponse = z.infer<typeof UserResponseSchema>;
+
+// ============ Mapper Functions ============
+
+export function toUserResponse(user: User): UserResponse {
+    return {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        cpf: user.cpf,
+        email: user.email,
+        username: user.username,
+        role: user.role ? { id: user.role.id, name: user.role.name } : undefined,
+        department: user.department ? { id: user.department.id, name: user.department.name } : undefined,
+        managedDepartments: user.managed_departments?.map(d => ({ id: d.id, name: d.name })),
+        isActive: !user.deleted_at,
+        requiresPasswordReset: user.requires_password_reset,
+    };
 }
 
-export class DepartmentDto {
-    id!: number;
-    name!: string;
-}
-
-export class UserResponseDto {
-    id!: number;
-    name!: string;
-    phone?: string;
-    cpf?: string;
-    email!: string;
-    username!: string;
-    role?: RoleDto;
-    department?: DepartmentDto;
-    managedDepartments: DepartmentDto[] = [];
-    isActive!: boolean;
-    requiresPasswordReset?: boolean;
-}
-
-export class LoginResponseDto {
-    token!: string;
-    expiresAt!: string;
-    mustResetPassword?: boolean;
+export function toUserResponseList(users: User[]): UserResponse[] {
+    return users.map(toUserResponse);
 }

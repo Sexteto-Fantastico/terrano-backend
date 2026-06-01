@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import * as DepartmentService from "../services/department.service";
-import { CreateDepartmentDto, DepartmentResponseDto, UpdateDepartmentDto } from "../dtos/department.dto";
+import { CreateDepartment, DepartmentResponse, UpdateDepartment, DepartmentQuery } from "../dtos/department.dto";
 
 async function getAllDepartments(
-    req: Request<DepartmentResponseDto[]>,
-    res: Response<DepartmentResponseDto[]>
+    req: Request<{}, DepartmentResponse[], {}, DepartmentQuery>,
+    res: Response<DepartmentResponse[]>
 ) {
     const [departments, total] = await DepartmentService.getAllDepartments(req.query);
     res.set("X-Total-Count", total.toString());
@@ -12,8 +12,8 @@ async function getAllDepartments(
 }
 
 async function getDepartmentById(
-    req: Request<{ id: string }, DepartmentResponseDto>,
-    res: Response<DepartmentResponseDto>
+    req: Request<{ id: string }, DepartmentResponse>,
+    res: Response<DepartmentResponse>
 ) {
     const id = Number(req.params.id);
     const department = await DepartmentService.getDepartmentById(id);
@@ -21,16 +21,16 @@ async function getDepartmentById(
 }
 
 async function createDepartment(
-    req: Request<DepartmentResponseDto, CreateDepartmentDto>,
-    res: Response<DepartmentResponseDto>
+    req: Request<DepartmentResponse, CreateDepartment>,
+    res: Response<DepartmentResponse>
 ) {
     const newDepartment = await DepartmentService.createDepartment(req.body);
     res.status(201).json(newDepartment);
 }
 
 async function updateDepartment(
-    req: Request<{ id: string }, DepartmentResponseDto, UpdateDepartmentDto>,
-    res: Response<DepartmentResponseDto>
+    req: Request<{ id: string }, DepartmentResponse, UpdateDepartment>,
+    res: Response<DepartmentResponse>
 ) {
     const id = Number(req.params.id);
     const updatedDepartment = await DepartmentService.updateDepartment(id, req.body);
@@ -39,16 +39,16 @@ async function updateDepartment(
 
 async function deleteDepartment(
     req: Request<{ id: string }>,
-    res: Response<{ message: string }>
+    res: Response
 ) {
     const id = Number(req.params.id);
     await DepartmentService.deleteDepartment(id);
-    res.status(200).json({ message: "Department deleted successfully" });
+    res.status(204).send();
 }
 
 async function restoreDepartment(
-    req: Request<{ id: string }, DepartmentResponseDto>,
-    res: Response<DepartmentResponseDto>
+    req: Request<{ id: string }, DepartmentResponse>,
+    res: Response<DepartmentResponse>
 ) {
     const id = Number(req.params.id);
     const restoredDepartment = await DepartmentService.restoreDepartment(id);

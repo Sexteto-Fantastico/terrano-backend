@@ -5,10 +5,10 @@ import { getProductLogs } from "../controllers/system-log.controller";
 import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct } from "../controllers/product.controller";
 import { createRoute } from "../utils/route-builder";
 import {
-    productQuerySchema,
+    ProductQuerySchema,
     CreateProductBodySchema,
     UpdateProductBodySchema,
-    productIdSchema,
+    ProductIdSchema,
     ProductResponseSchema
 } from "../dtos/product.dto";
 
@@ -39,7 +39,7 @@ createRoute(router, {
     tags: ["Products"],
     summary: "Returns the list of all products",
     request: {
-        query: productQuerySchema.shape.query
+        query: ProductQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -56,7 +56,7 @@ createRoute(router, {
     tags: ["Products"],
     summary: "Get a product by id",
     request: {
-        params: productIdSchema.shape.params
+        params: ProductIdSchema.shape.params
     },
     responses: {
         200: {
@@ -74,7 +74,7 @@ createRoute(router, {
     tags: ["Products"],
     summary: "Get logs for a product",
     request: {
-        params: productIdSchema.shape.params
+        params: ProductIdSchema.shape.params
     },
     responses: {
         200: { description: "List of product logs" }
@@ -88,7 +88,7 @@ createRoute(router, {
     tags: ["Products"],
     summary: "Update a product",
     request: {
-        params: productIdSchema.shape.params,
+        params: ProductIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateProductBodySchema } } }
     },
     responses: {
@@ -107,22 +107,22 @@ createRoute(router, {
     tags: ["Products"],
     summary: "Delete a product",
     request: {
-        params: productIdSchema.shape.params
+        params: ProductIdSchema.shape.params
     },
     responses: {
-        200: { description: "Product deleted successfully" },
+        204: { description: "Product deleted successfully" },
         404: { description: "Product not found" }
     }
 }, deleteProduct);
 
 createRoute(router, {
-    method: HttpMethod.POST,
+    method: HttpMethod.PATCH,
     path: Endpoints.PRODUCTS.RESTORE,
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Restore a deleted product",
     request: {
-        params: productIdSchema.shape.params
+        params: ProductIdSchema.shape.params
     },
     responses: {
         200: {

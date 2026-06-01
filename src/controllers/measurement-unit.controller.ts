@@ -8,15 +8,15 @@ import {
     restoreMeasurementUnit,
 } from "../services/measurement-unit.service";
 import {
-    CreateMeasurementUnitDto,
-    UpdateMeasurementUnitDto,
-    MeasurementUnitResponseDto,
-    MeasurementUnitQueryDto,
+    CreateMeasurementUnit,
+    UpdateMeasurementUnit,
+    MeasurementUnitResponse,
+    MeasurementUnitQuery,
 } from "../dtos/measurement-unit.dto";
 
 export const getAll = async (
-    req: Request<{}, MeasurementUnitResponseDto[], {}, MeasurementUnitQueryDto>,
-    res: Response<MeasurementUnitResponseDto[]>
+    req: Request<{}, MeasurementUnitResponse[], {}, MeasurementUnitQuery>,
+    res: Response<MeasurementUnitResponse[]>
 ) => {
     const [units, total] = await getAllMeasurementUnits(req.query);
     res.set("X-Total-Count", total.toString());
@@ -24,40 +24,40 @@ export const getAll = async (
 };
 
 export const getById = async (
-    req: Request<{ id: string }, MeasurementUnitResponseDto>,
-    res: Response<MeasurementUnitResponseDto>
+    req: Request<{ id: string }, MeasurementUnitResponse>,
+    res: Response<MeasurementUnitResponse>
 ) => {
     const unit = await getMeasurementUnitById(Number(req.params.id));
     res.json(unit);
 };
 
 export const create = async (
-    req: Request<CreateMeasurementUnitDto, MeasurementUnitResponseDto>,
-    res: Response<MeasurementUnitResponseDto>
+    req: Request<CreateMeasurementUnit, MeasurementUnitResponse>,
+    res: Response<MeasurementUnitResponse>
 ) => {
     const unit = await createNewMeasurementUnit(req.body);
     res.status(201).json(unit);
 };
 
 export const update = async (
-    req: Request<{ id: string }, MeasurementUnitResponseDto, UpdateMeasurementUnitDto>,
-    res: Response<MeasurementUnitResponseDto>
+    req: Request<{ id: string }, MeasurementUnitResponse, UpdateMeasurementUnit>,
+    res: Response<MeasurementUnitResponse>
 ) => {
     const unit = await updateExistingMeasurementUnit(Number(req.params.id), req.body);
     res.json(unit);
 };
 
 export const remove = async (
-    req: Request<{ id: string }, { message: string }>,
-    res: Response<{ message: string }>
+    req: Request<{ id: string }>,
+    res: Response
 ) => {
     await removeMeasurementUnit(Number(req.params.id));
-    res.status(200).json({ message: "Measurement unit deleted successfully" });
+    res.status(204).send();
 };
 
 export const restore = async (
-    req: Request<{ id: string }, MeasurementUnitResponseDto>,
-    res: Response<MeasurementUnitResponseDto>
+    req: Request<{ id: string }, MeasurementUnitResponse>,
+    res: Response<MeasurementUnitResponse>
 ) => {
     const unit = await restoreMeasurementUnit(Number(req.params.id));
     res.json(unit);
