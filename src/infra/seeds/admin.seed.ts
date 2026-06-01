@@ -39,7 +39,6 @@ export async function createAdminSeed(): Promise<void> {
         email: adminEmail,
         username: adminUsername,
         password: passwordHash,
-        is_active: true,
         requires_password_reset: false,
         role: adminRole,
     });

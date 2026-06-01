@@ -33,6 +33,7 @@ export const Endpoints = {
         FORGOT_PASSWORD: "/forgot-password",
         RESET_PASSWORD: "/reset-password",
         DEFINE_PASSWORD: "/define-password",
+        ME: "/me",
     },
     USERS: {
         BASE: `${API_PREFIX}/users`,

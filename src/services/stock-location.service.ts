@@ -1,9 +1,10 @@
 import {
-    CreateStockLocationDto,
-    UpdateStockLocationDto,
-    StockLocationResponseDto,
-    toStockLocationResponseDto,
-    toStockLocationResponseDtoList
+    CreateStockLocation,
+    UpdateStockLocation,
+    StockLocationResponse,
+    StockLocationQuery,
+    toStockLocationResponse,
+    toStockLocationResponseList
 } from "../dtos/stock-location.dto";
 
 import { NotFoundError } from "../errors/app-error";
@@ -12,16 +13,16 @@ import * as StockLocationRepository from "../repositories/stock-location.reposit
 import * as AddressRepository from "../repositories/address.repository";
 
 async function getAllStockLocations(
-    filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}
-): Promise<[StockLocationResponseDto[], number]> {
+    filters: StockLocationQuery = {}
+): Promise<[StockLocationResponse[], number]> {
 
     const [locations, total] = await StockLocationRepository.getAllStockLocations(filters);
-    return [toStockLocationResponseDtoList(locations), total];
+    return [toStockLocationResponseList(locations), total];
 }
 
 async function getStockLocationById(
     id: number
-): Promise<StockLocationResponseDto> {
+): Promise<StockLocationResponse> {
 
     const entity = await StockLocationRepository
         .getStockLocationById(id);
@@ -30,12 +31,12 @@ async function getStockLocationById(
         throw new NotFoundError("Stock location not found");
     }
 
-    return toStockLocationResponseDto(entity);
+    return toStockLocationResponse(entity);
 }
 
 async function createStockLocation(
-    data: CreateStockLocationDto
-): Promise<StockLocationResponseDto> {
+    data: CreateStockLocation
+): Promise<StockLocationResponse> {
 
     const { address, ...stockLocationData } = data;
 
@@ -49,13 +50,13 @@ async function createStockLocation(
         });
     }
 
-    return toStockLocationResponseDto(saved);
+    return toStockLocationResponse(saved);
 }
 
 async function updateStockLocation(
     id: number,
-    data: UpdateStockLocationDto
-): Promise<StockLocationResponseDto> {
+    data: UpdateStockLocation
+): Promise<StockLocationResponse> {
 
     const existing = await StockLocationRepository
         .getStockLocationById(id);
@@ -97,7 +98,7 @@ async function updateStockLocation(
         }
     }
 
-    return toStockLocationResponseDto(saved);
+    return toStockLocationResponse(saved);
 }
 
 async function deleteStockLocation(
@@ -118,7 +119,7 @@ async function deleteStockLocation(
 
 async function restoreStockLocation(
     id: number
-): Promise<StockLocationResponseDto> {
+): Promise<StockLocationResponse> {
 
     const restored = await StockLocationRepository
         .restoreStockLocation(id);
@@ -129,7 +130,7 @@ async function restoreStockLocation(
         );
     }
 
-    return toStockLocationResponseDto(restored);
+    return toStockLocationResponse(restored);
 }
 
 export {

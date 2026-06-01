@@ -1,7 +1,7 @@
+import { FindOptionsWhere, FindManyOptions, FindOptionsOrder, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { Product } from "../infra/entities/product.entity";
-import { FindOptionsWhere, ILike } from "typeorm";
-import { ProductQueryDTO } from "../dtos/product.dto";
+import { ProductQuery } from "../dtos/product.dto";
 
 const productRepository = AppDataSource.getRepository(Product);
 
@@ -27,8 +27,9 @@ async function restoreProduct(id: number): Promise<boolean> {
     return result.affected !== 0;
 }
 
-async function getAllProducts(filters: ProductQueryDTO = {}): Promise<[Product[], number]> {
-    const { name, activeOnly = true, brandId, categoryId, code, pageIndex, pageSize } = filters;
+async function getAllProducts(filters: ProductQuery = {}): Promise<[Product[], number]> {
+    const { name, activeOnly = true, brandId, categoryId, code, pageIndex, pageSize, sortBy, sortOrder } = filters;
+
     const where: FindOptionsWhere<Product> = {};
 
     if (name) where.name = ILike(`%${name}%`);
@@ -36,20 +37,23 @@ async function getAllProducts(filters: ProductQueryDTO = {}): Promise<[Product[]
     if (brandId) where.brand_id = brandId;
     if (categoryId) where.category_id = categoryId;
 
-    const dbQuery: any = {
+    const options: FindManyOptions<Product> = {
         where,
         relations: ["category", "measurement_unit", "brand"],
         withDeleted: !activeOnly,
-        order: { name: "ASC" },
     };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await productRepository.findAndCount(dbQuery);
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
     }
 
-    const results = await productRepository.find(dbQuery);
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return await productRepository.findAndCount(options);
+    }
+
+    const results = await productRepository.find(options);
     return [results, results.length];
 }
 

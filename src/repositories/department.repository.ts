@@ -1,29 +1,35 @@
+import { FindOptionsWhere, FindManyOptions, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { Department } from "../infra/entities/department.entity";
-import {FindOptionsWhere, ILike} from "typeorm";
+import { DepartmentQuery } from "../dtos/department.dto";
 
 const departmentRepository = AppDataSource.getRepository(Department);
 
-async function getAllDepartments(filters: { name?: string, activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[Department[], number]> {
-    const { name, activeOnly = true, pageIndex, pageSize } = filters;
+async function getAllDepartments(filters: DepartmentQuery = {}): Promise<[Department[], number]> {
+    const { activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
+
     const where: FindOptionsWhere<Department> = {};
 
-    if (activeOnly) where.is_active = true;
-    if (name) where.name = ILike(`%${name}%`);
+    if (filters.name) where.name = ILike(`%${filters.name}%`);
 
-    const dbQuery: any = {
+    const options: FindManyOptions<Department> = {
         where,
+        withDeleted: !activeOnly,
         relations: ["manager"],
         order: {id: "ASC"}
     };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await departmentRepository.findAndCount(dbQuery);
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
     }
 
-    const results = await departmentRepository.find(dbQuery);
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return await departmentRepository.findAndCount(options);
+    }
+
+    const results = await departmentRepository.find(options);
     return [results, results.length];
 }
 

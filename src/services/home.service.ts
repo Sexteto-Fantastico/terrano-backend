@@ -1,7 +1,7 @@
 import * as PurchaseRepository from "../repositories/purchase.repository";
 import * as MovementRepository from "../repositories/movement.repository";
 import { MovementType } from "../infra/entities/movement.entity";
-import { HomeResponseDTO, toHomeResponseDTO } from "../dtos/home.dto";
+import { HomeResponse, toHomeResponse } from "../dtos/home.dto";
 import { formatDateToYYYYMMDD, formatDateToStartOfDay } from "../utils/date.util";
 
 function calculatePercentageChange(current: number, previous: number): number {
@@ -12,7 +12,7 @@ function calculatePercentageChange(current: number, previous: number): number {
     return Number(percentage.toFixed(1));
 }
 
-async function getHomeSummary(): Promise<HomeResponseDTO> {
+async function getHomeSummary(): Promise<HomeResponse> {
     const now = new Date();
 
     const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -49,7 +49,7 @@ async function getHomeSummary(): Promise<HomeResponseDTO> {
         MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr)
     ]);
 
-    return toHomeResponseDTO({
+    return toHomeResponse({
         purchases: {
             total: purchasesGrandTotal,
             percentage: calculatePercentageChange(purchasesCurrentMonth, purchasesPreviousMonth),

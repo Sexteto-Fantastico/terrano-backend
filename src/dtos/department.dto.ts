@@ -1,54 +1,50 @@
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
+import { UserResponseSchema, toUserResponse } from "./user.dto";
+import { Department } from "../infra/entities/department.entity";
 
-export const departmentIdSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
+export const DepartmentIdSchema = idParamSchema;
 
-export const departmentQuerySchema = z.object({
+export const DepartmentQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
-        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: activeOnlyField,
     })
 });
-export type DepartmentQueryDto = z.infer<typeof departmentQuerySchema>["query"];
+export type DepartmentQuery = z.infer<typeof DepartmentQuerySchema>["query"];
 
 export const CreateDepartmentBodySchema = registry.register(
-    "CreateDepartmentDto",
+    "CreateDepartment",
     z.object({
         name: z.string().min(1, "Department name is required").openapi({ example: "Engineering" }),
         managerId: z.number().int().positive("Manager ID is required").openapi({ example: 1 }),
-        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
 export const createDepartmentSchema = z.object({ body: CreateDepartmentBodySchema });
-export type CreateDepartmentDto = z.infer<typeof createDepartmentSchema>["body"];
+export type CreateDepartment = z.infer<typeof createDepartmentSchema>["body"];
 
 export const UpdateDepartmentBodySchema = registry.register(
-    "UpdateDepartmentDto",
+    "UpdateDepartment",
     z.object({
         name: z.string().min(1, "Department name cannot be empty").optional().openapi({ example: "Engineering v2" }),
         managerId: z.number().int().positive().optional().openapi({ example: 2 }),
-        isActive: z.boolean().optional().openapi({ example: false }),
     })
 );
 
 export const updateDepartmentSchema = z.object({
-    params: departmentIdSchema.shape.params,
+    params: DepartmentIdSchema.shape.params,
     body: UpdateDepartmentBodySchema,
 });
-export type UpdateDepartmentDto = z.infer<typeof updateDepartmentSchema>["body"];
+export type UpdateDepartment = z.infer<typeof updateDepartmentSchema>["body"];
 
 export const DepartmentResponseSchema = registry.register(
-    "DepartmentResponseDto",
+    "DepartmentResponse",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Engineering" }),
-        managerId: z.number().int().optional().openapi({ example: 1 }),
+        manager: UserResponseSchema.optional(),
         isActive: z.boolean().openapi({ example: true }),
         createdAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
         updatedAt: z.date().optional().openapi({ type: "string", format: "date-time", example: "2026-05-16T19:42:00.000Z" }),
@@ -56,39 +52,17 @@ export const DepartmentResponseSchema = registry.register(
     })
 );
 
-export class DepartmentManagerResponseDto {
-    managerId: number;
-    name: string;
-    email: string;
-    username: string;
-}
+export type DepartmentResponse = z.infer<typeof DepartmentResponseSchema>;
 
-export class DepartmentResponseDto {
-    id: number;
-    name: string;
-    manager?: DepartmentManagerResponseDto;
-    isActive: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
-}
-
-export const toDepartmentManagerResponseDto = (manager: any): DepartmentManagerResponseDto => ({
-    managerId: manager.id,
-    name: manager.name,
-    email: manager.email,
-    username: manager.username,
-});
-
-export const toDepartmentResponseDto = (dept: any): DepartmentResponseDto => ({
+export const toDepartmentResponse = (dept: Department): DepartmentResponse => ({
     id: dept.id,
     name: dept.name,
-    manager: dept.manager ? toDepartmentManagerResponseDto(dept.manager) : undefined,
-    isActive: dept.is_active,
+    manager: dept.manager ? toUserResponse(dept.manager) : undefined,
+    isActive: !dept.deleted_at,
     createdAt: dept.created_at,
     updatedAt: dept.updated_at,
     deletedAt: dept.deleted_at,
 });
 
-export const toDepartmentResponseDtoList = (list: any[]) =>
-    list.map(toDepartmentResponseDto);
+export const toDepartmentResponseList = (list: Department[]): DepartmentResponse[] =>
+    list.map(toDepartmentResponse);

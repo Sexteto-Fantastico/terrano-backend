@@ -5,9 +5,9 @@ import { MovementExit } from "../infra/entities/movement-exit.entity";
 import { StockBalance } from "../infra/entities/stock-balance.entity";
 import { Product } from "../infra/entities/product.entity";
 import { StockLocation } from "../infra/entities/stock-location.entity";
-import { CreateMovementExitDto } from "../dtos/movement.dto";
+import { CreateMovementExitBody } from "../dtos/movement.dto";
 
-async function createMovementExit(data: CreateMovementExitDto): Promise<MovementExit> {
+async function createMovementExit(data: CreateMovementExitBody): Promise<MovementExit> {
     const { productId, stockLocationId, quantity, category } = data;
 
     return await AppDataSource.manager.transaction(async (manager) => {

@@ -28,9 +28,6 @@ export class Department extends TerranoBaseEntity implements IDepartment {
     @OneToMany(() => StockRequisition, (req) => req.department)
     requisitions: StockRequisition[];
 
-    @Column({ name: "is_active", type: "boolean", default: true })
-    is_active: boolean = true;
-
     constructor(department: IDepartment) {
         super(department);
         Object.assign(this, department);

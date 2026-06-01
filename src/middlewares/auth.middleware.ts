@@ -5,7 +5,6 @@ import { verifyJwt } from "../utils/jwt.util";
 export interface AuthenticatedRequest extends Request {
     user?: {
         id: number;
-        email: string;
     };
 }
 
@@ -20,8 +19,7 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
         const payload = verifyJwt(token);
         const authReq = req as AuthenticatedRequest;
         authReq.user = {
-            id: payload.userId,
-            email: payload.email,
+            id: payload.sub,
         };
         next();
     } catch (error) {

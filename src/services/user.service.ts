@@ -2,43 +2,20 @@ import { User } from "../infra/entities/user.entity";
 import { hashPassword } from "../utils/password.util";
 import { formatCpf, isValidCpf, cleanCpf } from "../utils/cpf.util";
 import {
-    ChangePasswordRequestDto,
-    CreateUserRequestDto,
-    GetUsersQueryDto,
-    UpdateUserRequestDto,
-    UserResponseDto,
+    ChangePasswordBody,
+    CreateUserBody,
+    UserQuery,
+    UpdateUserBody,
+    UserResponse,
+    toUserResponse,
+    toUserResponseList,
 } from "../dtos/user.dto";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
-import { createUser as repoCreateUser, getUserByUsername, getUserByEmail, getUserById as repoGetUserById, getAllUsers, updateUser as repoUpdateUser } from "../repositories/user.repository";
+import { createUser as repoCreateUser, getUserByUsername, getUserByEmail, getUserById as repoGetUserById, getAllUsers, updateUser as repoUpdateUser, deleteUser as repoDeleteUser, recoverUser as repoRecoverUser } from "../repositories/user.repository";
 import { getRoleById } from "../repositories/role.repository";
 import { getDepartmentById } from "../repositories/department.repository";
 
-function sanitizeUser(user: User): UserResponseDto {
-    return {
-        id: user.id,
-        name: user.name,
-        phone: user.phone,
-        cpf: user.cpf,
-        email: user.email,
-        username: user.username,
-        role: user.role && {
-            id: user.role.id,
-            name: user.role.name,
-        },
-        department: user.department && {
-            id: user.department.id,
-            name: user.department.name,
-        },
-        managedDepartments: (user.managed_departments ?? []).map((dept) => ({
-            id: dept.id,
-            name: dept.name,
-        })),
-        isActive: user.is_active,
-        requiresPasswordReset: user.requires_password_reset,
-    };
-}
-
-async function createUser(request: CreateUserRequestDto): Promise<UserResponseDto> {
+async function createUser(request: CreateUserBody): Promise<UserResponse> {
     const existingUser = await getUserByUsername(request.username);
     if (existingUser) {
         throw new ConflictError("Username already exists.");
@@ -79,30 +56,29 @@ async function createUser(request: CreateUserRequestDto): Promise<UserResponseDt
         department,
         requires_password_reset: request.requiresPasswordReset ?? false,
         updated_by: request.updatedBy,
-        is_active: true,
     });
 
     await repoCreateUser(user);
-    return sanitizeUser(user);
+    return toUserResponse(user);
 }
 
-async function getUsers(filters: GetUsersQueryDto): Promise<[UserResponseDto[], number]> {
+async function getUsers(filters: UserQuery): Promise<[UserResponse[], number]> {
     const [users, total] = await getAllUsers(filters);
-    return [users.map(sanitizeUser), total];
+    return [toUserResponseList(users), total];
 }
 
-async function getUserById(id: number): Promise<UserResponseDto> {
-    const user = await repoGetUserById(id, true);
+async function getUserById(id: number): Promise<UserResponse> {
+    const user = await repoGetUserById(id);
 
     if (!user) {
         throw new NotFoundError("User not found.");
     }
 
-    return sanitizeUser(user);
+    return toUserResponse(user);
 }
 
-async function updateUser(id: number, request: UpdateUserRequestDto): Promise<UserResponseDto> {
-    const user = await repoGetUserById(id, true);
+async function updateUser(id: number, request: UpdateUserBody): Promise<UserResponse> {
+    const user = await repoGetUserById(id);
     if (!user) {
         throw new NotFoundError("User not found.");
     }
@@ -170,11 +146,11 @@ async function updateUser(id: number, request: UpdateUserRequestDto): Promise<Us
     }
 
     await repoUpdateUser(user);
-    return sanitizeUser(user);
+    return toUserResponse(user);
 }
 
-async function changePassword(id: number, request: ChangePasswordRequestDto): Promise<UserResponseDto> {
-    const user = await repoGetUserById(id, true);
+async function changePassword(id: number, request: ChangePasswordBody): Promise<UserResponse> {
+    const user = await repoGetUserById(id);
     if (!user) {
         throw new NotFoundError("User not found.");
     }
@@ -188,41 +164,39 @@ async function changePassword(id: number, request: ChangePasswordRequestDto): Pr
     }
 
     await repoUpdateUser(user);
-    return sanitizeUser(user);
+    return toUserResponse(user);
 }
 
-async function deleteUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
-    const user = await repoGetUserById(id, true);
+async function deleteUser(id: number, updatedBy?: number): Promise<UserResponse> {
+    const user = await repoGetUserById(id);
     if (!user) {
         throw new NotFoundError("User not found.");
     }
 
-    user.is_active = false;
     if (updatedBy !== undefined) {
         user.updated_by = updatedBy;
     }
 
-    await repoUpdateUser(user);
-    return sanitizeUser(user);
+    await repoDeleteUser(user);
+    return toUserResponse(user);
 }
 
-async function restoreUser(id: number, updatedBy?: number): Promise<UserResponseDto> {
+async function restoreUser(id: number, updatedBy?: number): Promise<UserResponse> {
     const user = await repoGetUserById(id, true);
     if (!user) {
         throw new NotFoundError("User not found.");
     }
 
-    if (user.is_active) {
+    if (!user.deleted_at) {
         throw new BadRequestError("User is not deleted.");
     }
 
-    user.is_active = true;
     if (updatedBy !== undefined) {
         user.updated_by = updatedBy;
     }
 
-    await repoUpdateUser(user);
-    return sanitizeUser(user);
+    await repoRecoverUser(user);
+    return toUserResponse(user);
 }
 
 export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser };

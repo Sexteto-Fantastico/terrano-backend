@@ -8,12 +8,11 @@ if (!JWT_SECRET) {
 }
 
 export interface JwtPayload {
-    userId: number;
-    email: string;
+    sub: number;
 }
 
-export function signJwt(payload: JwtPayload): string {
-    return jwt.sign(payload, JWT_SECRET, {
+export function signJwt(payload: { userId: number }): string {
+    return jwt.sign({ sub: payload.userId }, JWT_SECRET, {
         expiresIn: JWT_EXPIRES_IN,
     });
 }

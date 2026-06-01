@@ -4,10 +4,10 @@ import { createProductBrand, getAllProductBrands, getProductBrandById, updatePro
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
-    productBrandQuerySchema,
+    ProductBrandQuerySchema,
     CreateProductBrandBodySchema,
     UpdateProductBrandBodySchema,
-    productBrandIdSchema,
+    ProductBrandIdSchema,
     ProductBrandResponseSchema
 } from "../dtos/product-brand.dto";
 
@@ -37,7 +37,7 @@ createRoute(router, {
     tags: ["Product Brands"],
     summary: "Returns the list of all product brands",
     request: {
-        query: productBrandQuerySchema.shape.query
+        query: ProductBrandQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -54,7 +54,7 @@ createRoute(router, {
     tags: ["Product Brands"],
     summary: "Get a product brand by id",
     request: {
-        params: productBrandIdSchema.shape.params
+        params: ProductBrandIdSchema.shape.params
     },
     responses: {
         200: {
@@ -72,7 +72,7 @@ createRoute(router, {
     tags: ["Product Brands"],
     summary: "Update a product brand",
     request: {
-        params: productBrandIdSchema.shape.params,
+        params: ProductBrandIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateProductBrandBodySchema } } }
     },
     responses: {
@@ -91,10 +91,10 @@ createRoute(router, {
     tags: ["Product Brands"],
     summary: "Soft delete a product brand",
     request: {
-        params: productBrandIdSchema.shape.params
+        params: ProductBrandIdSchema.shape.params
     },
     responses: {
-        200: { description: "Product brand deleted successfully" }
+        204: { description: "Product brand deleted successfully" }
     }
 }, deleteProductBrand);
 
@@ -105,7 +105,7 @@ createRoute(router, {
     tags: ["Product Brands"],
     summary: "Restore a soft-deleted product brand",
     request: {
-        params: productBrandIdSchema.shape.params
+        params: ProductBrandIdSchema.shape.params
     },
     responses: {
         200: {

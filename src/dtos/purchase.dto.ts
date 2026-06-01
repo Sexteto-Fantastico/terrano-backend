@@ -2,13 +2,13 @@ import { Purchase } from "../infra/entities/purchase.entity";
 import { z, registry } from "../infra/config/openapi";
 import { paginationFields } from "./common/pagination.dto";
 
-export const purchaseIdSchema = z.object({
+export const PurchaseIdSchema = z.object({
     params: z.object({
         id: z.coerce.number().int().positive()
     })
 });
 
-export const purchaseQuerySchema = z.object({
+export const PurchaseQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional().openapi({ example: "true" }),
@@ -30,10 +30,10 @@ export const purchaseQuerySchema = z.object({
         }
     })
 });
-export type PurchaseQueryDto = z.infer<typeof purchaseQuerySchema>["query"];
+export type PurchaseQuery = z.infer<typeof PurchaseQuerySchema>["query"];
 
 export const CreatePurchaseBodySchema = registry.register(
-    "CreatePurchaseDto",
+    "CreatePurchaseBody",
     z.object({
         total: z.number().positive().openapi({ example: 150.75 }),
         estimatedDeliveryDate: z.string().optional().openapi({ example: "2024-12-31" }),
@@ -56,11 +56,11 @@ export const CreatePurchaseBodySchema = registry.register(
     })
 );
 
-export const createpurchaseSchema = CreatePurchaseBodySchema;
-export type CreatePurchaseDto = z.infer<typeof createpurchaseSchema>;
+export const createPurchaseSchema = CreatePurchaseBodySchema;
+export type CreatePurchaseBody = z.infer<typeof createPurchaseSchema>;
 
 export const UpdatePurchaseBodySchema = registry.register(
-    "UpdatePurchaseDto",
+    "UpdatePurchaseBody",
     z.object({
         total: z.number().positive().optional().openapi({ example: 150.75 }),
         estimatedDeliveryDate: z.string().optional().openapi({ example: "2024-12-31" }),
@@ -84,37 +84,42 @@ export const UpdatePurchaseBodySchema = registry.register(
         })).optional(),
     })
 );
-export const updatepurchaseSchema = UpdatePurchaseBodySchema;
-export type UpdatePurchaseDto = z.infer<typeof updatepurchaseSchema>;
+export const updatePurchaseSchema = UpdatePurchaseBodySchema;
+export type UpdatePurchaseBody = z.infer<typeof updatePurchaseSchema>;
 
-export class PurchaseResponseDto {
-    id: number;
-    total: number;
-    estimatedDeliveryDate?: Date;
-    purchaseDate: Date;
-    supplier?: {
-        id: number;
-        name: string;
-    };
-    nfNumber: string;
-    nfSerie: string;
-    usedNfXmlDocument: boolean;
-    internalNotes?: string;
-    payments?: {
-        id?: number;
-        total: number;
-        paymentMethod: string;
-    }[];
-    products?: {
-        id?: number;
-        productId: number;
-        quantity: number;
-        unitPrice: number;
-        total: number;
-    }[];
-}
+export const PurchaseResponseSchema = registry.register(
+    "PurchaseResponse",
+    z.object({
+        id: z.number().int().openapi({ example: 1 }),
+        total: z.number().openapi({ example: 150.75 }),
+        estimatedDeliveryDate: z.date().nullable().optional().openapi({ type: "string", format: "date-time" }),
+        purchaseDate: z.date().openapi({ type: "string", format: "date-time" }),
+        supplier: z.object({
+            id: z.number().int().openapi({ example: 1 }),
+            name: z.string().openapi({ example: "Supplier Name" }),
+        }).optional(),
+        nfNumber: z.string().openapi({ example: "12345" }),
+        nfSerie: z.string().openapi({ example: "1" }),
+        usedNfXmlDocument: z.boolean().openapi({ example: false }),
+        internalNotes: z.string().optional().openapi({ example: "Urgent delivery" }),
+        payments: z.array(z.object({
+            id: z.number().int().optional().openapi({ example: 1 }),
+            total: z.number().openapi({ example: 150.75 }),
+            paymentMethod: z.string().openapi({ example: "CASH" }),
+        })).optional(),
+        products: z.array(z.object({
+            id: z.number().int().optional().openapi({ example: 1 }),
+            productId: z.number().int().openapi({ example: 1 }),
+            quantity: z.number().openapi({ example: 10 }),
+            unitPrice: z.number().openapi({ example: 15.075 }),
+            total: z.number().openapi({ example: 150.75 }),
+        })).optional(),
+    })
+);
 
-export const toPurchaseResponseDto = (entity: Purchase): PurchaseResponseDto => ({
+export type PurchaseResponse = z.infer<typeof PurchaseResponseSchema>;
+
+export const toPurchaseResponse = (entity: Purchase): PurchaseResponse => ({
     id: entity.id,
     total: entity.total,
     estimatedDeliveryDate: entity.estimated_delivery_date,
@@ -131,5 +136,5 @@ export const toPurchaseResponseDto = (entity: Purchase): PurchaseResponseDto => 
     products: (entity as any).items ? (entity as any).items.map((it: any) => ({ id: it.id, productId: it.product?.id ?? it.product_id, quantity: it.quantity, unitPrice: it.unit_price, total: it.total })) : undefined,
 });
 
-export const toPurchaseResponseDtoList = (list: Purchase[]) =>
-    list.map(toPurchaseResponseDto);
+export const toPurchaseResponseList = (list: Purchase[]) =>
+    list.map(toPurchaseResponse);

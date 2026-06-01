@@ -3,10 +3,10 @@ import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints
 import { createRoute } from "../utils/route-builder";
 import { z } from "zod";
 import {
-	purchaseIdSchema,
-	purchaseQuerySchema,
-	createpurchaseSchema,
-	updatepurchaseSchema,
+	PurchaseIdSchema,
+	PurchaseQuerySchema,
+	createPurchaseSchema,
+	updatePurchaseSchema,
 } from "../dtos/purchase.dto";
 import { getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase } from "../controllers/purchase.controller";
 
@@ -20,7 +20,7 @@ createRoute(router, {
 	tags: ["Purchases"],
 	summary: "Returns the list of all purchases",
 	request: {
-		query: purchaseQuerySchema.shape.query,
+		query: PurchaseQuerySchema.shape.query,
 	},
 	responses: {
 		200: { description: "The list of purchases" },
@@ -34,7 +34,7 @@ createRoute(router, {
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Get a purchase by id",
-	request: { params: purchaseIdSchema.shape.params },
+	request: { params: PurchaseIdSchema.shape.params },
 	responses: { 200: { description: "The purchase" }, 404: { description: "Purchase not found" } },
 }, getPurchaseById);
 
@@ -44,7 +44,7 @@ createRoute(router, {
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Create a purchase",
-	request: { body: { content: { [ContentType.JSON]: { schema: createpurchaseSchema } } } },
+	request: { body: { content: { [ContentType.JSON]: { schema: createPurchaseSchema } } } },
 	responses: { 201: { description: "Created" }, 400: { description: "Validation error" } },
 }, createPurchase);
 
@@ -54,7 +54,7 @@ createRoute(router, {
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Update a purchase",
-	request: { params: purchaseIdSchema.shape.params, body: { content: { [ContentType.JSON]: { schema: updatepurchaseSchema } } } },
+	request: { params: PurchaseIdSchema.shape.params, body: { content: { [ContentType.JSON]: { schema: updatePurchaseSchema } } } },
 	responses: { 200: { description: "Updated" }, 404: { description: "Purchase not found" } },
 }, updatePurchase);
 
@@ -64,7 +64,7 @@ createRoute(router, {
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Delete a purchase",
-	request: { params: purchaseIdSchema.shape.params },
+	request: { params: PurchaseIdSchema.shape.params },
 	responses: { 200: { description: "Deleted" }, 404: { description: "Purchase not found" } },
 }, deletePurchase);
 
@@ -74,7 +74,7 @@ createRoute(router, {
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Restore a deleted purchase",
-	request: { params: purchaseIdSchema.shape.params },
+	request: { params: PurchaseIdSchema.shape.params },
 	responses: { 200: { description: "Restored" }, 400: { description: "Purchase is not deleted" }, 404: { description: "Purchase not found" } },
 }, restorePurchase);
 

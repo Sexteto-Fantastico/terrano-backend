@@ -1,25 +1,21 @@
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 import { ProductCategory } from "../infra/entities/product-category.entity";
 
-export const productCategoryIdSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
+export const ProductCategoryIdSchema = idParamSchema;
 
-export const productCategoryQuerySchema = z.object({
+export const ProductCategoryQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
         name: z.string().optional(),
-        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: activeOnlyField,
     })
 });
 
-export type ProductCategoryQueryDTO = z.infer<typeof productCategoryQuerySchema>["query"];
+export type ProductCategoryQuery = z.infer<typeof ProductCategoryQuerySchema>["query"];
 
 export const CreateProductCategoryBodySchema = registry.register(
-    "CreateProductCategoryDto",
+    "CreateProductCategory",
     z.object({
         name: z.string().min(1, "Category name is required").openapi({ example: "Electronics" }),
         description: z.string().optional().openapi({ example: "Electronic devices" }),
@@ -28,10 +24,10 @@ export const CreateProductCategoryBodySchema = registry.register(
 );
 
 export const createProductCategorySchema = z.object({ body: CreateProductCategoryBodySchema });
-export type CreateProductCategoryDTO = z.infer<typeof createProductCategorySchema>["body"];
+export type CreateProductCategory = z.infer<typeof createProductCategorySchema>["body"];
 
 export const UpdateProductCategoryBodySchema = registry.register(
-    "UpdateProductCategoryDto",
+    "UpdateProductCategory",
     z.object({
         name: z.string().min(1, "Category name cannot be empty").optional().openapi({ example: "Electronics" }),
         description: z.string().optional().openapi({ example: "Electronic devices" }),
@@ -40,13 +36,13 @@ export const UpdateProductCategoryBodySchema = registry.register(
 );
 
 export const updateProductCategorySchema = z.object({
-    params: productCategoryIdSchema.shape.params,
+    params: ProductCategoryIdSchema.shape.params,
     body: UpdateProductCategoryBodySchema,
 });
-export type UpdateProductCategoryDTO = z.infer<typeof updateProductCategorySchema>["body"];
+export type UpdateProductCategory = z.infer<typeof updateProductCategorySchema>["body"];
 
 export const ProductCategoryParentSchema = registry.register(
-    "ProductCategoryParentDto",
+    "ProductCategoryParent",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Electronics" }),
@@ -56,7 +52,7 @@ export const ProductCategoryParentSchema = registry.register(
 );
 
 export const ProductCategoryResponseSchema = registry.register(
-    "ProductCategoryResponseDto",
+    "ProductCategoryResponse",
     z.object({
         id: z.number().int().openapi({ example: 2 }),
         name: z.string().openapi({ example: "Computers" }),
@@ -66,22 +62,11 @@ export const ProductCategoryResponseSchema = registry.register(
     })
 );
 
-export class ProductCategoryParentDTO {
-    id!: number;
-    name!: string;
-    description?: string;
-    deletedAt?: Date | null;
-}
+export type ProductCategoryParent = z.infer<typeof ProductCategoryParentSchema>;
 
-export class ProductCategoryResponseDTO {
-    id!: number;
-    name!: string;
-    description?: string;
-    deletedAt?: Date | null;
-    parent?: ProductCategoryParentDTO | null;
-}
+export type ProductCategoryResponse = z.infer<typeof ProductCategoryResponseSchema>;
 
-export function toProductCategoryResponseDTO(entity: ProductCategory): ProductCategoryResponseDTO {
+export function toProductCategoryResponse(entity: ProductCategory): ProductCategoryResponse {
     return {
         id: entity.id,
         name: entity.name,
@@ -96,6 +81,6 @@ export function toProductCategoryResponseDTO(entity: ProductCategory): ProductCa
     };
 }
 
-export function toProductCategoryResponseDTOList(entities: ProductCategory[]): ProductCategoryResponseDTO[] {
-    return entities.map(toProductCategoryResponseDTO);
+export function toProductCategoryResponseList(entities: ProductCategory[]): ProductCategoryResponse[] {
+    return entities.map(toProductCategoryResponse);
 }
