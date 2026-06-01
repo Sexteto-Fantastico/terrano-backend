@@ -33,7 +33,7 @@ setupSwagger(app);
 app.use(requestContextMiddleware);
 
 app.use(Endpoints.AUTH.BASE, authRoutes);
-//app.use(authMiddleware);
+app.use(authMiddleware);
 
 app.use(Endpoints.USERS.BASE, userRoutes);
 app.use(Endpoints.PRODUCT_CATEGORIES.BASE, productCategoryRoutes);
