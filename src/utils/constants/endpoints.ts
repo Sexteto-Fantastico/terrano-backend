@@ -68,5 +68,9 @@ export const Endpoints = {
     MEASUREMENT_UNITS: {
         BASE: `${API_PREFIX}/measurement-units`,
         ...CRUD_ROUTES,
-    },
+        
+    },MATERIAL_REQUESTS: {
+    BASE: `${API_PREFIX}/material-requests`,
+    ...CRUD_ROUTES,
+},
 } as const;
