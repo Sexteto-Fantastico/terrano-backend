@@ -79,6 +79,8 @@ export const Endpoints = {
     MOVEMENTS: {
         BASE: `${API_PREFIX}/movements`,
         EXIT: "/exit",
+        ENTRY: "/entry",
+        ENTRY_GET_BY_ID: "/entry/:id",
     },
 
     HOME: {

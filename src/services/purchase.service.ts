@@ -12,6 +12,10 @@ import { Supplier } from "../infra/entities/supplier.entity";
 import { toPurchaseResponse, toPurchaseResponseList } from "../dtos/purchase.dto";
 import { getSupplierById } from "../repositories/supplier.repository";
 import { getProductById } from "./product.service";
+import { MovementEntry, EntryMovementCategory } from "../infra/entities/movement-entry.entity";
+import { Movement } from "../infra/entities/movement.entity";
+import { StockBalance } from "../infra/entities/stock-balance.entity";
+import { StockLocation } from "../infra/entities/stock-location.entity";
 
 type CreatePurchaseBody = any;
 type UpdatePurchaseBody = any;
@@ -56,7 +60,6 @@ async function createPurchase(data: CreatePurchaseBody) {
 
         const savedPurchase = await manager.save(purchase);
 
-        // payments
         if (Array.isArray(data.payments)) {
             for (const p of data.payments) {
                 const payment = new PurchasePayment({
@@ -67,12 +70,22 @@ async function createPurchase(data: CreatePurchaseBody) {
                 await manager.save(payment);
             }
         }
+        
+        // INICIO DA INTEGRAÇÃO COM ESTOQUE
+        const location = await manager.findOne(StockLocation, { where: { id: data.stockLocationId } });
+        if (!location) throw new NotFoundError("Stock location not found");
 
-        // products/items
+        const movementEntry = new MovementEntry({
+            entryDate: new Date(),
+            entryMovementCategory: EntryMovementCategory.PURCHASE,
+            purchase: savedPurchase
+        });
+        const savedEntry = await manager.save(movementEntry);
+
         if (Array.isArray(data.products)) {
             for (const it of data.products) {
                 const product = await ProductRepository.getProductById(it.productId);
-                if (!product) throw new NotFoundError("Product not found");
+                if (!product) throw new NotFoundError(`Product ID ${it.productId} not found`);
 
                 const item = new PurchaseItem({
                     product,
@@ -82,6 +95,27 @@ async function createPurchase(data: CreatePurchaseBody) {
                     purchase: savedPurchase,
                 });
                 await manager.save(item);
+
+                let balance = await manager.findOne(StockBalance, {
+                    where: { product: { id: it.productId }, location: { id: data.stockLocationId } }
+                });
+
+                if (!balance) {
+                    balance = new StockBalance({ product, location, quantity: 0 });
+                }
+
+                const movement = new Movement({
+                    product,
+                    quantity: it.quantity,
+                    movement_exit: null,
+                    movement_entry: savedEntry,
+                    stock_location: location
+                });
+                await manager.save(movement);
+
+
+                balance.quantity += it.quantity;
+                await manager.save(balance);
             }
         }
 
@@ -216,6 +250,10 @@ async function validatePurchaseData(data: CreatePurchaseBody | UpdatePurchaseBod
 
     if (data.payments && !Array.isArray(data.payments)) {
         throw new BadRequestError("Invalid payments format");
+    }
+
+    if (!data.stockLocationId) {
+        throw new BadRequestError("stockLocationId is required to register the stock entry");
     }
 
     if (data.estimatedDeliveryDate && data.purchaseDate) {

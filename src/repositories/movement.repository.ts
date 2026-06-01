@@ -1,7 +1,9 @@
 import { AppDataSource } from "../infra/config/data-source";
 import { Movement, MovementType } from "../infra/entities/movement.entity";
+import { MovementEntry } from "../infra/entities/movement-entry.entity";
 
 const movementRepository = AppDataSource.getRepository(Movement);
+const movementEntryRepository = AppDataSource.getRepository(MovementEntry);
 
 async function getGrandTotalQuantity(type: MovementType): Promise<number> {
     const qb = movementRepository.createQueryBuilder("movement");
@@ -32,4 +34,23 @@ async function getTotalQuantityByDateRange(
     return Math.abs(Number(result?.total || 0));
 }
 
-export { getGrandTotalQuantity, getTotalQuantityByDateRange, movementRepository };
+async function getMovementEntries(): Promise<MovementEntry[]> {
+    return await movementEntryRepository.find({
+        relations: ["purchase"],
+        order: { entryDate: "DESC" }
+    });
+}
+
+async function getMovementEntryById(id: number): Promise<MovementEntry | null> {
+    return await movementEntryRepository.findOne({
+        where: { id },
+        relations: ["purchase", "movements", "movements.product", "movements.stock_location"]
+    });
+}
+
+export { 
+    getGrandTotalQuantity, 
+    getTotalQuantityByDateRange, 
+    getMovementEntries,
+    getMovementEntryById
+};
