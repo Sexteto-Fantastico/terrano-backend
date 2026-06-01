@@ -1,6 +1,6 @@
 import { Purchase } from "../infra/entities/purchase.entity";
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { idParamSchema, paginationFields } from "./common/pagination.dto";
 
 export const PurchaseIdSchema = z.object({
     params: z.object({
@@ -138,3 +138,22 @@ export const toPurchaseResponse = (entity: Purchase): PurchaseResponse => ({
 
 export const toPurchaseResponseList = (list: Purchase[]) =>
     list.map(toPurchaseResponse);
+
+export const ReceivePurchaseBodySchema = registry.register(
+    "ReceivePurchaseBody",
+    z.object({
+        items: z.array(
+            z.object({
+                purchaseItemId: z.number().int().positive("Purchase Item ID is required"),
+                stockLocationId: z.number().int().positive("Stock Location ID is required")
+            })
+        ).min(1, "You must provide at least one item to receive")
+    })
+);
+
+export const receivePurchaseSchema = z.object({
+    params: idParamSchema.shape.params,
+    body: ReceivePurchaseBodySchema
+});
+
+export type ReceivePurchaseBody = z.infer<typeof receivePurchaseSchema>["body"];

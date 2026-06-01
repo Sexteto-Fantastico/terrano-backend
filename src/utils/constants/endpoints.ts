@@ -45,7 +45,10 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/product-categories`,
         ...CRUD_ROUTES,
     },
-
+    SUPPLIERS: {
+        BASE: `${API_PREFIX}/suppliers`,
+        ...CRUD_ROUTES,
+    },
     PRODUCTS: {
         BASE: `${API_PREFIX}/products`,
         ...CRUD_ROUTES,
@@ -74,6 +77,7 @@ export const Endpoints = {
     PURCHASES: {
         BASE: `${API_PREFIX}/purchases`,
         ...CRUD_ROUTES,
+        RECEIVE: "/:id/receive",
     },
 
     MOVEMENTS: {

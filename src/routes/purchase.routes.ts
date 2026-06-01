@@ -7,8 +7,10 @@ import {
 	PurchaseQuerySchema,
 	createPurchaseSchema,
 	updatePurchaseSchema,
+	ReceivePurchaseBodySchema
 } from "../dtos/purchase.dto";
-import { getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase } from "../controllers/purchase.controller";
+import { getAllPurchases, getPurchaseById, createPurchase, updatePurchase, deletePurchase, restorePurchase, receivePurchase } from "../controllers/purchase.controller";
+import { MovementEntryResponseSchema } from "../dtos/movement.dto";
 
 const router = Router();
 
@@ -77,5 +79,31 @@ createRoute(router, {
 	request: { params: PurchaseIdSchema.shape.params },
 	responses: { 200: { description: "Restored" }, 400: { description: "Purchase is not deleted" }, 404: { description: "Purchase not found" } },
 }, restorePurchase);
+
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.PURCHASES.RECEIVE,
+    basePath: Endpoints.PURCHASES.BASE,
+    tags: ["Purchases"],
+    summary: "Receive a purchase into stock, specifying the stock location for each item",
+    request: { 
+        params: PurchaseIdSchema.shape.params,
+        body: { 
+            content: { 
+                [ContentType.JSON]: { schema: ReceivePurchaseBodySchema } 
+            } 
+        } 
+    },
+    responses: { 
+        201: { 
+            description: "Purchase received and stock movements generated successfully",
+            content: {
+                [ContentType.JSON]: { schema: MovementEntryResponseSchema }
+            }
+        }, 
+        400: { description: "Validation error, mismatch in items, or purchase already received" }, 
+        404: { description: "Purchase, product, or stock location not found" } 
+    },
+}, receivePurchase);
 
 export default router;
