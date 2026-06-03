@@ -114,6 +114,7 @@ export const PurchaseResponseSchema = registry.register(
             unitPrice: z.number().openapi({ example: 15.075 }),
             total: z.number().openapi({ example: 150.75 }),
         })).optional(),
+        isActive: z.boolean().openapi({ example: true }),
     })
 );
 
@@ -134,6 +135,7 @@ export const toPurchaseResponse = (entity: Purchase): PurchaseResponse => ({
     internalNotes: entity.internal_notes,
     payments: (entity as any).payments ? (entity as any).payments.map((p: any) => ({ id: p.id, total: p.total, paymentMethod: p.payment_method })) : undefined,
     products: (entity as any).items ? (entity as any).items.map((it: any) => ({ id: it.id, productId: it.product?.id ?? it.product_id, quantity: it.quantity, unitPrice: it.unit_price, total: it.total })) : undefined,
+    isActive: entity.deleted_at ? false : true,
 });
 
 export const toPurchaseResponseList = (list: Purchase[]) =>
