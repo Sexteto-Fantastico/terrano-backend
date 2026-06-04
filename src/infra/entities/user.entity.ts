@@ -19,7 +19,6 @@ export interface IUser extends ITerranoBaseEntity {
     role: Role;
     department: Department;
     updated_by?: number;
-    is_active?: boolean;
     requires_password_reset?: boolean;
     password_reset_token?: string;
     password_reset_token_expires_at?: Date;
@@ -65,9 +64,6 @@ export class User extends TerranoBaseEntity implements IUser {
 
     @OneToMany(() => Department, (dept) => dept.manager)
     managed_departments: Department[];
-
-    @Column({ name: "is_active", type: "boolean", default: true })
-    is_active: boolean = true;
 
     constructor(user: IUser) {
         super(user);

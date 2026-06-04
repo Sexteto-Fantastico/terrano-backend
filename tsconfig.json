@@ -8,22 +8,32 @@
       "ES2022"
     ],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
+
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strictPropertyInitialization": false
+
+    "strictPropertyInitialization": false,
+    "isolatedModules": true,
+
+    "types": ["node", "jest"]
   },
+
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ],
+
   "exclude": [
     "node_modules",
     "dist"

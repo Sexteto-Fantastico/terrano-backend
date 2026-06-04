@@ -1,20 +1,16 @@
 import { z, registry } from "../infra/config/openapi";
-import { paginationFields } from "./common/pagination.dto";
+import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 import { StockLocation } from "../infra/entities/stock-location.entity";
 
-export const stockLocationIdSchema = z.object({
-    params: z.object({
-        id: z.coerce.number().int().positive()
-    })
-});
+export const StockLocationIdSchema = idParamSchema;
 
-export const stockLocationQuerySchema = z.object({
+export const StockLocationQuerySchema = z.object({
     query: z.object({
         ...paginationFields,
-        activeOnly: z.enum(["true", "false", ""]).transform(v => v === "true").optional(),
+        activeOnly: activeOnlyField,
     })
 });
-export type StockLocationQueryDto = z.infer<typeof stockLocationQuerySchema>["query"];
+export type StockLocationQuery = z.infer<typeof StockLocationQuerySchema>["query"];
 
 const AddressSchema = z.object({
     street: z.string().min(1, "Street is required").openapi({ example: "Main St" }),
@@ -37,7 +33,7 @@ const PartialAddressSchema = z.object({
 });
 
 export const CreateStockLocationBodySchema = registry.register(
-    "CreateStockLocationDto",
+    "CreateStockLocation",
     z.object({
         name: z.string().min(1, "Stock location name is required").openapi({ example: "Main Warehouse" }),
         description: z.string().optional().openapi({ example: "Central storage facility" }),
@@ -56,10 +52,10 @@ export const CreateStockLocationBodySchema = registry.register(
 );
 
 export const createStockLocationSchema = z.object({ body: CreateStockLocationBodySchema });
-export type CreateStockLocationDto = z.infer<typeof createStockLocationSchema>["body"];
+export type CreateStockLocation = z.infer<typeof createStockLocationSchema>["body"];
 
 export const UpdateStockLocationBodySchema = registry.register(
-    "UpdateStockLocationDto",
+    "UpdateStockLocation",
     z.object({
         name: z.string().min(1, "Stock location name cannot be empty").openapi({ example: "Main Warehouse" }),
         description: z.string().optional().openapi({ example: "Central storage facility" }),
@@ -78,13 +74,13 @@ export const UpdateStockLocationBodySchema = registry.register(
 );
 
 export const updateStockLocationSchema = z.object({
-    params: stockLocationIdSchema.shape.params,
+    params: StockLocationIdSchema.shape.params,
     body: UpdateStockLocationBodySchema,
 });
-export type UpdateStockLocationDto = z.infer<typeof updateStockLocationSchema>["body"];
+export type UpdateStockLocation = z.infer<typeof updateStockLocationSchema>["body"];
 
 export const StockLocationResponseSchema = registry.register(
-    "StockLocationResponseDto",
+    "StockLocationResponse",
     z.object({
         id: z.number().int().openapi({ example: 1 }),
         name: z.string().openapi({ example: "Main Warehouse" }),
@@ -93,19 +89,14 @@ export const StockLocationResponseSchema = registry.register(
     })
 );
 
-export class StockLocationResponseDto {
-    id: number;
-    name: string;
-    description?: string;
-    deletedAt?: Date | null;
-}
+export type StockLocationResponse = z.infer<typeof StockLocationResponseSchema>;
 
-export const toStockLocationResponseDto = (entity: StockLocation): StockLocationResponseDto => ({
+export const toStockLocationResponse = (entity: StockLocation): StockLocationResponse => ({
     id: entity.id,
     name: entity.name,
     description: entity.description,
     deletedAt: entity.deleted_at,
 });
 
-export const toStockLocationResponseDtoList = (list: StockLocation[]) =>
-    list.map(toStockLocationResponseDto);
+export const toStockLocationResponseList = (list: StockLocation[]) =>
+    list.map(toStockLocationResponse);

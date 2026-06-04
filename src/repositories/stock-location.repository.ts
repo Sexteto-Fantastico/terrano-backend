@@ -1,22 +1,31 @@
+import { FindOptionsWhere, FindManyOptions, FindOptionsOrder } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { StockLocation } from "../infra/entities/stock-location.entity";
+import { StockLocationQuery } from "../dtos/stock-location.dto";
 
 const repository = AppDataSource.getRepository(StockLocation);
 
-async function getAllStockLocations(filters: { activeOnly?: boolean; pageIndex?: number; pageSize?: number; } = {}): Promise<[StockLocation[], number]> {
-    const { activeOnly = false, pageIndex, pageSize } = filters;
+async function getAllStockLocations(filters: StockLocationQuery = {}): Promise<[StockLocation[], number]> {
+    const { activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
-    const dbQuery: any = {
+    const where: FindOptionsWhere<StockLocation> = {};
+
+    const options: FindManyOptions<StockLocation> = {
+        where,
         withDeleted: !activeOnly,
     };
 
-    if (pageIndex !== undefined && pageSize !== undefined) {
-        dbQuery.take = pageSize;
-        dbQuery.skip = (pageIndex - 1) * pageSize;
-        return await repository.findAndCount(dbQuery);
+    if (sortBy) {
+        options.order = { [sortBy]: sortOrder ?? "ASC" };
     }
 
-    const results = await repository.find(dbQuery);
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        options.take = pageSize;
+        options.skip = (pageIndex - 1) * pageSize;
+        return await repository.findAndCount(options);
+    }
+
+    const results = await repository.find(options);
     return [results, results.length];
 }
 

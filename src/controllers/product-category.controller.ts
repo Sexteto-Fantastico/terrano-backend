@@ -2,24 +2,24 @@ import { Request, Response } from "express";
 import * as ProductCategoyService from "../services/product-category.service";
 import { NotFoundError } from "../errors";
 import {
-    CreateProductCategoryDTO,
-    UpdateProductCategoryDTO,
-    ProductCategoryResponseDTO,
-    ProductCategoryQueryDTO,
+    CreateProductCategory,
+    UpdateProductCategory,
+    ProductCategoryResponse,
+    ProductCategoryQuery,
 } from "../dtos/product-category.dto";
 
-async function createProductCategory(req: Request<ProductCategoryResponseDTO, CreateProductCategoryDTO>, res: Response<ProductCategoryResponseDTO>) {
+async function createProductCategory(req: Request<ProductCategoryResponse, CreateProductCategory>, res: Response<ProductCategoryResponse>) {
     const category = await ProductCategoyService.createCategory(req.body);
     res.status(201).json(category);
 }
 
-async function getAllProductCategories(req: Request<{}, ProductCategoryResponseDTO[], {}, ProductCategoryQueryDTO>, res: Response<ProductCategoryResponseDTO[]>) {
+async function getAllProductCategories(req: Request<{}, ProductCategoryResponse[], {}, ProductCategoryQuery>, res: Response<ProductCategoryResponse[]>) {
     const [categories, total] = await ProductCategoyService.getAllCategories(req.query);
     res.set("X-Total-Count", total.toString());
     res.status(200).json(categories);
 }
 
-async function getProductCategoryById(req: Request<{ id: string }, ProductCategoryResponseDTO>, res: Response<ProductCategoryResponseDTO>) {
+async function getProductCategoryById(req: Request<{ id: string }, ProductCategoryResponse>, res: Response<ProductCategoryResponse>) {
     const id = Number(req.params.id);
     const category = await ProductCategoyService.getCategoryById(id);
     if (!category) {
@@ -28,7 +28,7 @@ async function getProductCategoryById(req: Request<{ id: string }, ProductCatego
     res.status(200).json(category);
 }
 
-async function updateProductCategory(req: Request<{ id: string }, ProductCategoryResponseDTO, UpdateProductCategoryDTO>, res: Response<ProductCategoryResponseDTO>) {
+async function updateProductCategory(req: Request<{ id: string }, ProductCategoryResponse, UpdateProductCategory>, res: Response<ProductCategoryResponse>) {
     const id = Number(req.params.id);
     const category = await ProductCategoyService.updateCategory(id, req.body);
     if (!category) {
@@ -37,16 +37,16 @@ async function updateProductCategory(req: Request<{ id: string }, ProductCategor
     res.status(200).json(category);
 }
 
-async function deleteProductCategory(req: Request<{ id: string }>, res: Response<void>) {
+async function deleteProductCategory(req: Request<{ id: string }>, res: Response) {
     const id = Number(req.params.id);
     const success = await ProductCategoyService.deleteCategory(id);
     if (!success) {
         throw new NotFoundError("Product category not found");
     }
-    res.status(200).json({ message: "Product category deleted successfully" } as any);
+    res.status(204).send();
 }
 
-async function restoreProductCategory(req: Request<{ id: string }, ProductCategoryResponseDTO>, res: Response<ProductCategoryResponseDTO>) {
+async function restoreProductCategory(req: Request<{ id: string }, ProductCategoryResponse>, res: Response<ProductCategoryResponse>) {
     const id = Number(req.params.id);
     const category = await ProductCategoyService.restoreCategory(id);
     if (!category) {

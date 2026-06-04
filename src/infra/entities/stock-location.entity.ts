@@ -3,7 +3,7 @@ import {
     Column,
     OneToMany,
 } from "typeorm";
-import { StockMovement } from "./stock-movement.entity";
+import { Movement } from "./movement.entity";
 import { StockLocationProduct } from "./stock-location-product.entity";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
 import { OneToOne } from "typeorm";
@@ -28,8 +28,8 @@ export class StockLocation extends TerranoBaseEntity implements IStockLocation {
     @OneToMany(() => StockLocationProduct, (slp) => slp.location)
     stock_location_products: StockLocationProduct[];
 
-    @OneToMany(() => StockMovement, (movement) => movement.location)
-    stock_movements: StockMovement[];
+    @OneToMany(() => Movement, (movement) => movement.stock_location)
+    stock_movements: Movement[];
 
     @OneToOne(() => Address, (address) => address.stock_location)
     address: Address;

@@ -4,10 +4,10 @@ import { createProductCategory, getAllProductCategories, getProductCategoryById,
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
-    productCategoryQuerySchema,
+    ProductCategoryQuerySchema,
     CreateProductCategoryBodySchema,
     UpdateProductCategoryBodySchema,
-    productCategoryIdSchema,
+    ProductCategoryIdSchema,
     ProductCategoryResponseSchema
 } from "../dtos/product-category.dto";
 
@@ -37,7 +37,7 @@ createRoute(router, {
     tags: ["Product Categories"],
     summary: "Returns the list of all product categories",
     request: {
-        query: productCategoryQuerySchema.shape.query
+        query: ProductCategoryQuerySchema.shape.query
     },
     responses: {
         200: {
@@ -54,7 +54,7 @@ createRoute(router, {
     tags: ["Product Categories"],
     summary: "Get a product category by id",
     request: {
-        params: productCategoryIdSchema.shape.params
+        params: ProductCategoryIdSchema.shape.params
     },
     responses: {
         200: {
@@ -72,7 +72,7 @@ createRoute(router, {
     tags: ["Product Categories"],
     summary: "Update a product category",
     request: {
-        params: productCategoryIdSchema.shape.params,
+        params: ProductCategoryIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateProductCategoryBodySchema } } }
     },
     responses: {
@@ -91,10 +91,10 @@ createRoute(router, {
     tags: ["Product Categories"],
     summary: "Soft delete a product category",
     request: {
-        params: productCategoryIdSchema.shape.params
+        params: ProductCategoryIdSchema.shape.params
     },
     responses: {
-        200: { description: "Product category deleted successfully" }
+        204: { description: "Product category deleted successfully" }
     }
 }, deleteProductCategory);
 
@@ -105,7 +105,7 @@ createRoute(router, {
     tags: ["Product Categories"],
     summary: "Restore a soft-deleted product category",
     request: {
-        params: productCategoryIdSchema.shape.params
+        params: ProductCategoryIdSchema.shape.params
     },
     responses: {
         200: {

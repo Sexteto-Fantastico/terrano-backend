@@ -1,24 +1,24 @@
-import { CreateProductRequestDTO, ProductResponseDTO, ProductUpdateRequestDTO, toProductResponseDTO, ProductQueryDTO } from "../dtos/product.dto";
+import { CreateProductBody, ProductResponse, UpdateProductBody, toProductResponse, ProductQuery } from "../dtos/product.dto";
 import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 import * as ProductRepository from "../repositories/product.repository";
 import { getCategoryById } from "../repositories/product-category.repository";
 import { findMeasurementUnitById } from "../repositories/measurement-unit.repository";
 import { getBrandById } from "../repositories/product-brand.repository";
 
-async function getAllProducts(filters: ProductQueryDTO = {}): Promise<[ProductResponseDTO[], number]> {
+async function getAllProducts(filters: ProductQuery = {}): Promise<[ProductResponse[], number]> {
     const [allProducts, total] = await ProductRepository.getAllProducts(filters);
-    return [allProducts.map(toProductResponseDTO), total];
+    return [allProducts.map(toProductResponse), total];
 }
 
-async function getProductById(id: number): Promise<ProductResponseDTO> {
+async function getProductById(id: number): Promise<ProductResponse> {
     const product = await ProductRepository.getProductById(id, false);
     if (!product) {
         throw new NotFoundError("Product not found");
     }
-    return toProductResponseDTO(product);
+    return toProductResponse(product);
 }
 
-async function createProduct(data: CreateProductRequestDTO): Promise<ProductResponseDTO> {
+async function createProduct(data: CreateProductBody): Promise<ProductResponse> {
     const existingProduct = await ProductRepository.getProductByCode(data.code);
     if (existingProduct) {
         throw new ConflictError("Product code already exists");
@@ -53,10 +53,10 @@ async function createProduct(data: CreateProductRequestDTO): Promise<ProductResp
     });
 
     const savedProduct = await ProductRepository.saveProduct(product);
-    return toProductResponseDTO(savedProduct);
+    return toProductResponse(savedProduct);
 }
 
-async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResponseDTO> {
+async function updateProduct(data: UpdateProductBody): Promise<ProductResponse> {
     const existingProduct = await ProductRepository.getProductById(data.id, false);
 
     if (!existingProduct) {
@@ -115,7 +115,7 @@ async function updateProduct(data: ProductUpdateRequestDTO): Promise<ProductResp
     }
 
     const updatedProduct = await ProductRepository.saveProduct(existingProduct);
-    return toProductResponseDTO(updatedProduct);
+    return toProductResponse(updatedProduct);
 }
 
 async function deleteProduct(id: number): Promise<boolean> {
@@ -130,7 +130,7 @@ async function deleteProduct(id: number): Promise<boolean> {
     return true;
 }
 
-async function restoreProduct(id: number): Promise<ProductResponseDTO> {
+async function restoreProduct(id: number): Promise<ProductResponse> {
     const product = await ProductRepository.getProductById(id, true);
 
     if (!product) {
@@ -144,7 +144,7 @@ async function restoreProduct(id: number): Promise<ProductResponseDTO> {
     await ProductRepository.restoreProduct(id);
 
     const restoredProduct = await ProductRepository.getProductById(id, true);
-    return toProductResponseDTO(restoredProduct!);
+    return toProductResponse(restoredProduct!);
 }
 
 export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, restoreProduct };

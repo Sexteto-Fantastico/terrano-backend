@@ -10,3 +10,12 @@ This layer is strictly responsible for mapping HTTP endpoints to Controller func
 - **Async Handling:** `createRoute` automatically wraps the main handler in `asyncHandler()`. You do not need to wrap it manually.
 - **Middlewares:** Apply authentication (`authMiddleware`) or other custom middlewares using the `middlewares` array property inside the `createRoute` configuration.
 - **No Logic:** It is strictly forbidden to write any data manipulation, response handling (`res.send`), or business logic in this layer.
+- **DELETE Response:** All delete endpoints MUST return `204 No Content` with no response body. Do NOT return `200` with a JSON body.
+- **RESTORE Method:** All restore/undelete endpoints MUST use `PATCH`, not `POST`.
+- **CRUD Status Code Standards:**
+  - `POST` (create) → `201 Created`
+  - `GET` (list) → `200 OK`
+  - `GET /:id` (single) → `200 OK`
+  - `PUT /:id` (update) → `200 OK`
+  - `DELETE /:id` → `204 No Content`
+  - `PATCH /:id/restore` → `200 OK`
