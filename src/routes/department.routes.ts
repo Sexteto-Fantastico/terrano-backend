@@ -8,6 +8,7 @@ import {
     deleteDepartment,
     restoreDepartment
 } from "../controllers/department.controller";
+import { getDepartmentLogs } from "../controllers/system-log.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -71,6 +72,20 @@ createRoute(router, {
         404: { description: "Department not found" }
     }
 }, getDepartmentById);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.DEPARTMENTS.GET_LOGS,
+    basePath: Endpoints.DEPARTMENTS.BASE,
+    tags: ["Departments"],
+    summary: "Get logs for a department",
+    request: {
+        params: DepartmentIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "List of department logs" }
+    }
+}, getDepartmentLogs);
 
 createRoute(router, {
     method: HttpMethod.PUT,

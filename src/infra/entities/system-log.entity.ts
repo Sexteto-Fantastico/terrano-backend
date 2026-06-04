@@ -1,5 +1,6 @@
-import { Entity, Column } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
+import { User } from "./user.entity";
 
 export interface ISystemLog extends ITerranoBaseEntity {
     entity_name: string;
@@ -23,6 +24,10 @@ export class SystemLog extends TerranoBaseEntity implements ISystemLog {
 
     @Column({ name: "user_id", type: "int", nullable: true })
     user_id?: number;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: "user_id" })
+    user?: User;
 
     @Column({ type: "simple-json", nullable: true })
     metadata?: Record<string, unknown>;

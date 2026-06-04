@@ -42,3 +42,59 @@ export async function getStockLocationLogs(
 
     return res.status(200).json(logs);
 }
+
+export async function getDepartmentLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
+
+    const logs = await SystemLogService.getEntityLogs(
+        "department",
+        id
+    );
+
+    return res.status(200).json(logs);
+}
+
+export async function getProductBrandLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
+
+    const logs = await SystemLogService.getEntityLogs(
+        "product_brand",
+        id
+    );
+
+    return res.status(200).json(logs);
+}
+
+export async function getProductCategoryLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
+
+    const logs = await SystemLogService.getEntityLogs(
+        "product_category",
+        id
+    );
+
+    return res.status(200).json(logs);
+}
+
+export async function getMeasurementUnitLogs(
+    req: Request,
+    res: Response
+) {
+    const id = Number(req.params.id);
+
+    const logs = await SystemLogService.getEntityLogs(
+        "measurement_unit",
+        id
+    );
+
+    return res.status(200).json(logs);
+}
