@@ -19,7 +19,7 @@ export class ErrorLog extends BaseEntity {
     })
     level: LogLevel;
 
-    @Column({ type: "varchar", length: 1000 })
+    @Column({ type: "varchar", length: 1000, default: "Mensagem Genérica" })
     message: string;
 
     @Column({ name: "status_code", type: "int" })
