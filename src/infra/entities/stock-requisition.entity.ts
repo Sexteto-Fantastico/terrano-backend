@@ -1,43 +1,37 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     OneToMany,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
-    DeleteDateColumn,
+    ManyToOne,JoinColumn
 } from "typeorm";
-import { StockRequisitionItem } from "./stock-requisition-item.entity";
-import { Department } from "./department.entity";
-import { Movement } from "./movement.entity";
+
 import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-entity";
+import { StockRequisitionItem } from "./stock-requisition-item.entity";
+import { StockRequisitionStatusLog } from "./stock-requisition-status-log.entity";
+import { Department } from "./department.entity";
+
+
 
 export enum RequisitionStatus {
     PENDING = "PENDING",
-    APPROVED = "APPROVED",
-    REJECTED = "REJECTED",
-    COMPLETED = "COMPLETED",
     CANCELLED = "CANCELLED",
+    DENIED = "DENIED",
+    APPROVED = "APPROVED",
+    WAITING_PURCHASE = "WAITING_PURCHASE",
+    WAITING_ARRIVAL = "WAITING_ARRIVAL",
+    FINISHED = "FINISHED",
 }
 
 export interface IStockRequisition extends ITerranoBaseEntity {
-    company_name: string;
+    requester_justification: string;
     status: RequisitionStatus;
-    declared_at: Date;
-    total_value: number;
-    department: Department;
     items: StockRequisitionItem[];
-    stock_movements: Movement[];
+    status_logs: StockRequisitionStatusLog[];
     updated_by?: number;
 }
+
 @Entity("stock_requisition")
 export class StockRequisition extends TerranoBaseEntity implements IStockRequisition {
-
-    @Column({ type: "varchar", length: 200 })
-    company_name: string;
 
     @Column({
         type: "simple-enum",
@@ -46,26 +40,29 @@ export class StockRequisition extends TerranoBaseEntity implements IStockRequisi
     })
     status: RequisitionStatus;
 
-    @Column({ name: "declared_at", type: "date" })
-    declared_at: Date;
+    @Column({
+        name: "requester_justification",
+        type: "varchar",
+        length: 500
+    })
+    requester_justification: string;
 
-    @Column({ name: "total_value", type: "real", default: 0 })
-    total_value: number;
+    @OneToMany(() => StockRequisitionItem, item => item.stock_requisition, {
+        cascade: true
+    })
+    items: StockRequisitionItem[];
 
-    @ManyToOne(() => Department)
+    @OneToMany(() => StockRequisitionStatusLog, log => log.stock_requisition)
+    status_logs: StockRequisitionStatusLog[];
+
+    @ManyToOne(() => Department, department => department.stock_requisitions)
+
     @JoinColumn({ name: "department_id" })
     department: Department;
 
-    @OneToMany(() => StockRequisitionItem, (item) => item.requisition)
-    items: StockRequisitionItem[];
-
-    @OneToMany(() => Movement, (movement) => (movement as any).requisition)
-    stock_movements: Movement[];
-
-    constructor(requisition: IStockRequisition) {
-        super(requisition);
-        Object.assign(this, requisition);
+    constructor(stockRequisition: IStockRequisition) {
+        super(stockRequisition);
+        Object.assign(this, stockRequisition);
     }
+ 
 }
-
-

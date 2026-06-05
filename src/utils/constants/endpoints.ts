@@ -91,4 +91,9 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/home`,
         SUMMARY: "/summary",
     },
+    
+    STOCK_REQUISITIONS: {
+        BASE: `${API_PREFIX}/stock-requisitions`,
+        ...CRUD_ROUTES,
+    },
 } as const;

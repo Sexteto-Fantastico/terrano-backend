@@ -20,12 +20,19 @@ export async function createStockRequisitionItemSeed(): Promise<void> {
     const products =
         await productRepository.find();
 
+    if (products.length === 0) {
+        console.log(
+            "No products found. Skipping StockRequisitionItem seed."
+        );
+        return;
+    }
+
     for (const requisition of requisitions) {
 
         const existingItems =
             await itemRepository.count({
                 where: {
-                    requisition: {
+                    stock_requisition: {
                         id: requisition.id,
                     },
                 },
@@ -36,47 +43,31 @@ export async function createStockRequisitionItemSeed(): Promise<void> {
         }
 
         const itemCount =
-            Math.floor(Math.random() * 7) + 2;
+            Math.floor(Math.random() * 5) + 1;
 
-        let requisitionTotal = 0;
+        const items: StockRequisitionItem[] = [];
 
         for (let i = 0; i < itemCount; i++) {
 
             const product =
                 products[
-                    Math.floor(Math.random() * products.length)
+                    Math.floor(
+                        Math.random() * products.length
+                    )
                 ];
 
-            const quantity =
-                Math.floor(Math.random() * 15) + 1;
-
-            const delivered =
-                requisition.status === "COMPLETED"
-                    ? quantity
-                    : Math.floor(quantity / 2);
-
-            const unitPrice =
-                Math.floor(Math.random() * 300) + 10;
-
-            requisitionTotal +=
-                quantity * unitPrice;
-
-            await itemRepository.save(
+            items.push(
                 itemRepository.create({
-                    item: product.name,
-                    declared_at: requisition.declared_at,
+                    stock_requisition: requisition,
                     product,
-                    quantity,
-                    delivered,
-                    requisition,
+                    quantity:
+                        Math.floor(Math.random() * 20) + 1,
+                    delivered: false,
                 })
             );
         }
 
-        requisition.total_value =
-            Number(requisitionTotal.toFixed(2));
-
-        await requisitionRepository.save(requisition);
+        await itemRepository.save(items);
     }
 
     console.log("StockRequisitionItem seed completed");

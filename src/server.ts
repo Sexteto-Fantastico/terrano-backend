@@ -11,15 +11,12 @@ import productRoutes from "./routes/product.routes";
 import departmentRoutes from "./routes/department.routes";
 import stockLocationRoutes from "./routes/stock-location.routes";
 import measurementUnitRoutes from "./routes/measurement-unit.routes";
-import purchaseRoutes from "./routes/purchase.routes";
-import movementRoutes from "./routes/movement.routes";
-import homeRoutes from "./routes/home.routes";
+import stockRequisitionRoutes from "./routes/stock-requisition.routes"; 
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
 import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
 import { requestContextMiddleware } from "./utils/request-context";
-import supplierRoutes from "./routes/supplier.routes";
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -43,10 +40,7 @@ app.use(Endpoints.PRODUCTS.BASE, productRoutes);
 app.use(Endpoints.DEPARTMENTS.BASE, departmentRoutes);
 app.use(Endpoints.STOCK_LOCATIONS.BASE, stockLocationRoutes);
 app.use(Endpoints.MEASUREMENT_UNITS.BASE, measurementUnitRoutes);
-app.use(Endpoints.PURCHASES.BASE, purchaseRoutes);
-app.use(Endpoints.MOVEMENTS.BASE, movementRoutes);
-app.use(Endpoints.HOME.BASE, homeRoutes);
-app.use(Endpoints.SUPPLIERS.BASE, supplierRoutes);
+app.use(Endpoints.STOCK_REQUISITIONS.BASE, stockRequisitionRoutes)
 
 
 app.use(globalErrorMiddleware);

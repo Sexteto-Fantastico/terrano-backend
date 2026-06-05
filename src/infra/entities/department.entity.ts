@@ -32,6 +32,11 @@ export class Department extends TerranoBaseEntity implements IDepartment {
         super(department);
         Object.assign(this, department);
     }
+    @OneToMany(
+    () => StockRequisition,
+    requisition => requisition.department
+)
+stock_requisitions: StockRequisition[];
 }
 
 
