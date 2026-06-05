@@ -29,7 +29,7 @@ describe("Get Departments", () => {
     it("should return departments list", async () => {
         await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app).get("/departments");
 
@@ -49,11 +49,11 @@ describe("Get Departments", () => {
     it("should return all created departments", async () => {
         await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         await request(app)
             .post("/departments")
-            .send({ name: "RH", costCenterCode: "CC-002", managerId: manager.id });
+            .send({ name: "RH", managerId: manager.id });
 
         const response = await request(app).get("/departments");
 
@@ -64,21 +64,20 @@ describe("Get Departments", () => {
     it("should return department with correct fields", async () => {
         await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app).get("/departments");
         const dept = response.body[0];
 
         expect(dept).toHaveProperty("id");
         expect(dept).toHaveProperty("name");
-        expect(dept).toHaveProperty("costCenterCode"); 
         expect(dept).toHaveProperty("managerId");     
     });
 
     it("should return department by id", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app)
             .get(`/departments/${created.body.id}`);
@@ -97,7 +96,7 @@ describe("Get Departments", () => {
     it("should return correct managerId inside department", async () => {
         await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app).get("/departments");
         const dept = response.body[0];

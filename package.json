@@ -2,11 +2,11 @@
   "name": "terrano-backend",
   "version": "1.0.0",
   "description": "Backend para o sistema de gerenciamento de almoxarifado Terrano",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "node scripts/generate-migration.js",
     "migration:run": "npm run typeorm migration:run -- -d src/infra/config/data-source.ts",

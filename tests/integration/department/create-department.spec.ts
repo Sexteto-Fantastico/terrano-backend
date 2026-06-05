@@ -30,7 +30,7 @@ describe("Create Department", () => {
     it("should create a department", async () => {
         const response = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         expect(response.status).toBe(201);
         expect(response.body.name).toBe("TI");
@@ -39,23 +39,16 @@ describe("Create Department", () => {
     it("should return 400 when name is missing", async () => {
         const response = await request(app)
             .post("/departments")
-            .send({ costCenterCode: "CC-001", managerId: manager.id });
+            .send({ managerId: manager.id });
 
         expect(response.status).toBe(400);
     });
 
-    it("should return 400 when costCenterCode is missing", async () => {
-        const response = await request(app)
-            .post("/departments")
-            .send({ name: "TI", managerId: manager.id });
-
-        expect(response.status).toBe(400);
-    });
 
     it("should return 400 when managerId is missing", async () => {
         const response = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001" });
+            .send({ name: "TI" });
 
         expect(response.status).toBe(400);
     });
@@ -71,7 +64,7 @@ describe("Create Department", () => {
     it("should return 404 when managerId does not exist", async () => {
         const response = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: 999999 });
+            .send({ name: "TI", managerId: 999999 });
 
         expect(response.status).toBe(404);
     });
@@ -79,20 +72,19 @@ describe("Create Department", () => {
     it("should persist the department in database after creation", async () => {
         const response = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const found = await TestDataSource.getRepository(Department)
             .findOneBy({ id: response.body.id });
 
         expect(found).not.toBeNull();
         expect(found!.name).toBe("TI");
-        expect(found!.cost_center_code).toBe("CC-001");
     });
 
     it("should persist manager relation in database", async () => {
         const response = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const found = await TestDataSource.getRepository(Department)
             .findOne({ where: { id: response.body.id }, relations: ["manager"] });

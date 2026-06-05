@@ -30,7 +30,7 @@ describe("Update Department", () => {
     it("should update a department name", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app)
             .put(`/departments/${created.body.id}`)
@@ -43,7 +43,7 @@ describe("Update Department", () => {
     it("should update only the manager and keep other fields unchanged", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const newManager = await TestDataSource.getRepository(User).save({
             name: "New Manager",
@@ -62,19 +62,6 @@ describe("Update Department", () => {
         expect(response.body.name).toBe("TI");               
     });
 
-    it("should update costCenterCode and keep other fields unchanged", async () => {
-        const created = await request(app)
-            .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
-
-        const response = await request(app)
-            .put(`/departments/${created.body.id}`)
-            .send({ costCenterCode: "CC-999" });
-
-        expect(response.status).toBe(200);
-        expect(response.body.costCenterCode).toBe("CC-999"); 
-        expect(response.body.name).toBe("TI");              
-    });
 
     it("should return 404 when department does not exist", async () => {
         const response = await request(app)
@@ -87,7 +74,7 @@ describe("Update Department", () => {
     it("should return 404 when new managerId does not exist", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app)
             .put(`/departments/${created.body.id}`)
@@ -99,7 +86,7 @@ describe("Update Department", () => {
     it("should persist name update in database", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         await request(app)
             .put(`/departments/${created.body.id}`)
@@ -112,19 +99,4 @@ describe("Update Department", () => {
         expect(found!.name).toBe("Human Resources");
     });
 
-    it("should persist costCenterCode update in database", async () => {
-        const created = await request(app)
-            .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
-
-        await request(app)
-            .put(`/departments/${created.body.id}`)
-            .send({ costCenterCode: "CC-999" });
-
-        const found = await TestDataSource.getRepository(Department)
-            .findOneBy({ id: created.body.id });
-
-        expect(found).not.toBeNull();
-        expect(found!.cost_center_code).toBe("CC-999");
-    });
 });
