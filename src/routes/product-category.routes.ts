@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { createProductCategory, getAllProductCategories, getProductCategoryById, updateProductCategory, deleteProductCategory, restoreProductCategory } from "../controllers/product-category.controller";
+import { getProductCategoryLogs } from "../controllers/system-log.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -64,6 +65,20 @@ createRoute(router, {
         404: { description: "Product category not found" }
     }
 }, getProductCategoryById);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCT_CATEGORIES.GET_LOGS,
+    basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
+    tags: ["Product Categories"],
+    summary: "Get logs for a product category",
+    request: {
+        params: ProductCategoryIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "List of product category logs" }
+    }
+}, getProductCategoryLogs);
 
 createRoute(router, {
     method: HttpMethod.PUT,

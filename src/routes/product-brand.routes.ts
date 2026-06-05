@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { createProductBrand, getAllProductBrands, getProductBrandById, updateProductBrand, deleteProductBrand, restoreProductBrand } from "../controllers/product-brand.controller";
+import { getProductBrandLogs } from "../controllers/system-log.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -64,6 +65,20 @@ createRoute(router, {
         404: { description: "Product brand not found" }
     }
 }, getProductBrandById);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.PRODUCT_BRANDS.GET_LOGS,
+    basePath: Endpoints.PRODUCT_BRANDS.BASE,
+    tags: ["Product Brands"],
+    summary: "Get logs for a product brand",
+    request: {
+        params: ProductBrandIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "List of product brand logs" }
+    }
+}, getProductBrandLogs);
 
 createRoute(router, {
     method: HttpMethod.PUT,

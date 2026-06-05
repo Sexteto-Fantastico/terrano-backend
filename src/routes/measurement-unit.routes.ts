@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { getAll, getById, create, update, remove, restore } from "../controllers/measurement-unit.controller";
+import { getMeasurementUnitLogs } from "../controllers/system-log.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -47,6 +48,20 @@ createRoute(router, {
         404: { description: "Measurement unit not found" }
     }
 }, getById);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.MEASUREMENT_UNITS.GET_LOGS,
+    basePath: Endpoints.MEASUREMENT_UNITS.BASE,
+    tags: ["Measurement Units"],
+    summary: "Get logs for a measurement unit",
+    request: {
+        params: MeasurementUnitIdSchema.shape.params
+    },
+    responses: {
+        200: { description: "List of measurement unit logs" }
+    }
+}, getMeasurementUnitLogs);
 
 createRoute(router, {
     method: HttpMethod.POST,
