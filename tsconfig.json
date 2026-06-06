@@ -3,37 +3,32 @@
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
     "lib": [
       "ES2022"
     ],
     "outDir": "./dist",
     "rootDir": ".",
-
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-
     "strictPropertyInitialization": false,
     "isolatedModules": true,
-
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest"
+    ]
   },
-
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts"
   ],
-
   "exclude": [
     "node_modules",
     "dist"

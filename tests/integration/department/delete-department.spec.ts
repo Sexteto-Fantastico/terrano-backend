@@ -30,7 +30,7 @@ describe("Delete Department", () => {
     it("should delete a department", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const response = await request(app)
             .delete(`/departments/${created.body.id}`);
@@ -42,7 +42,7 @@ describe("Delete Department", () => {
     it("should set deletedAt in database after deletion", async () => {
         const created = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         await request(app).delete(`/departments/${created.body.id}`);
 
@@ -56,11 +56,11 @@ describe("Delete Department", () => {
     it("should not affect other departments when deleting one", async () => {
         const first = await request(app)
             .post("/departments")
-            .send({ name: "TI", costCenterCode: "CC-001", managerId: manager.id });
+            .send({ name: "TI", managerId: manager.id });
 
         const second = await request(app)
             .post("/departments")
-            .send({ name: "RH", costCenterCode: "CC-002", managerId: manager.id });
+            .send({ name: "RH", managerId: manager.id });
 
         await request(app).delete(`/departments/${first.body.id}`);
 
