@@ -58,7 +58,7 @@ export async function createUserSeed(): Promise<void> {
         await userRepository.save(
             userRepository.create({
                 ...userData,
-                password: hashPassword("123456"),
+                password: hashPassword("12345678"),
                 role: employeeRole,
                 department: departments[i % departments.length],
             })

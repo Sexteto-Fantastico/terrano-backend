@@ -6,12 +6,15 @@ import {
     getStockRequisitions,
     getStockRequisitionById,
     updateStockRequisition,
+    updateStockRequisitionStatus,
     deleteStockRequisition,
+    restoreStockRequisition,
 } from "../controllers/stock-requisition.controller";
 
 import {
     CreateStockRequisitionBodySchema,
     UpdateStockRequisitionBodySchema,
+    UpdateStockRequisitionStatusBodySchema,
     StockRequisitionResponseSchema,
     stockRequisitionIdSchema,
     stockRequisitionQuerySchema,
@@ -46,9 +49,7 @@ createRoute(router, {
         201: {
             description: "The created stock requisition",
             content: {
-                [ContentType.JSON]: {
-                    schema: StockRequisitionResponseSchema
-                }
+                [ContentType.JSON]: { schema: StockRequisitionResponseSchema }
             }
         }
     }
@@ -88,14 +89,10 @@ createRoute(router, {
         200: {
             description: "The stock requisition",
             content: {
-                [ContentType.JSON]: {
-                    schema: StockRequisitionResponseSchema
-                }
+                [ContentType.JSON]: { schema: StockRequisitionResponseSchema }
             }
         },
-        404: {
-            description: "Stock requisition not found"
-        }
+        404: { description: "Stock requisition not found" }
     }
 }, getStockRequisitionById);
 
@@ -119,16 +116,39 @@ createRoute(router, {
         200: {
             description: "The updated stock requisition",
             content: {
-                [ContentType.JSON]: {
-                    schema: StockRequisitionResponseSchema
-                }
+                [ContentType.JSON]: { schema: StockRequisitionResponseSchema }
             }
         },
-        404: {
-            description: "Stock requisition not found"
-        }
+        404: { description: "Stock requisition not found" }
     }
 }, updateStockRequisition);
+
+createRoute(router, {
+    method: HttpMethod.PATCH,
+    path: Endpoints.STOCK_REQUISITIONS.UPDATE_STATUS,
+    basePath: Endpoints.STOCK_REQUISITIONS.BASE,
+    tags: ["Stock Requisitions"],
+    summary: "Update stock requisition status",
+    request: {
+        params: stockRequisitionIdSchema.shape.params,
+        body: {
+            content: {
+                [ContentType.JSON]: {
+                    schema: UpdateStockRequisitionStatusBodySchema
+                }
+            }
+        }
+    },
+    responses: {
+        200: {
+            description: "The updated stock requisition",
+            content: {
+                [ContentType.JSON]: { schema: StockRequisitionResponseSchema }
+            }
+        },
+        404: { description: "Stock requisition not found" }
+    }
+}, updateStockRequisitionStatus);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
@@ -140,13 +160,29 @@ createRoute(router, {
         params: stockRequisitionIdSchema.shape.params
     },
     responses: {
-        204: {
-            description: "Stock requisition cancelled successfully"
-        },
-        404: {
-            description: "Stock requisition not found"
-        }
+        204: { description: "Stock requisition cancelled successfully" },
+        404: { description: "Stock requisition not found" }
     }
 }, deleteStockRequisition);
+
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.STOCK_REQUISITIONS.RESTORE,
+    basePath: Endpoints.STOCK_REQUISITIONS.BASE,
+    tags: ["Stock Requisitions"],
+    summary: "Restore a stock requisition",
+    request: {
+        params: stockRequisitionIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "The restored stock requisition",
+            content: {
+                [ContentType.JSON]: { schema: StockRequisitionResponseSchema }
+            }
+        },
+        404: { description: "Stock requisition not found" }
+    }
+}, restoreStockRequisition);
 
 export default router;

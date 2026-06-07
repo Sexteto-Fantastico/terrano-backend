@@ -95,6 +95,7 @@ export const Endpoints = {
     STOCK_REQUISITIONS: {
         BASE: `${API_PREFIX}/stock-requisitions`,
         ...CRUD_ROUTES,
+	UPDATE_STATUS: "/:id/status",
     },
 
     STOCK_POSITIONINGS: {

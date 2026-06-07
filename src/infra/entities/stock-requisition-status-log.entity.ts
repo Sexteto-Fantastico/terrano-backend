@@ -16,18 +16,31 @@ import {
 } from "../config/terrano-base-entity";
 
 export interface IStockRequisitionStatusLog extends ITerranoBaseEntity {
-    stock_requisition: StockRequisition;
+    stock_requisition?: StockRequisition;
+    stock_requisition_id?: number;
     previous_status?: RequisitionStatus;
     current_status: RequisitionStatus;
     change_justification?: string;
 }
 
 @Entity("stock_requisition_status_log")
-export class StockRequisitionStatusLog extends TerranoBaseEntity implements IStockRequisitionStatusLog {
+export class StockRequisitionStatusLog
+    extends TerranoBaseEntity
+    implements IStockRequisitionStatusLog {
 
-    @ManyToOne(() => StockRequisition)
+    @Column({
+        name: "stock_requisition_id",
+        type: "integer",
+        nullable: false,
+    })
+    stock_requisition_id: number;
+
+    @ManyToOne(
+        () => StockRequisition,
+        requisition => requisition.status_logs
+    )
     @JoinColumn({ name: "stock_requisition_id" })
-    stock_requisition: StockRequisition;
+    stock_requisition?: StockRequisition;
 
     @Column({
         name: "previous_status",
@@ -50,8 +63,8 @@ export class StockRequisitionStatusLog extends TerranoBaseEntity implements ISto
     })
     change_justification?: string;
 
-    constructor(log: IStockRequisitionStatusLog) {
-        super(log);
+    constructor(log?: Partial<IStockRequisitionStatusLog>) {
+        super(log || {});
         Object.assign(this, log);
     }
 }
