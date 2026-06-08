@@ -12,7 +12,11 @@ import departmentRoutes from "./routes/department.routes";
 import stockLocationRoutes from "./routes/stock-location.routes";
 import measurementUnitRoutes from "./routes/measurement-unit.routes";
 import stockRequisitionRoutes from "./routes/stock-requisition.routes";
-import stockPositioningRoutes from "./routes/stock-positioning.routes"; 
+import stockPositioningRoutes from "./routes/stock-positioning.routes";
+import purchaseRoutes from "./routes/purchase.routes";
+import movementRoutes from "./routes/movement.routes";
+import supplierRoutes from "./routes/supplier.routes";
+import homeRoutes from "./routes/home.routes";
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints } from "./utils/constants/endpoints";
@@ -43,6 +47,10 @@ app.use(Endpoints.STOCK_LOCATIONS.BASE, stockLocationRoutes);
 app.use(Endpoints.MEASUREMENT_UNITS.BASE, measurementUnitRoutes);
 app.use(Endpoints.STOCK_REQUISITIONS.BASE, stockRequisitionRoutes);
 app.use(Endpoints.STOCK_POSITIONINGS.BASE, stockPositioningRoutes);
+app.use(Endpoints.PURCHASES.BASE, purchaseRoutes);
+app.use(Endpoints.MOVEMENTS.BASE, movementRoutes);
+app.use(Endpoints.SUPPLIERS.BASE, supplierRoutes);
+app.use(Endpoints.HOME.BASE, homeRoutes);
 
 
 app.use(globalErrorMiddleware);
