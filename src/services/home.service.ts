@@ -2,7 +2,7 @@ import * as PurchaseRepository from "../repositories/purchase.repository";
 import * as MovementRepository from "../repositories/movement.repository";
 import { MovementType } from "../infra/entities/movement.entity";
 import { HomeResponse, toHomeResponse } from "../dtos/home.dto";
-import { formatDateToYYYYMMDD, formatDateToStartOfDay } from "../utils/date.util";
+import { getStartOfDay } from "../utils/date.util";
 
 function calculatePercentageChange(current: number, previous: number): number {
     if (previous === 0) {
@@ -19,13 +19,9 @@ async function getHomeSummary(): Promise<HomeResponse> {
     const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-    const previousMonthStartStr = formatDateToYYYYMMDD(previousMonthStart);
-    const currentMonthStartStr = formatDateToYYYYMMDD(currentMonthStart);
-    const nextMonthStartStr = formatDateToYYYYMMDD(nextMonthStart);
-
-    const previousMonthStartDateTimeStr = formatDateToStartOfDay(previousMonthStart);
-    const currentMonthStartDateTimeStr = formatDateToStartOfDay(currentMonthStart);
-    const nextMonthStartDateTimeStr = formatDateToStartOfDay(nextMonthStart);
+    const previousMonthStartDateTime = getStartOfDay(previousMonthStart);
+    const currentMonthStartDateTime = getStartOfDay(currentMonthStart);
+    const nextMonthStartDateTime = getStartOfDay(nextMonthStart);
 
     const [
         purchasesGrandTotal,
@@ -39,14 +35,14 @@ async function getHomeSummary(): Promise<HomeResponse> {
         exitsPreviousMonth
     ] = await Promise.all([
         PurchaseRepository.getGrandTotalPurchases(),
-        PurchaseRepository.getPurchasesTotalByDateRange(currentMonthStartStr, nextMonthStartStr),
-        PurchaseRepository.getPurchasesTotalByDateRange(previousMonthStartStr, currentMonthStartStr),
+        PurchaseRepository.getPurchasesTotalByDateRange(currentMonthStartDateTime, nextMonthStartDateTime),
+        PurchaseRepository.getPurchasesTotalByDateRange(previousMonthStartDateTime, currentMonthStartDateTime),
         MovementRepository.getGrandTotalQuantity(MovementType.IN),
-        MovementRepository.getTotalQuantityByDateRange(MovementType.IN, currentMonthStartDateTimeStr, nextMonthStartDateTimeStr),
-        MovementRepository.getTotalQuantityByDateRange(MovementType.IN, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.IN, currentMonthStartDateTime, nextMonthStartDateTime),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.IN, previousMonthStartDateTime, currentMonthStartDateTime),
         MovementRepository.getGrandTotalQuantity(MovementType.OUT),
-        MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, currentMonthStartDateTimeStr, nextMonthStartDateTimeStr),
-        MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, previousMonthStartDateTimeStr, currentMonthStartDateTimeStr)
+        MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, currentMonthStartDateTime, nextMonthStartDateTime),
+        MovementRepository.getTotalQuantityByDateRange(MovementType.OUT, previousMonthStartDateTime, currentMonthStartDateTime)
     ]);
 
     return toHomeResponse({

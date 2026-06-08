@@ -72,7 +72,7 @@ async function getGrandTotalPurchases(): Promise<number> {
     return Number(result?.total || 0);
 }
 
-async function getPurchasesTotalByDateRange(startDate: string, endDate: string): Promise<number> {
+async function getPurchasesTotalByDateRange(startDate: string | Date, endDate: string | Date): Promise<number> {
     const result = await purchaseRepository
         .createQueryBuilder("purchase")
         .select("SUM(purchase.total)", "total")

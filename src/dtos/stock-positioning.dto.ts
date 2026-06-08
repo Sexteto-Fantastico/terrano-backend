@@ -20,7 +20,7 @@ export enum StockPositioningStatus {
     EXCESSO = "EXCESSO",
 }
 
-export const StockPositioningStatusSchema = z.nativeEnum(StockPositioningStatus).openapi({ example: StockPositioningStatus.ADEQUADO });
+export const StockPositioningStatusSchema = z.enum(StockPositioningStatus).openapi({ example: StockPositioningStatus.ADEQUADO });
 
 export const StockPositioningResponseSchema = registry.register(
     "StockPositioningResponse",

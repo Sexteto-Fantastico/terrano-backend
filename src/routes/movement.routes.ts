@@ -2,18 +2,23 @@ import { Router } from "express";
 import { z } from "zod";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
-import { 
+import {
     createMovementExit,
     createMovementEntry,
     getMovementEntries,
-    getMovementEntryById
+    getMovementEntryById,
+    getMovementExits,
+    getMovementExitById,
+    deleteMovementExit
 } from "../controllers/movement.controller";
-import { 
-    CreateMovementExitBodySchema, 
+import {
+    CreateMovementExitBodySchema,
     MovementExitResponseSchema,
+    MovementExitIdSchema,
     CreateMovementEntryBodySchema,
     MovementEntryResponseSchema,
     MovementEntryIdSchema,
+    MovementExitQuerySchema,
 } from "../dtos/movement.dto";
 
 const router = Router();
@@ -42,6 +47,62 @@ createRoute(router, {
 }, createMovementExit);
 
 createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.MOVEMENTS.EXIT,
+    basePath: Endpoints.MOVEMENTS.BASE,
+    tags: ["Movements"],
+    summary: "List all stock exit movements",
+    request: {
+        query: MovementExitQuerySchema.shape.query
+    },
+    responses: {
+        200: {
+            description: "List of exit movements",
+            content: {
+                [ContentType.JSON]: {
+                    schema: z.array(MovementExitResponseSchema)
+                }
+            }
+        }
+    },
+}, getMovementExits);
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.MOVEMENTS.EXIT_GET_BY_ID,
+    basePath: Endpoints.MOVEMENTS.BASE,
+    tags: ["Movements"],
+    summary: "Get a specific stock exit movement by ID",
+    request: {
+        params: MovementExitIdSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "Exit movement details",
+            content: { [ContentType.JSON]: { schema: MovementExitResponseSchema } }
+        },
+        400: { description: "Invalid ID format" },
+        404: { description: "Movement exit not found" }
+    }
+}, getMovementExitById);
+
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.MOVEMENTS.EXIT_DELETE,
+    basePath: Endpoints.MOVEMENTS.BASE,
+    tags: ["Movements"],
+    summary: "Delete a specific stock exit movement by ID",
+    request: {
+        params: MovementExitIdSchema.shape.params
+    },
+    responses: {
+        204: { description: "Exit movement deleted successfully" },
+        400: { description: "Movement exit is already inactive or invalid ID format" },
+        404: { description: "Movement exit not found" }
+    }
+}, deleteMovementExit);
+
+createRoute(router, {
     method: HttpMethod.POST,
     path: Endpoints.MOVEMENTS.ENTRY,
     basePath: Endpoints.MOVEMENTS.BASE,
@@ -64,7 +125,6 @@ createRoute(router, {
     },
 }, createMovementEntry);
 
-
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.MOVEMENTS.ENTRY,
@@ -85,7 +145,7 @@ createRoute(router, {
 
 createRoute(router, {
     method: HttpMethod.GET,
-    path: Endpoints.MOVEMENTS.ENTRY_GET_BY_ID, // Usando a constante ao invés de template string
+    path: Endpoints.MOVEMENTS.ENTRY_GET_BY_ID,
     basePath: Endpoints.MOVEMENTS.BASE,
     tags: ["Movements"],
     summary: "Get a specific stock entry movement by ID",

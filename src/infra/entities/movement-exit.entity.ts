@@ -23,6 +23,7 @@ export interface IMovementExit extends ITerranoBaseEntity {
     exitMovementCategory: ExitMovementCategory;
     purchase?: Purchase | null;
     stockRequisition?: StockRequisition | null;
+    internalNotes?: string | null;
 }
 
 @Entity("movement_exit")
@@ -45,6 +46,9 @@ export class MovementExit extends TerranoBaseEntity implements IMovementExit {
     @ManyToOne(() => StockRequisition, { nullable: true })
     @JoinColumn({ name: "stock_requisition_id" })
     stockRequisition: StockRequisition | null;
+
+    @Column({ name: "internal_notes", type: "text", nullable: true })
+    internalNotes: string | null;
 
     @OneToMany(() => Movement, (movement) => movement.movement_exit)
     movements: Movement[];

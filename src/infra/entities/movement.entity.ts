@@ -21,6 +21,7 @@ export interface IMovement extends ITerranoBaseEntity {
     movement_exit?: MovementExit | null;
     movement_entry?: MovementEntry | null;
     stock_location: StockLocation;
+    unit_cost?: number | null;
 }
 
 @Entity("movement")
@@ -32,6 +33,9 @@ export class Movement extends TerranoBaseEntity implements IMovement {
 
     @Column({ type: "int" })
     quantity: number;
+
+    @Column({ name: "unit_cost", type: "real", nullable: true })
+    unit_cost?: number | null;
 
     @ManyToOne(() => MovementExit, (exit) => exit.movements, { nullable: true })
     @JoinColumn({ name: "movement_exit_id" })
