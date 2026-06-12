@@ -1,4 +1,4 @@
-import { FindOptionsWhere, FindManyOptions, FindOptionsOrder } from "typeorm";
+import { FindOptionsWhere, FindManyOptions, ILike } from "typeorm";
 import { AppDataSource } from "../infra/config/data-source";
 import { StockLocation } from "../infra/entities/stock-location.entity";
 import { StockLocationQuery } from "../dtos/stock-location.dto";
@@ -6,13 +6,18 @@ import { StockLocationQuery } from "../dtos/stock-location.dto";
 const repository = AppDataSource.getRepository(StockLocation);
 
 async function getAllStockLocations(filters: StockLocationQuery = {}): Promise<[StockLocation[], number]> {
-    const { activeOnly = true, pageIndex, pageSize, sortBy, sortOrder } = filters;
+    const { activeOnly = true, name, pageIndex, pageSize, sortBy, sortOrder } = filters;
 
     const where: FindOptionsWhere<StockLocation> = {};
+
+    if (name) {
+        where.name = ILike(`%${name}%`);
+    }
 
     const options: FindManyOptions<StockLocation> = {
         where,
         withDeleted: !activeOnly,
+        relations: ["address"],
     };
 
     if (sortBy) {
@@ -33,6 +38,7 @@ async function getStockLocationById(id: number): Promise<StockLocation | null> {
     return await repository.findOne({
         where: { id },
         withDeleted: true,
+        relations: ["address"],
     });
 }
 

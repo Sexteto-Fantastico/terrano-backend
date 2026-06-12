@@ -16,7 +16,7 @@ import {
     CreateStockLocationBodySchema,
     UpdateStockLocationBodySchema,
     StockLocationIdSchema,
-    StockLocationResponseSchema
+    StockLocationResponseSchema,
 } from "../dtos/stock-location.dto";
 
 const router = Router();
@@ -43,7 +43,8 @@ createRoute(router, {
     path: Endpoints.STOCK_LOCATIONS.GET_ALL,
     basePath: Endpoints.STOCK_LOCATIONS.BASE,
     tags: ["Stock Locations"],
-    summary: "Returns the list of all stock locations",
+    summary: "Returns the list of stock locations",
+    description: "Supports pagination, sorting, activeOnly, and name filtering. Each item includes isActive derived from deleted_at.",
     request: {
         query: StockLocationQuerySchema.shape.query
     },
