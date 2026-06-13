@@ -32,7 +32,10 @@ app.use(cors({
     exposedHeaders: ["X-Total-Count", "X-Total-Pages", "X-Page", "X-Limit"],
 }));
 app.use(express.json());
-app.use(UPLOADS_PATH, express.static(path.resolve(__dirname, "../../uploads")));
+
+const BASE_UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(__dirname, "../../uploads");
+
+app.use(UPLOADS_PATH, express.static(BASE_UPLOAD_DIR));
 
 setupSwagger(app);
 app.use(requestContextMiddleware);

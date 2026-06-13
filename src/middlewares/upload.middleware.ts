@@ -2,10 +2,18 @@ import multer, { StorageEngine } from "multer";
 import { Request } from "express";
 import { createHash } from "crypto";
 import path from "path";
+import fs from "fs";
 
-const UPLOAD_DIR = path.resolve(__dirname, "../../uploads/profiles");
+const BASE_UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(__dirname, "../../uploads");
+
+const UPLOAD_DIR = path.join(BASE_UPLOAD_DIR, "profiles");
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/pjpeg", "image/png", "image/webp"];
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 const storage: StorageEngine = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
