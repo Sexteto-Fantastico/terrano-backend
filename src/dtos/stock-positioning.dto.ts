@@ -3,16 +3,6 @@ import { paginationFields } from "./common/pagination.dto";
 import { ProductResponseSchema, toProductResponse } from "./product.dto";
 import { StockLocationProduct } from "../infra/entities/stock-location-product.entity";
 
-export const StockPositioningQuerySchema = z.object({
-    query: z.object({
-        ...paginationFields,
-        search: z.string().optional().openapi({ example: "Steel" }),
-        stockLocationId: z.coerce.number().int().positive().optional().openapi({ example: 1 }),
-    })
-});
-
-export type StockPositioningQuery = z.infer<typeof StockPositioningQuerySchema>["query"];
-
 export enum StockPositioningStatus {
     ESGOTADO = "ESGOTADO",
     BAIXO = "BAIXO",
@@ -21,6 +11,17 @@ export enum StockPositioningStatus {
 }
 
 export const StockPositioningStatusSchema = z.enum(StockPositioningStatus).openapi({ example: StockPositioningStatus.ADEQUADO });
+
+export const StockPositioningQuerySchema = z.object({
+    query: z.object({
+        ...paginationFields,
+        search: z.string().optional().openapi({ example: "Steel" }),
+        stockLocationId: z.coerce.number().int().positive().optional().openapi({ example: 1 }),
+        status: z.nativeEnum(StockPositioningStatus).optional().openapi({ example: StockPositioningStatus.BAIXO }),
+    })
+});
+
+export type StockPositioningQuery = z.infer<typeof StockPositioningQuerySchema>["query"];
 
 export const StockPositioningResponseSchema = registry.register(
     "StockPositioningResponse",
