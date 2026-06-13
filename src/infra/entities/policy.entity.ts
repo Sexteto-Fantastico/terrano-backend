@@ -27,6 +27,9 @@ export class Policy extends TerranoBaseEntity implements IPolicy {
     resource: string;
 
     @Column({ type: "varchar", length: 50 })
+    module: string;
+
+    @Column({ type: "varchar", length: 50 })
     action: string;
 
     @ManyToMany(() => Role, (role) => role.policies)

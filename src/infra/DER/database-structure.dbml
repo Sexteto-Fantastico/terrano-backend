@@ -22,11 +22,11 @@ Enum exit_movement_category {
 Enum material_request_status {
   PENDING
   CANCELLED
-  REJECTED
+  DENIED
   APPROVED
   WAITING_PURCHASE
-  WAITING_DELIVERY
-  DELIVERED
+  WAITING_ARRIVAL
+  FINISHED
 }
 
 Table user {
@@ -40,8 +40,10 @@ Table user {
   requires_password_reset boolean [default: false]
   password_reset_token varchar(255)
   password_reset_token_expires_at datetime
-  role_id int
-  department_id int
+  role_id int [ref: > role.id]
+  department_id int [ref: > department.id]
+  policy_id int [ref: > policy.id]
+  profile_picture text
   created_by int [ref: > user.id]
   updated_by int [ref: > user.id]
   created_at datetime [not null, default: `now()`]
@@ -52,7 +54,7 @@ Table user {
 Table role {
   id int [pk, increment]
   name varchar(50) [unique]
-  description text
+  description VARCHAR(100)
   created_by int [ref: > user.id]
   updated_by int [ref: > user.id]
   created_at datetime [not null, default: `now()`]
@@ -63,9 +65,9 @@ Table role {
 Table policy {
   id int [pk, increment]
   name varchar(100) [unique]
-  description text
-  resource varchar(50)
-  action varchar(50)
+  description varchar(255)
+  resource varchar(100)
+  action varchar(255)
   created_by int [ref: > user.id]
   updated_by int [ref: > user.id]
   created_at datetime [not null, default: `now()`]
@@ -74,8 +76,14 @@ Table policy {
 }
 
 Table role_policies {
+  id int [pk, increment]
   role_id int [ref: > role.id]
   policy_id int [ref: > policy.id]
+  created_by int [ref: > user.id]
+  updated_by int [ref: > user.id]
+  created_at datetime [not null, default: `now()`]
+  updated_at datetime
+  deleted_at datetime
 }
 
 Table department {

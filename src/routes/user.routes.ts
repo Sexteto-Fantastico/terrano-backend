@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, uploadProfilePicture } from "../controllers/user.controller";
+import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, uploadProfilePicture, getMyPermissions } from "../controllers/user.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { getUserLogs } from "../controllers/system-log.controller";
 import { createRoute } from "../utils/route-builder";
@@ -13,10 +13,26 @@ import {
     RestoreUserBodySchema,
     UserResponseSchema,
     UserIdParamsSchema,
-    UserQuerySchema
+    UserQuerySchema,
+    UserPermissionsSchema
 } from "../dtos/user.dto";
 
 const router = Router();
+
+createRoute(router, {
+    method: HttpMethod.GET,
+    path: Endpoints.USERS.GET_MY_PERMISSIONS,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Get permissions of the authenticated user",
+    responses: {
+        200: {
+            description: "User permissions",
+            content: { [ContentType.JSON]: { schema: UserPermissionsSchema } }
+        },
+        404: { description: "User or role not found" }
+    }
+}, getMyPermissions);
 
 createRoute(router, {
     method: HttpMethod.POST,

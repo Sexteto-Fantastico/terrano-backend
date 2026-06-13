@@ -20,6 +20,7 @@ import { createSystemLogSeed } from "../seeds/system-log.seed";
 import { createErrorLogSeed } from "../seeds/error-log.seed";
 import { createStockRequisitionItemSeed } from "../seeds/stock-requisiton-item.seed";
 import { createMovementSeed } from "../seeds/movement.seed";
+import { createRolePoliciesSeed } from "../seeds/role-policy.seed";
 
 export async function migrateDatabase(): Promise<void> {
     try {
@@ -37,6 +38,7 @@ export async function migrateDatabase(): Promise<void> {
         await createRoleSeed()
         await createAdminSeed();
         await createPolicySeed()
+        await createRolePoliciesSeed();
         await createProductCategorySeed()
         await createProductBrandSeed()
         await createMeasurementUnitSeed()

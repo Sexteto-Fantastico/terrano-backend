@@ -42,6 +42,7 @@ export const Endpoints = {
         ...CRUD_ROUTES,
         CHANGE_PASSWORD: "/:id/password",
         UPLOAD_AVATAR: "/:id/avatar",
+        GET_MY_PERMISSIONS: "/me/permissions"
     },
 
     PRODUCT_CATEGORIES: {

@@ -9,9 +9,11 @@ import {
     UserResponse,
     toUserResponse,
     toUserResponseList,
+    UserPermissionsResponse,
+    toUserPermissionsResponse,
 } from "../dtos/user.dto";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
-import { createUser as repoCreateUser, getUserByUsername, getUserByEmail, getUserById as repoGetUserById, getAllUsers, updateUser as repoUpdateUser, deleteUser as repoDeleteUser, recoverUser as repoRecoverUser } from "../repositories/user.repository";
+import { createUser as repoCreateUser, getUserByUsername, getUserByEmail, getUserById as repoGetUserById, getAllUsers, updateUser as repoUpdateUser, deleteUser as repoDeleteUser, recoverUser as repoRecoverUser, getUserWithPermissions } from "../repositories/user.repository";
 import { getRoleById } from "../repositories/role.repository";
 import { getDepartmentById } from "../repositories/department.repository";
 
@@ -210,4 +212,13 @@ async function updateProfilePicture(id: number, filePath: string): Promise<UserR
     return toUserResponse(user);
 }
 
-export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, updateProfilePicture };
+async function getUserPermissions(userId: number): Promise<UserPermissionsResponse> {
+    const user = await getUserWithPermissions(userId);
+
+    if (!user) throw new NotFoundError("User not found");
+    if (!user.role) throw new NotFoundError("User has no role assigned");
+
+    return toUserPermissionsResponse(user.role.policies);
+}
+
+export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, updateProfilePicture, getUserPermissions };
