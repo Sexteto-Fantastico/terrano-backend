@@ -6,7 +6,7 @@ import { StockPositioningQuery } from "../dtos/stock-positioning.dto";
 const repository = AppDataSource.getRepository(StockLocationProduct);
 
 async function getStockPositionings(filters: StockPositioningQuery = {}): Promise<[StockLocationProduct[], number]> {
-    const { pageIndex, pageSize, stockLocationId, search } = filters;
+    const { pageIndex, pageSize, stockLocationId, search, status } = filters;
 
     const queryBuilder = repository.createQueryBuilder("slp")
         .leftJoinAndSelect("slp.product", "product")
@@ -23,6 +23,18 @@ async function getStockPositionings(filters: StockPositioningQuery = {}): Promis
         queryBuilder.andWhere(
             "(product.name LIKE :search OR product.code LIKE :search)",
             { search: `%${search}%` }
+        );
+    }
+
+    if (status) {
+        queryBuilder.andWhere(
+            `CASE
+                WHEN slp.quantity <= 0 THEN 'ESGOTADO'
+                WHEN product.min_stock IS NOT NULL AND slp.quantity < product.min_stock THEN 'BAIXO'
+                WHEN product.max_stock IS NOT NULL AND slp.quantity > product.max_stock THEN 'EXCESSO'
+                ELSE 'ADEQUADO'
+            END = :status`,
+            { status: filters.status }
         );
     }
 
