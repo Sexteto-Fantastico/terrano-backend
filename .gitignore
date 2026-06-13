@@ -42,3 +42,8 @@ nodejs-sample-kubernetes.yaml
 !tsconfig.json
 
 database.sqlite
+
+# Local uploads
+uploads/*
+!uploads/.gitkeep
+!uploads/profiles/.gitkeep

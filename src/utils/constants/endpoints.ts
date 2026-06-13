@@ -26,6 +26,8 @@ const CRUD_ROUTES = {
 
 export const API_PREFIX = "/api" as const;
 
+export const UPLOADS_PATH = "/uploads" as const;
+
 export const Endpoints = {
     AUTH: {
         BASE: `${API_PREFIX}/auth`,
@@ -39,6 +41,7 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/users`,
         ...CRUD_ROUTES,
         CHANGE_PASSWORD: "/:id/password",
+        UPLOAD_AVATAR: "/:id/avatar",
     },
 
     PRODUCT_CATEGORIES: {
