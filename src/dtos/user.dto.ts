@@ -1,6 +1,7 @@
 import { User } from "../infra/entities/user.entity";
 import { z, registry } from "../infra/config/openapi";
 import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
+import { Policy } from "../infra/entities/policy.entity";
 
 // ============ Reusable Schemas ============
 
@@ -133,6 +134,43 @@ export const UserResponseSchema = registry.register(
     })
 );
 
+export const UserPermissionsSchema = registry.register(
+    "UserPermissions",
+    z.object({
+        registers: z.array(z.object({
+            product: z.array(z.string()).openapi({ example: ["create", "read"] }),
+            productBrand: z.array(z.string()).openapi({ example: ["read"] }),
+            productCategory: z.array(z.string()).openapi({ example: ["read"] }),
+            stockLocation: z.array(z.string()).openapi({ example: ["read"] }),
+            supplier: z.array(z.string()).openapi({ example: ["read"] }),
+            department: z.array(z.string()).openapi({ example: ["read"] }),
+            measurementUnit: z.array(z.string()).openapi({ example: ["read"] }),
+        })).optional(),
+        requests: z.array(z.object({
+            materialRequester: z.array(z.string()).openapi({ example: ["create_update", "read" ]}),
+            materialRequestsManagement: z.array(z.string()).openapi({ example: ["read"] })
+        })).optional(),
+        transactions: z.array(z.object({
+            purchase: z.array(z.string()).openapi({ example: ["create_update", "read" ]}),
+            movementEntry: z.array(z.string()).openapi({ example: ["read"] }),
+            movementExit: z.array(z.string()).openapi({ example: ["read"] })
+        })).optional(),
+        reports: z.array(z.object({
+            stockPosition: z.array(z.string()).openapi({ example: ["read"] }),
+            productTrace: z.array(z.string()).openapi({ example: ["read"] }),
+        })).optional(),
+        accessControl: z.array(z.object({
+            user: z.array(z.string()).openapi({ example: ["create_update", "read" ]})
+        })).optional(),
+        notifications: z.array(z.object({
+            alert: z.array(z.string()).openapi({ example: ["create_update", "read" ]})
+        })).optional(),
+        logs: z.array(z.object({
+            tableLogs: z.array(z.string()).openapi({ example: ["read"] })
+        })).optional(),
+    })
+);
+
 // ============ Inferred Types ============
 
 export type Role = z.infer<typeof RoleResponseSchema>;
@@ -140,6 +178,10 @@ export type Role = z.infer<typeof RoleResponseSchema>;
 export type Department = z.infer<typeof DepartmentResponseSchema>;
 
 export type UserResponse = z.infer<typeof UserResponseSchema>;
+
+export type UserPermissionsResponse = z.infer<typeof UserPermissionsSchema>;
+
+type Action = "CREATE" | "READ" | "UPDATE" | "DELETE";
 
 // ============ Mapper Functions ============
 
@@ -162,4 +204,49 @@ export function toUserResponse(user: User): UserResponse {
 
 export function toUserResponseList(users: User[]): UserResponse[] {
     return users.map(toUserResponse);
+}
+
+
+function actionsOf(policies: Policy[], resource: string): string[] {
+    return policies
+        .filter(p => p.resource === resource)
+        .map(p => p.action);
+}
+
+export function toUserPermissionsResponse(policies: Policy[]): UserPermissionsResponse {
+    const a = (resource: string) => actionsOf(policies, resource);
+
+    return {
+        registers: [{
+            product:         a("PRODUCT"),
+            productBrand:    a("PRODUCT_BRAND"),
+            productCategory: a("PRODUCT_CATEGORY"),
+            stockLocation:   a("STOCK_LOCATION"),
+            supplier:        a("SUPPLIER"),
+            department:      a("DEPARTMENT"),
+            measurementUnit: a("MEASUREMENT_UNIT"),
+        }],
+        requests: [{
+            materialRequester:          a("MATERIAL_REQUESTER"),
+            materialRequestsManagement: a("MATERIAL_REQUESTS_MANAGEMENT"),
+        }],
+        transactions: [{
+            purchase:      a("PURCHASE"),
+            movementEntry: a("MOVEMENT_ENTRY"),
+            movementExit:  a("MOVEMENT_EXIT"),
+        }],
+        reports: [{
+            stockPosition: a("STOCK_POSITION"),
+            productTrace:  a("PRODUCT_TRACE"),
+        }],
+        accessControl: [{
+            user: a("USER"),
+        }],
+        notifications: [{
+            alert: a("ALERT"),
+        }],
+        logs: [{
+            tableLogs: a("TABLE_LOGS"),
+        }],
+    };
 }

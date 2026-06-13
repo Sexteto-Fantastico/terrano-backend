@@ -9,14 +9,14 @@ export async function createUserSeed(): Promise<void> {
     const roleRepository = AppDataSource.getRepository(Role);
     const departmentRepository = AppDataSource.getRepository(Department);
 
-    const employeeRole = await roleRepository.findOne({
+    const adminRole = await roleRepository.findOne({
         where: {
-            name: "EMPLOYEE",
+            name: "ADMIN",
         },
     });
 
-    if (!employeeRole) {
-        throw new Error("EMPLOYEE role not found");
+    if (!adminRole) {
+        throw new Error("ADMIN role not found");
     }
 
     const departments = await departmentRepository.find();
@@ -59,7 +59,7 @@ export async function createUserSeed(): Promise<void> {
             userRepository.create({
                 ...userData,
                 password: hashPassword("12345678"),
-                role: employeeRole,
+                role: adminRole,
                 department: departments[i % departments.length],
             })
         );

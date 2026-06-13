@@ -83,6 +83,13 @@ async function recoverUser(user: User): Promise<User> {
   return await userRepository.recover(user);
 }
 
+async function getUserWithPermissions(userId: number): Promise<User | null> {
+    return await userRepository.findOne({
+        where: { id: userId },
+        relations: ["role", "role.policies"],
+    });
+}
+
 export {
   createUser,
   getUserByUsername,
@@ -93,4 +100,5 @@ export {
   updateUser,
   deleteUser,
   recoverUser,
+  getUserWithPermissions,
 };

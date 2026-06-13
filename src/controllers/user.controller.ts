@@ -7,8 +7,10 @@ import {
     UserQuery,
     UpdateUserBody,
     UserResponse,
+    UserPermissionsResponse,
 } from "../dtos/user.dto";
 import { BadRequestError } from "../errors";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
 async function createUser(req: Request<unknown, UserResponse, CreateUserBody>, res: Response<UserResponse>) {
     const user = await UserService.createUser(req.body);
@@ -63,4 +65,10 @@ async function uploadProfilePicture(req: Request<{ id: string }>, res: Response<
     res.json(user);
 }
 
-export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, uploadProfilePicture };
+async function getMyPermissions(req: AuthenticatedRequest, res: Response<UserPermissionsResponse>) {
+    const userId = req.user!.id;
+    const permissions = await UserService.getUserPermissions(userId);
+    res.json(permissions);
+}
+
+export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, uploadProfilePicture, getMyPermissions };
