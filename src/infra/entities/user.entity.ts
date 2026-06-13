@@ -22,6 +22,7 @@ export interface IUser extends ITerranoBaseEntity {
     requires_password_reset?: boolean;
     password_reset_token?: string;
     password_reset_token_expires_at?: Date;
+    profile_picture?: string;
 }
 
 @Entity("user")
@@ -53,6 +54,9 @@ export class User extends TerranoBaseEntity implements IUser {
 
     @Column({ name: "password_reset_token_expires_at", type: "datetime", nullable: true })
     password_reset_token_expires_at?: Date;
+
+    @Column({ name: "profile_picture", type: "varchar", length: 255, nullable: true })
+    profile_picture?: string;
 
     @ManyToOne(() => Role)
     @JoinColumn({ name: "role_id" })

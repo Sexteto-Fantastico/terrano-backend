@@ -8,6 +8,7 @@ import {
     UpdateUserBody,
     UserResponse,
 } from "../dtos/user.dto";
+import { BadRequestError } from "../errors";
 
 async function createUser(req: Request<unknown, UserResponse, CreateUserBody>, res: Response<UserResponse>) {
     const user = await UserService.createUser(req.body);
@@ -50,4 +51,16 @@ async function restoreUser(req: Request<{ id: string }, UserResponse, { updatedB
     res.json(user);
 }
 
-export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser };
+async function uploadProfilePicture(req: Request<{ id: string }>, res: Response<UserResponse>) {
+    const id = Number(req.params.id);
+
+    if (!req.file) {
+        throw new BadRequestError("No file provided. Please upload an image file.");
+    }
+
+    const fileUrl = `/uploads/profiles/${req.file.filename}`;
+    const user = await UserService.updateProfilePicture(id, fileUrl);
+    res.json(user);
+}
+
+export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, uploadProfilePicture };

@@ -199,4 +199,15 @@ async function restoreUser(id: number, updatedBy?: number): Promise<UserResponse
     return toUserResponse(user);
 }
 
-export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser };
+async function updateProfilePicture(id: number, filePath: string): Promise<UserResponse> {
+    const user = await repoGetUserById(id);
+    if (!user) {
+        throw new NotFoundError("User not found.");
+    }
+
+    user.profile_picture = filePath;
+    await repoUpdateUser(user);
+    return toUserResponse(user);
+}
+
+export { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, updateProfilePicture };

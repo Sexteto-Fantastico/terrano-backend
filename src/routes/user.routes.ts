@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { z } from "zod";
-import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser } from "../controllers/user.controller";
+import { createUser, getUsers, getUserById, updateUser, changePassword, deleteUser, restoreUser, uploadProfilePicture } from "../controllers/user.controller";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { getUserLogs } from "../controllers/system-log.controller";
 import { createRoute } from "../utils/route-builder";
+import { uploadAvatar } from "../middlewares/upload.middleware";
 import {
     CreateUserBodySchema,
     UpdateUserBodySchema,
@@ -159,5 +160,25 @@ createRoute(router, {
         404: { description: "User not found" }
     }
 }, restoreUser);
+
+createRoute(router, {
+    method: HttpMethod.PATCH,
+    path: Endpoints.USERS.UPLOAD_AVATAR,
+    basePath: Endpoints.USERS.BASE,
+    tags: ["Users"],
+    summary: "Upload user profile picture",
+    request: {
+        params: UserIdParamsSchema.shape.params
+    },
+    responses: {
+        200: {
+            description: "Profile picture uploaded successfully",
+            content: { [ContentType.JSON]: { schema: UserResponseSchema } }
+        },
+        400: { description: "No file provided or invalid file type" },
+        404: { description: "User not found" }
+    },
+    middlewares: [uploadAvatar.single("avatar")]
+}, uploadProfilePicture);
 
 export default router;

@@ -2,6 +2,7 @@ import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 import { authMiddleware } from "./middlewares/auth.middleware";
@@ -19,7 +20,7 @@ import supplierRoutes from "./routes/supplier.routes";
 import homeRoutes from "./routes/home.routes";
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
-import { Endpoints } from "./utils/constants/endpoints";
+import { Endpoints, UPLOADS_PATH } from "./utils/constants/endpoints";
 import { globalErrorMiddleware } from "./middlewares/global-error.middleware";
 import { requestContextMiddleware } from "./utils/request-context";
 const app = express();
@@ -31,6 +32,7 @@ app.use(cors({
     exposedHeaders: ["X-Total-Count", "X-Total-Pages", "X-Page", "X-Limit"],
 }));
 app.use(express.json());
+app.use(UPLOADS_PATH, express.static(path.resolve(__dirname, "../../uploads")));
 
 setupSwagger(app);
 app.use(requestContextMiddleware);
