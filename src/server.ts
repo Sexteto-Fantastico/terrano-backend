@@ -17,6 +17,7 @@ import stockPositioningRoutes from "./routes/stock-positioning.routes";
 import purchaseRoutes from "./routes/purchase.routes";
 import movementRoutes from "./routes/movement.routes";
 import supplierRoutes from "./routes/supplier.routes";
+import productTrackingRoutes from "./routes/product-tracking.routes";
 import homeRoutes from "./routes/home.routes";
 import roleRoutes from "./routes/role.routes";
 import policyRoutes from "./routes/policy.routes";
@@ -60,6 +61,8 @@ app.use(Endpoints.SUPPLIERS.BASE, supplierRoutes);
 app.use(Endpoints.HOME.BASE, homeRoutes);
 app.use(Endpoints.ROLES.BASE, roleRoutes);
 app.use(Endpoints.POLICIES.BASE, policyRoutes);
+app.use(Endpoints.PRODUCT_TRACKING.BASE, productTrackingRoutes);
+
 
 app.use(globalErrorMiddleware);
 
