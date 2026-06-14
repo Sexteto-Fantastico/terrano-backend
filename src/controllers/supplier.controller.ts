@@ -2,46 +2,61 @@ import { Request, Response } from "express";
 import * as SupplierService from "../services/supplier.service";
 import { NotFoundError } from "../errors";
 import {
-    CreateSupplierBody,
-    UpdateSupplierBody,
+    CreateSupplier,
+    UpdateSupplier,
     SupplierResponse,
     SupplierQuery,
 } from "../dtos/supplier.dto";
 
-async function createSupplier(req: Request<{}, SupplierResponse, CreateSupplierBody>, res: Response<SupplierResponse>) {
-    const supplier = await SupplierService.createSupplier(req.body);
-    res.status(201).json(supplier);
-}
-
-async function getAllSuppliers(req: Request<{}, SupplierResponse[], {}, SupplierQuery>, res: Response<SupplierResponse[]>) {
-    const [suppliers, total] = await SupplierService.getAllSuppliers(req.query);
+async function getAllSuppliers(
+    req: Request<{}, SupplierResponse[], {}, SupplierQuery>,
+    res: Response<SupplierResponse[]>
+) {
+    const [data, total] = await SupplierService.getAllSuppliers(req.query);
     res.set("X-Total-Count", total.toString());
-    res.status(200).json(suppliers);
+    res.status(200).json(data);
 }
 
-async function getSupplierById(req: Request<{ id: string }, SupplierResponse>, res: Response<SupplierResponse>) {
+async function getSupplierById(
+    req: Request<{ id: string }, SupplierResponse>,
+    res: Response<SupplierResponse>
+) {
     const id = Number(req.params.id);
-    const supplier = await SupplierService.getSupplierById(id);
+    const data = await SupplierService.getSupplierById(id);
     
-    if (!supplier) {
+    if (!data) {
         throw new NotFoundError("Supplier not found");
     }
     
-    res.status(200).json(supplier);
+    res.status(200).json(data);
 }
 
-async function updateSupplier(req: Request<{ id: string }, SupplierResponse, UpdateSupplierBody>, res: Response<SupplierResponse>) {
+async function createSupplier(
+    req: Request<{}, SupplierResponse, CreateSupplier>,
+    res: Response<SupplierResponse>
+) {
+    const data = await SupplierService.createSupplier(req.body);
+    res.status(201).json(data);
+}
+
+async function updateSupplier(
+    req: Request<{ id: string }, SupplierResponse, UpdateSupplier>,
+    res: Response<SupplierResponse>
+) {
     const id = Number(req.params.id);
-    const supplier = await SupplierService.updateSupplier(id, req.body);
+    const data = await SupplierService.updateSupplier(id, req.body);
     
-    if (!supplier) {
+    if (!data) {
         throw new NotFoundError("Supplier not found");
     }
     
-    res.status(200).json(supplier);
+    res.status(200).json(data);
 }
 
-async function deleteSupplier(req: Request<{ id: string }>, res: Response) {
+async function deleteSupplier(
+    req: Request<{ id: string }>,
+    res: Response
+) {
     const id = Number(req.params.id);
     const success = await SupplierService.deleteSupplier(id);
     
@@ -52,22 +67,25 @@ async function deleteSupplier(req: Request<{ id: string }>, res: Response) {
     res.status(204).send();
 }
 
-async function restoreSupplier(req: Request<{ id: string }, SupplierResponse>, res: Response<SupplierResponse>) {
+async function restoreSupplier(
+    req: Request<{ id: string }, SupplierResponse>,
+    res: Response<SupplierResponse>
+) {
     const id = Number(req.params.id);
-    const supplier = await SupplierService.restoreSupplier(id);
+    const data = await SupplierService.restoreSupplier(id);
     
-    if (!supplier) {
+    if (!data) {
         throw new NotFoundError("Supplier not found or not deleted");
     }
     
-    res.status(200).json(supplier);
+    res.status(200).json(data);
 }
 
-export { 
-    createSupplier, 
-    getAllSuppliers, 
-    getSupplierById, 
-    updateSupplier, 
-    deleteSupplier, 
-    restoreSupplier 
+export {
+    getAllSuppliers,
+    getSupplierById,
+    createSupplier,
+    updateSupplier,
+    deleteSupplier,
+    restoreSupplier
 };

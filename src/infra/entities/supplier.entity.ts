@@ -34,7 +34,13 @@ export class Supplier extends TerranoBaseEntity implements ISupplier {
     @OneToMany(() => Purchase, (p) => p.supplier)
     purchases: Purchase[];
 
-    @OneToOne(() => Address, (address) => address.supplier)
+    @OneToOne(
+        () => Address,
+        (address) => address.supplier,
+        {
+            cascade: true,
+        }
+    )
     address: Address;
 
     constructor(supplier: ISupplier) {
