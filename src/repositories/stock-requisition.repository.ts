@@ -74,6 +74,10 @@ async function updateStockRequisition(requisition: StockRequisition) {
     return repository.save(requisition);
 }
 
+async function updateStockRequisitionStatus(id: number, status: RequisitionStatus) {
+  await repository.update(id, { status });
+}
+
 async function deleteStockRequisition(id: number) {
     const result = await repository.softDelete(id);
     return result.affected === 1;
@@ -91,4 +95,5 @@ export {
     updateStockRequisition,
     deleteStockRequisition,
     restoreStockRequisition,
+    updateStockRequisitionStatus
 };

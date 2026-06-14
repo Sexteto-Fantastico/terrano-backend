@@ -126,16 +126,14 @@ async function updateStockRequisitionStatus(
 
     const log = new StockRequisitionStatusLog({} as any);
 
-    log.stock_requisition_id = requisition.id;
     log.previous_status = requisition.status;
     log.current_status = data.status;
     log.change_justification = data.changeJustification;
+    log.stock_requisition = requisition;
 
     await statusLogRepository.save(log);
 
-    requisition.status = data.status;
-
-    await StockRequisitionRepository.updateStockRequisition(requisition);
+    await StockRequisitionRepository.updateStockRequisitionStatus(id, data.status);
 
     const updated =
         await StockRequisitionRepository.getStockRequisitionById(id);
