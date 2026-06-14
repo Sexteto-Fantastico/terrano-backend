@@ -35,12 +35,14 @@ createRoute(router, {
             description: "The created stock location",
             content: { [ContentType.JSON]: { schema: StockLocationResponseSchema } }
         }
-    }
+    },
+    permissions: { resource: "STOCK_LOCATION", action: "CREATE" },
 }, createStockLocation);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.STOCK_LOCATIONS.GET_ALL,
+    permissions: { resource: "STOCK_LOCATION", action: "READ" },
     basePath: Endpoints.STOCK_LOCATIONS.BASE,
     tags: ["Stock Locations"],
     summary: "Returns the list of stock locations",
@@ -71,12 +73,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: StockLocationResponseSchema } }
         },
         404: { description: "Stock location not found" }
-    }
+    },
+    permissions: { resource: "STOCK_LOCATION", action: "READ" },
 }, getStockLocationById);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.STOCK_LOCATIONS.GET_LOGS,
+    permissions: { resource: "STOCK_LOCATION", action: "READ" },
     basePath: Endpoints.STOCK_LOCATIONS.BASE,
     tags: ["Stock Locations"],
     summary: "Get logs for a stock location",
@@ -104,12 +108,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: StockLocationResponseSchema } }
         },
         404: { description: "Stock location not found" }
-    }
+    },
+    permissions: { resource: "STOCK_LOCATION", action: "UPDATE" },
 }, updateStockLocation);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.STOCK_LOCATIONS.DELETE,
+    permissions: { resource: "STOCK_LOCATION", action: "DELETE" },
     basePath: Endpoints.STOCK_LOCATIONS.BASE,
     tags: ["Stock Locations"],
     summary: "Soft delete a stock location",
@@ -136,7 +142,8 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: StockLocationResponseSchema } }
         },
         404: { description: "Stock location not found" }
-    }
+    },
+    permissions: { resource: "STOCK_LOCATION", action: "UPDATE" },
 }, restoreStockLocation);
 
 export default router;

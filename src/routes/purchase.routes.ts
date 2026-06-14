@@ -27,12 +27,14 @@ createRoute(router, {
 	responses: {
 		200: { description: "The list of purchases" },
 	},
+    permissions: { resource: "PURCHASE", action: "READ" },
 }, getAllPurchases);
 
 
 createRoute(router, {
-	method: HttpMethod.GET,
-	path: Endpoints.PURCHASES.GET_BY_ID,
+    method: HttpMethod.GET,
+    path: Endpoints.PURCHASES.GET_BY_ID,
+    permissions: { resource: "PURCHASE", action: "READ" },
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Get a purchase by id",
@@ -48,10 +50,12 @@ createRoute(router, {
 	summary: "Create a purchase",
 	request: { body: { content: { [ContentType.JSON]: { schema: createPurchaseSchema } } } },
 	responses: { 201: { description: "Created" }, 400: { description: "Validation error" } },
+    permissions: { resource: "PURCHASE", action: "CREATE" },
 }, createPurchase);
 
 createRoute(router, {
-	method: HttpMethod.PUT,
+    method: HttpMethod.PUT,
+    permissions: { resource: "PURCHASE", action: "UPDATE" },
 	path: Endpoints.PURCHASES.UPDATE,
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
@@ -68,11 +72,13 @@ createRoute(router, {
 	summary: "Delete a purchase",
 	request: { params: PurchaseIdSchema.shape.params },
 	responses: { 200: { description: "Deleted" }, 404: { description: "Purchase not found" } },
+    permissions: { resource: "PURCHASE", action: "DELETE" },
 }, deletePurchase);
 
 createRoute(router, {
-	method: HttpMethod.POST,
-	path: Endpoints.PURCHASES.RESTORE,
+    method: HttpMethod.POST,
+    path: Endpoints.PURCHASES.RESTORE,
+    permissions: { resource: "PURCHASE", action: "UPDATE" },
 	basePath: Endpoints.PURCHASES.BASE,
 	tags: ["Purchases"],
 	summary: "Restore a deleted purchase",
@@ -104,6 +110,7 @@ createRoute(router, {
         400: { description: "Validation error, mismatch in items, or purchase already received" }, 
         404: { description: "Purchase, product, or stock location not found" } 
     },
+    permissions: { resource: "PURCHASE", action: "UPDATE" },
 }, receivePurchase);
 
 export default router;

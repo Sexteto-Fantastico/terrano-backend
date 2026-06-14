@@ -110,4 +110,15 @@ export const Endpoints = {
         METRICS: "/metrics",
         EXPORT: "/export",
     },
+
+    ROLES: {
+        BASE: `${API_PREFIX}/roles`,
+        ...CRUD_ROUTES,
+        ASSIGN_POLICIES: "/:id/policies",
+    },
+
+    POLICIES: {
+        BASE: `${API_PREFIX}/policies`,
+        GET_ALL: "/",
+    },
 } as const;

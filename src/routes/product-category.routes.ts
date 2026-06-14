@@ -28,12 +28,14 @@ createRoute(router, {
             description: "The created product category",
             content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
         }
-    }
+    },
+    permissions: { resource: "PRODUCT_CATEGORY", action: "CREATE" },
 }, createProductCategory);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.PRODUCT_CATEGORIES.GET_ALL,
+    permissions: { resource: "PRODUCT_CATEGORY", action: "READ" },
     basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
     tags: ["Product Categories"],
     summary: "Returns the list of all product categories",
@@ -63,12 +65,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
         },
         404: { description: "Product category not found" }
-    }
+    },
+    permissions: { resource: "PRODUCT_CATEGORY", action: "READ" },
 }, getProductCategoryById);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.PRODUCT_CATEGORIES.GET_LOGS,
+    permissions: { resource: "PRODUCT_CATEGORY", action: "READ" },
     basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
     tags: ["Product Categories"],
     summary: "Get logs for a product category",
@@ -96,12 +100,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
         },
         404: { description: "Product category not found" }
-    }
+    },
+    permissions: { resource: "PRODUCT_CATEGORY", action: "UPDATE" },
 }, updateProductCategory);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.PRODUCT_CATEGORIES.DELETE,
+    permissions: { resource: "PRODUCT_CATEGORY", action: "DELETE" },
     basePath: Endpoints.PRODUCT_CATEGORIES.BASE,
     tags: ["Product Categories"],
     summary: "Soft delete a product category",
@@ -128,7 +134,8 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: ProductCategoryResponseSchema } }
         },
         404: { description: "Product category not found" }
-    }
+    },
+    permissions: { resource: "PRODUCT_CATEGORY", action: "UPDATE" },
 }, restoreProductCategory);
 
 export default router;

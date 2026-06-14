@@ -18,6 +18,8 @@ import purchaseRoutes from "./routes/purchase.routes";
 import movementRoutes from "./routes/movement.routes";
 import supplierRoutes from "./routes/supplier.routes";
 import homeRoutes from "./routes/home.routes";
+import roleRoutes from "./routes/role.routes";
+import policyRoutes from "./routes/policy.routes";
 import { migrateDatabase } from "./infra/config/migration-manager";
 import { setupSwagger } from "./infra/config/swagger";
 import { Endpoints, UPLOADS_PATH } from "./utils/constants/endpoints";
@@ -56,7 +58,8 @@ app.use(Endpoints.PURCHASES.BASE, purchaseRoutes);
 app.use(Endpoints.MOVEMENTS.BASE, movementRoutes);
 app.use(Endpoints.SUPPLIERS.BASE, supplierRoutes);
 app.use(Endpoints.HOME.BASE, homeRoutes);
-
+app.use(Endpoints.ROLES.BASE, roleRoutes);
+app.use(Endpoints.POLICIES.BASE, policyRoutes);
 
 app.use(globalErrorMiddleware);
 

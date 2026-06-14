@@ -3,6 +3,7 @@ import { ZodType } from "zod";
 import { z, registry } from "../infra/config/openapi";
 import { asyncHandler } from "./async-handler";
 import { validateRequest } from "../middlewares/validate.middleware";
+import { requirePermission } from "../middlewares/permission.middleware";
 
 import { HttpMethod } from "./constants/endpoints";
 
@@ -13,6 +14,7 @@ export interface RouteConfig extends Omit<OpenAPIRouteConfig, "path" | "method">
     path: string;
     basePath?: string;
     middlewares?: RequestHandler[];
+    permissions?: { resource: string; action: string };
 }
 
 export function createRoute(
@@ -36,6 +38,10 @@ export function createRoute(
 
     if (middlewares.length > 0) {
         handlers.push(...middlewares);
+    }
+
+    if (config.permissions) {
+        handlers.push(requirePermission(config.permissions.resource, config.permissions.action));
     }
 
     if (config.request) {

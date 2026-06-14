@@ -65,6 +65,7 @@ createRoute(router, {
             }
         }
     },
+    permissions: { resource: "MOVEMENT_EXIT", action: "READ" },
 }, getMovementExits);
 
 createRoute(router, {
@@ -83,12 +84,14 @@ createRoute(router, {
         },
         400: { description: "Invalid ID format" },
         404: { description: "Movement exit not found" }
-    }
+    },
+    permissions: { resource: "MOVEMENT_EXIT", action: "READ" },
 }, getMovementExitById);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.MOVEMENTS.EXIT_DELETE,
+    permissions: { resource: "MOVEMENT_EXIT", action: "DELETE" },
     basePath: Endpoints.MOVEMENTS.BASE,
     tags: ["Movements"],
     summary: "Delete a specific stock exit movement by ID",
@@ -141,6 +144,7 @@ createRoute(router, {
             }
         }
     },
+    permissions: { resource: "MOVEMENT_ENTRY", action: "READ" },
 }, getMovementEntries);
 
 createRoute(router, {
@@ -159,7 +163,8 @@ createRoute(router, {
         },
         400: { description: "Invalid ID format" },
         404: { description: "Movement entry not found" }
-    }
+    },
+    permissions: { resource: "MOVEMENT_ENTRY", action: "READ" },
 }, getMovementEntryById);
 
 export default router;

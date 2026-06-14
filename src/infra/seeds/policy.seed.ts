@@ -69,8 +69,9 @@ export async function createPolicySeed(): Promise<void> {
         { name: "MOVEMENT_EXIT_DELETE",  description: "Excluir saídas de movimento",  resource: "MOVEMENT_EXIT",  module: "TRANSACTIONS", action: "DELETE" },
 
         // ── REPORTS ───────────────────────────────────────────────────────────
-        { name: "STOCK_POSITION_READ",  description: "Visualizar posição de estoque",  resource: "STOCK_POSITION", module: "REPORTS", action: "READ" },
-        { name: "PRODUCT_TRACE_READ",   description: "Visualizar rastreamento de produto", resource: "PRODUCT_TRACE", module: "REPORTS", action: "READ" },
+        { name: "DASHBOARD_READ",       description: "Visualizar dashboard",               resource: "DASHBOARD",      module: "REPORTS",  action: "READ" },
+        { name: "STOCK_POSITION_READ",  description: "Visualizar posição de estoque",      resource: "STOCK_POSITION", module: "REPORTS", action: "READ" },
+        { name: "PRODUCT_TRACE_READ",   description: "Visualizar rastreamento de produto", resource: "PRODUCT_TRACE",   module: "REPORTS", action: "READ" },
 
         // ── ACCESS CONTROL ────────────────────────────────────────────────────
         { name: "USER_CREATE",          description: "Criar usuários",               resource: "USER",           module: "ACCESS_CONTROL", action: "CREATE" },

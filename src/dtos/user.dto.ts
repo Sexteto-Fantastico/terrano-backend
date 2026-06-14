@@ -81,6 +81,7 @@ export const UserQuerySchema = z.object({
         name: z.string().optional(),
         cpf: z.string().optional(),
         departmentId: z.coerce.number().int().positive().optional(),
+        roleId: z.coerce.number().int().positive().optional(),
         activeOnly: activeOnlyField,
     })
 });

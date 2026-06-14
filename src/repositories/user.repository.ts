@@ -50,6 +50,9 @@ async function getAllUsers(filters: UserQuery = {}): Promise<[User[], number]> {
   if (filters.departmentId) {
     where.department = { id: filters.departmentId };
   }
+  if (filters.roleId) {
+    where.role = { id: filters.roleId };
+  }
 
   const options: FindManyOptions<User> = {
     where,
