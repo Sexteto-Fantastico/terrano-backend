@@ -157,6 +157,7 @@ export const UserPermissionsSchema = registry.register(
             movementExit: z.array(z.string()).openapi({ example: ["read"] })
         })).optional(),
         reports: z.array(z.object({
+            dashboard: z.array(z.string()).openapi({ example: ["read"] }),
             stockPosition: z.array(z.string()).openapi({ example: ["read"] }),
             productTrace: z.array(z.string()).openapi({ example: ["read"] }),
         })).optional(),
@@ -237,6 +238,7 @@ export function toUserPermissionsResponse(policies: Policy[]): UserPermissionsRe
             movementExit:  a("MOVEMENT_EXIT"),
         }],
         reports: [{
+            dashboard:     a("DASHBOARD"),
             stockPosition: a("STOCK_POSITION"),
             productTrace:  a("PRODUCT_TRACE"),
         }],
