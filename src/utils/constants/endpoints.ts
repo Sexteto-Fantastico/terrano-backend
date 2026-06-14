@@ -103,7 +103,6 @@ export const Endpoints = {
         ...CRUD_ROUTES,
 	UPDATE_STATUS: "/:id/status",
     },
-
     STOCK_POSITIONINGS: {
         BASE: `${API_PREFIX}/stock-positionings`,
         GET_ALL: "/",
@@ -121,4 +120,8 @@ export const Endpoints = {
         BASE: `${API_PREFIX}/policies`,
         GET_ALL: "/",
     },
+    PRODUCT_TRACKING: {
+    BASE: `${API_PREFIX}/product-tracking`,
+    GET_REPORT: "/",
+},
 } as const;
