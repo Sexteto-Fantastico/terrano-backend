@@ -60,7 +60,8 @@ async function createStockRequisition(data: CreateStockRequisitionDto) {
         items,
     });
 
-    return toStockRequisitionResponseDto(saved);
+    const requisition = await StockRequisitionRepository.getStockRequisitionById(saved.id);
+    return toStockRequisitionResponseDto(requisition!);
 }
 
 async function updateStockRequisition(id: number, data: UpdateStockRequisitionDto) {
