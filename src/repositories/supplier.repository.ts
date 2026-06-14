@@ -56,6 +56,20 @@ async function getSupplierById(id: number, withDeleted: boolean = false): Promis
     });
 }
 
+async function getSupplierByEmail(email: string): Promise<Supplier | null> {
+    return await supplierRepository.findOne({
+        where: { email },
+        withDeleted: true,
+    });
+}
+
+async function getSupplierByCnpj(cnpj: string): Promise<Supplier | null> {
+    return await supplierRepository.findOne({
+        where: { cnpj },
+        withDeleted: true,
+    });
+}
+
 async function updateSupplier(supplier: Supplier): Promise<Supplier> {
     return await supplierRepository.save(supplier);
 }
@@ -73,6 +87,8 @@ export {
     createSupplier, 
     getAllSuppliers, 
     getSupplierById, 
+    getSupplierByEmail,
+    getSupplierByCnpj, 
     updateSupplier, 
     deleteSupplier, 
     restoreSupplier 

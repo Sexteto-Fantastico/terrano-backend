@@ -1,80 +1,176 @@
-import { Supplier, ISupplier } from "../infra/entities/supplier.entity";
+import { Supplier } from "../infra/entities/supplier.entity";
+import { Address } from "../infra/entities/address.entity";
+import { NotFoundError, BadRequestError } from "../errors/app-error";
 import {
+    CreateSupplier,
+    UpdateSupplier,
     SupplierResponse,
-    CreateSupplierBody,
-    UpdateSupplierBody,
     SupplierQuery,
     toSupplierResponse,
     toSupplierResponseList,
 } from "../dtos/supplier.dto";
 import * as SupplierRepository from "../repositories/supplier.repository";
+import * as AddressRepository from "../repositories/address.repository";
 
-async function createSupplier(data: CreateSupplierBody): Promise<SupplierResponse> {
-
-    const entityData = {
-        corporate_name: data.corporateName,
-        trade_name: data.tradeName,
-        cnpj: data.cnpj,
-        email: data.email,
-        phone: data.phone,
-    } as Supplier;
-
-    const supplier = await SupplierRepository.createSupplier(entityData);
-    const loaded = await SupplierRepository.getSupplierById(supplier.id as number);
-    
-    return toSupplierResponse(loaded!);
-}
-
-async function getAllSuppliers(filters: SupplierQuery = {}): Promise<[SupplierResponse[], number]> {
+async function getAllSuppliers(
+    filters: SupplierQuery = {}
+): Promise<[SupplierResponse[], number]> {
     const [suppliers, total] = await SupplierRepository.getAllSuppliers(filters);
     return [toSupplierResponseList(suppliers), total];
 }
 
-async function getSupplierById(id: number): Promise<SupplierResponse | null> {
-    const supplier = await SupplierRepository.getSupplierById(id, true);
-    if (!supplier) return null;
-    return toSupplierResponse(supplier);
+async function getSupplierById(
+    id: number
+): Promise<SupplierResponse> {
+    const entity = await SupplierRepository.getSupplierById(id, true);
+
+    if (!entity) {
+        throw new NotFoundError("Supplier not found");
+    }
+
+    return toSupplierResponse(entity);
 }
 
-async function updateSupplier(id: number, data: UpdateSupplierBody): Promise<SupplierResponse | null> {
-    const supplier = await SupplierRepository.getSupplierById(id, true);
-    if (!supplier) return null;
+async function createSupplier(
+    data: CreateSupplier
+): Promise<SupplierResponse> {
+    const { address, ...supplierData } = data;
 
-    if (data.corporateName !== undefined) supplier.corporate_name = data.corporateName;
-    if (data.tradeName !== undefined) supplier.trade_name = data.tradeName;
-    if (data.cnpj !== undefined) supplier.cnpj = data.cnpj;
-    if (data.email !== undefined) supplier.email = data.email;
-    if (data.phone !== undefined) supplier.phone = data.phone;
+    const emailExists = await SupplierRepository.getSupplierByEmail(supplierData.email);
+    if (emailExists) {
+        throw new BadRequestError("Já existe um fornecedor cadastrado com este e-mail.");
+    }
 
-    await SupplierRepository.updateSupplier(supplier);
+    const cnpjExists = await SupplierRepository.getSupplierByCnpj(supplierData.cnpj);
+    if (cnpjExists) {
+        throw new BadRequestError("Já existe um fornecedor cadastrado com este CNPJ.");
+    }
 
-    const loaded = await SupplierRepository.getSupplierById(id, true);
+    const supplier = new Supplier({
+        corporate_name: supplierData.corporateName,
+        trade_name: supplierData.tradeName,
+        cnpj: supplierData.cnpj,
+        email: supplierData.email,
+        phone: supplierData.phone,
+    });
+
+    const savedSupplier = await SupplierRepository.createSupplier(supplier);
+
+    if (address) {
+        await AddressRepository.saveAddress(new Address({
+            street: address.street,
+            number: address.number,
+            neighborhood: address.neighborhood,
+            city: address.city,
+            state: address.state,
+            country: address.country,
+            complement: address.complement,
+            supplier: savedSupplier
+        }));
+    }
+
+    const loaded = await SupplierRepository.getSupplierById(
+        savedSupplier.id as number,
+        true
+    );
+
     return toSupplierResponse(loaded!);
 }
 
-async function deleteSupplier(id: number): Promise<boolean> {
-    const supplier = await SupplierRepository.getSupplierById(id, false);
-    if (!supplier) return false;
+async function updateSupplier(
+    id: number,
+    data: UpdateSupplier
+): Promise<SupplierResponse> {
+    const existing = await SupplierRepository.getSupplierById(id, true);
+
+    if (!existing) {
+        throw new NotFoundError("Supplier not found");
+    }
+
+    const { address, corporateName, tradeName, cnpj, email, phone } = data;
+
+    if (email && email !== existing.email) {
+        const emailExists = await SupplierRepository.getSupplierByEmail(email);
+        if (emailExists) {
+            throw new BadRequestError("Este e-mail já está em uso por outro fornecedor.");
+        }
+    }
+
+    if (cnpj && cnpj !== existing.cnpj) {
+        const cnpjExists = await SupplierRepository.getSupplierByCnpj(cnpj);
+        if (cnpjExists) {
+            throw new BadRequestError("Este CNPJ já está em uso por outro fornecedor.");
+        }
+    }
+
+    const updateData = {
+        ...(corporateName !== undefined && { corporate_name: corporateName }),
+        ...(tradeName !== undefined && { trade_name: tradeName }),
+        ...(cnpj !== undefined && { cnpj }),
+        ...(email !== undefined && { email }),
+        ...(phone !== undefined && { phone }),
+    };
+
+    Object.assign(existing, updateData);
     
-    await SupplierRepository.deleteSupplier(supplier);
+    const savedSupplier = await SupplierRepository.updateSupplier(existing);
+
+    if (address) {
+        if (!existing.address) {
+            await AddressRepository.saveAddress(new Address({
+                street: address.street ?? "",
+                number: address.number ?? "",
+                neighborhood: address.neighborhood ?? "",
+                city: address.city ?? "",
+                state: address.state ?? "",
+                country: address.country ?? "",
+                complement: address.complement,
+                supplier: savedSupplier
+            }));
+        } else {
+            Object.assign(existing.address, address);
+            await AddressRepository.saveAddress(existing.address);
+        }
+    }
+
+    const loaded = await SupplierRepository.getSupplierById(id, true);
+
+    return toSupplierResponse(loaded!);
+}
+
+async function deleteSupplier(
+    id: number
+): Promise<boolean> {
+    const existing = await SupplierRepository.getSupplierById(id, false);
+
+    if (!existing) {
+        throw new NotFoundError("Supplier not found");
+    }
+
+    await SupplierRepository.deleteSupplier(existing);
+
     return true;
 }
 
-async function restoreSupplier(id: number): Promise<SupplierResponse | null> {
-    const supplier = await SupplierRepository.getSupplierById(id, true);
+async function restoreSupplier(
+    id: number
+): Promise<SupplierResponse> {
+    const existing = await SupplierRepository.getSupplierById(id, true);
 
-    if (!supplier) return null;
-    if (!supplier.deleted_at) return null;
+    if (!existing || !existing.deleted_at) {
+        throw new NotFoundError("Supplier not found or not deleted");
+    }
 
-    await SupplierRepository.restoreSupplier(supplier);
-    return toSupplierResponse(supplier);
+    await SupplierRepository.restoreSupplier(existing);
+
+    return toSupplierResponse(existing);
 }
 
-export { 
-    createSupplier, 
-    getAllSuppliers, 
-    getSupplierById, 
-    updateSupplier, 
-    deleteSupplier, 
-    restoreSupplier 
+export {
+    getAllSuppliers,
+    getSupplierById,
+    createSupplier,
+    updateSupplier,
+    deleteSupplier,
+    restoreSupplier,
 };

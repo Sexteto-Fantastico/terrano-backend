@@ -11,6 +11,8 @@ export interface IAddress extends ITerranoBaseEntity {
     state: string;
     country: string;
     complement?: string;
+    supplier?: Supplier;
+    stock_location?: StockLocation;
 }
 
 @Entity("address")
