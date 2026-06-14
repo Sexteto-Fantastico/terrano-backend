@@ -9,7 +9,8 @@ import {
     getMovementEntryById,
     getMovementExits,
     getMovementExitById,
-    deleteMovementExit
+    deleteMovementExit,
+    deleteMovementEntry,
 } from "../controllers/movement.controller";
 import {
     CreateMovementExitBodySchema,
@@ -19,6 +20,7 @@ import {
     MovementEntryResponseSchema,
     MovementEntryIdSchema,
     MovementExitQuerySchema,
+    MovementEntryQuerySchema,
 } from "../dtos/movement.dto";
 
 const router = Router();
@@ -110,7 +112,7 @@ createRoute(router, {
     path: Endpoints.MOVEMENTS.ENTRY,
     basePath: Endpoints.MOVEMENTS.BASE,
     tags: ["Movements"],
-    summary: "Create a direct stock entry movement (e.g. for purchases or manual adjustment)",
+    summary: "Create a stock entry movement",
     request: {
         body: { content: { [ContentType.JSON]: { schema: CreateMovementEntryBodySchema } } }
     },
@@ -134,6 +136,9 @@ createRoute(router, {
     basePath: Endpoints.MOVEMENTS.BASE,
     tags: ["Movements"],
     summary: "List all stock entry movements",
+    request: {
+        query: MovementEntryQuerySchema.shape.query
+    },
     responses: {
         200: {
             description: "List of entry movements",
@@ -166,5 +171,22 @@ createRoute(router, {
     },
     permissions: { resource: "MOVEMENT_ENTRY", action: "READ" },
 }, getMovementEntryById);
+
+createRoute(router, {
+    method: HttpMethod.DELETE,
+    path: Endpoints.MOVEMENTS.ENTRY_DELETE,
+    permissions: { resource: "MOVEMENT_ENTRY", action: "DELETE" },
+    basePath: Endpoints.MOVEMENTS.BASE,
+    tags: ["Movements"],
+    summary: "Inactivate a stock entry movement and revert stock balance",
+    request: {
+        params: MovementEntryIdSchema.shape.params
+    },
+    responses: {
+        204: { description: "Entry movement inactivated successfully" },
+        400: { description: "Entry is already inactive or has active returns" },
+        404: { description: "Movement entry not found" }
+    }
+}, deleteMovementEntry);
 
 export default router;

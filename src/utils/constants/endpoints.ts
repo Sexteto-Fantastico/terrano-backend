@@ -91,6 +91,7 @@ export const Endpoints = {
         EXIT_DELETE: "/exit/:id",
         ENTRY: "/entry",
         ENTRY_GET_BY_ID: "/entry/:id",
+        ENTRY_DELETE: "/entry/:id",
     },
 
     HOME: {

@@ -18,6 +18,7 @@ export interface IMovementEntry extends ITerranoBaseEntity {
     entryDate: Date;
     entryMovementCategory: EntryMovementCategory;
     purchase?: Purchase | null;
+    internalNotes?: string | null;
 }
 
 @Entity("movement_entry")
@@ -36,6 +37,9 @@ export class MovementEntry extends TerranoBaseEntity implements IMovementEntry {
     @ManyToOne(() => Purchase, { nullable: true })
     @JoinColumn({ name: "purchase_id" })
     purchase: Purchase | null;
+
+    @Column({ name: "internal_notes", type: "text", nullable: true })
+    internalNotes: string | null;
 
     @OneToMany(() => Movement, (movement) => movement.movement_entry)
     movements: Movement[];
