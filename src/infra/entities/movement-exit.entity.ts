@@ -9,6 +9,7 @@ import { TerranoBaseEntity, ITerranoBaseEntity } from "../config/terrano-base-en
 import { Purchase } from "./purchase.entity";
 import { StockRequisition } from "./stock-requisition.entity";
 import { Movement } from "./movement.entity";
+import { MovementEntry } from "./movement-entry.entity";
 
 export enum ExitMovementCategory {
     MATERIAL_REQUEST = "MATERIAL_REQUEST",
@@ -24,6 +25,9 @@ export interface IMovementExit extends ITerranoBaseEntity {
     purchase?: Purchase | null;
     stockRequisition?: StockRequisition | null;
     internalNotes?: string | null;
+    nfNumber?: string | null;
+    nfSerie?: string | null;
+    movementEntry?: MovementEntry | null;
 }
 
 @Entity("movement_exit")
@@ -49,6 +53,16 @@ export class MovementExit extends TerranoBaseEntity implements IMovementExit {
 
     @Column({ name: "internal_notes", type: "text", nullable: true })
     internalNotes: string | null;
+
+    @Column({ name: "nf_number", type: "varchar", length: 50, nullable: true })
+    nfNumber: string | null;
+
+    @Column({ name: "nf_serie", type: "varchar", length: 50, nullable: true })
+    nfSerie: string | null;
+
+    @ManyToOne(() => MovementEntry, { nullable: true })
+    @JoinColumn({ name: "movement_entry_id" })
+    movementEntry: MovementEntry | null;
 
     @OneToMany(() => Movement, (movement) => movement.movement_exit)
     movements: Movement[];

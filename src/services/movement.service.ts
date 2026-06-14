@@ -5,15 +5,16 @@ import { MovementExit } from "../infra/entities/movement-exit.entity";
 import { StockBalance } from "../infra/entities/stock-balance.entity";
 import { Product } from "../infra/entities/product.entity";
 import { StockLocation } from "../infra/entities/stock-location.entity";
-import { CreateMovementExitBody, CreateMovementEntryBody, MovementExitQuery } from "../dtos/movement.dto";
+import { CreateMovementExitBody, CreateMovementEntryBody, MovementExitQuery, MovementEntryQuery } from "../dtos/movement.dto";
 import { MovementEntry } from "../infra/entities/movement-entry.entity";
 import { Purchase } from "../infra/entities/purchase.entity";
 import { StockRequisition, RequisitionStatus } from "../infra/entities/stock-requisition.entity";
 import { ExitMovementCategory } from "../infra/entities/movement-exit.entity";
+import { IsNull } from "typeorm";
 import { getMovementEntries, getMovementEntryById, getMovementExitById, getMovementExits } from "../repositories/movement.repository";
 
 async function createMovementExit(data: CreateMovementExitBody): Promise<MovementExit> {
-    const { stockLocationId, category, internalNotes, stockRequisitionId, items } = data;
+    const { stockLocationId, category, internalNotes, stockRequisitionId, movementEntryId, nfNumber, nfSerie, items } = data;
 
     return await AppDataSource.manager.transaction(async (manager) => {
         const location = await manager.findOne(StockLocation, { where: { id: stockLocationId } });
@@ -31,12 +32,21 @@ async function createMovementExit(data: CreateMovementExitBody): Promise<Movemen
             await manager.save(stockRequisition);
         }
 
+        let movementEntry = null;
+        if (movementEntryId) {
+            movementEntry = await manager.findOne(MovementEntry, { where: { id: movementEntryId } });
+            if (!movementEntry) throw new NotFoundError("Movement entry not found");
+        }
+
         const movementExit = new MovementExit({
             exitDate: new Date(),
             exitMovementCategory: category,
             internalNotes: internalNotes || null,
+            nfNumber: nfNumber || null,
+            nfSerie: nfSerie || null,
             purchase: null,
-            stockRequisition: stockRequisition
+            stockRequisition: stockRequisition,
+            movementEntry: movementEntry,
         });
         const savedExit = await manager.save(movementExit);
 
@@ -134,61 +144,68 @@ async function deleteMovementExit(id: number): Promise<void> {
 }
 
 async function createMovementEntry(data: CreateMovementEntryBody): Promise<MovementEntry> {
-    const { productId, stockLocationId, quantity, category, purchaseId } = data;
+    const { stockLocationId, category, entryDate, purchaseId, internalNotes, items } = data;
 
     return await AppDataSource.manager.transaction(async (manager) => {
-        const product = await manager.findOne(Product, { where: { id: productId } });
-        if (!product) throw new NotFoundError("Product not found");
-
         const location = await manager.findOne(StockLocation, { where: { id: stockLocationId } });
         if (!location) throw new NotFoundError("Stock location not found");
 
         let purchase = null;
         if (purchaseId) {
-            purchase = await manager.findOne(Purchase, { where: { id: purchaseId } });
+            purchase = await manager.findOne(Purchase, {
+                where: { id: purchaseId },
+                relations: ["supplier", "items", "items.product"]
+            });
             if (!purchase) throw new NotFoundError("Purchase not found");
         }
 
-        let balance = await manager.findOne(StockBalance, {
-            where: {
-                product: { id: productId },
-                location: { id: stockLocationId }
-            }
-        });
-
-        if (!balance) {
-            balance = new StockBalance({
-                product,
-                location,
-                quantity: 0
-            });
-        }
-
         const movementEntry = new MovementEntry({
-            entryDate: new Date(),
+            entryDate: entryDate ? new Date(entryDate) : new Date(),
             entryMovementCategory: category,
+            internalNotes: internalNotes || null,
             purchase: purchase
         });
         const savedEntry = await manager.save(movementEntry);
 
-        const movement = new Movement({
-            product,
-            quantity: quantity,
-            movement_exit: null,
-            movement_entry: savedEntry,
-            stock_location: location
-        });
-        await manager.save(movement);
+        for (const item of items) {
+            const product = await manager.findOne(Product, { where: { id: item.productId } });
+            if (!product) throw new NotFoundError(`Product ${item.productId} not found`);
 
-        balance.quantity += quantity;
-        await manager.save(balance);
+            let balance = await manager.findOne(StockBalance, {
+                where: {
+                    product: { id: item.productId },
+                    location: { id: stockLocationId }
+                }
+            });
+
+            if (!balance) {
+                balance = new StockBalance({
+                    product,
+                    location,
+                    quantity: 0
+                });
+            }
+
+            const movement = new Movement({
+                product,
+                quantity: item.quantity,
+                unit_cost: item.unitCost,
+                movement_exit: null,
+                movement_entry: savedEntry,
+                stock_location: location
+            });
+            await manager.save(movement);
+
+            balance.quantity += item.quantity;
+            await manager.save(balance);
+        }
 
         return savedEntry;
     });
 }
 
-async function listMovementEntries(): Promise<MovementEntry[]> {
-    return await getMovementEntries();
+async function listMovementEntries(filters: MovementEntryQuery = {}): Promise<[MovementEntry[], number]> {
+    return await getMovementEntries(filters);
 }
 
 async function findMovementEntry(id: number): Promise<MovementEntry> {
@@ -199,10 +216,57 @@ async function findMovementEntry(id: number): Promise<MovementEntry> {
     return entry;
 }
 
+async function deleteMovementEntry(id: number): Promise<void> {
+    return await AppDataSource.manager.transaction(async (manager) => {
+        const entry = await manager.findOne(MovementEntry, {
+            where: { id },
+            relations: ["movements", "movements.product", "movements.stock_location"]
+        });
+
+        if (!entry) {
+            throw new NotFoundError("Movement entry not found");
+        }
+
+        if (entry.deleted_at) {
+            throw new BadRequestError("Movement entry is already inactive");
+        }
+
+        const activeReturns = await manager.count(MovementExit, {
+            where: {
+                movementEntry: { id },
+                deleted_at: IsNull()
+            }
+        });
+
+        if (activeReturns > 0) {
+            throw new BadRequestError("Não é possível inativar uma entrada com devoluções ativas");
+        }
+
+        if (entry.movements) {
+            for (const movement of entry.movements) {
+                const balance = await manager.findOne(StockBalance, {
+                    where: {
+                        product: { id: movement.product.id },
+                        location: { id: movement.stock_location.id }
+                    }
+                });
+
+                if (balance) {
+                    balance.quantity -= Math.abs(movement.quantity);
+                    await manager.save(balance);
+                }
+            }
+        }
+
+        await manager.softRemove(entry);
+    });
+}
+
 export {
     createMovementEntry,
     listMovementEntries,
     findMovementEntry,
+    deleteMovementEntry,
     createMovementExit,
     listMovementExits,
     findMovementExit,

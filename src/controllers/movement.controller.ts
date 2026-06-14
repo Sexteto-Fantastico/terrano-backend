@@ -4,7 +4,8 @@ import {
     toMovementExitResponse,
     toMovementEntryResponse,
     MovementExitQuery,
-    MovementExitResponse
+    MovementExitResponse,
+    MovementEntryQuery,
 } from "../dtos/movement.dto";
 
 async function createMovementExit(req: Request, res: Response) {
@@ -29,8 +30,9 @@ async function createMovementEntry(req: Request, res: Response) {
     res.status(201).json(toMovementEntryResponse(created));
 }
 
-async function getMovementEntries(req: Request, res: Response) {
-    const entries = await MovementService.listMovementEntries();
+async function getMovementEntries(req: Request<{}, {}, {}, MovementEntryQuery>, res: Response) {
+    const [entries, total] = await MovementService.listMovementEntries(req.query);
+    res.set("X-Total-Count", total.toString());
     res.status(200).json(entries.map(toMovementEntryResponse));
 }
 
@@ -46,6 +48,12 @@ async function deleteMovementExit(req: Request, res: Response) {
     res.status(204).send();
 }
 
+async function deleteMovementEntry(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    await MovementService.deleteMovementEntry(id);
+    res.status(204).send();
+}
+
 export {
     createMovementExit,
     createMovementEntry,
@@ -53,5 +61,6 @@ export {
     getMovementEntryById,
     getMovementExits,
     getMovementExitById,
-    deleteMovementExit
+    deleteMovementExit,
+    deleteMovementEntry,
 };

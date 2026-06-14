@@ -3,7 +3,7 @@ import { Movement, MovementType } from "../infra/entities/movement.entity";
 import { MovementEntry } from "../infra/entities/movement-entry.entity";
 import { MovementExit } from "../infra/entities/movement-exit.entity";
 import { getStartOfDay, getEndOfDay } from "../utils/date.util";
-import { MovementExitQuery } from "../dtos/movement.dto";
+import { MovementExitQuery, MovementEntryQuery } from "../dtos/movement.dto";
 import { FindManyOptions, FindOptionsWhere, Between, LessThanOrEqual, MoreThanOrEqual, Not, IsNull } from "typeorm";
 
 const movementRepository = AppDataSource.getRepository(Movement);
@@ -39,17 +39,61 @@ async function getTotalQuantityByDateRange(
     return Math.abs(Number(result?.total || 0));
 }
 
-async function getMovementEntries(): Promise<MovementEntry[]> {
-    return await movementEntryRepository.find({
-        relations: ["purchase"],
-        order: { entryDate: "DESC" }
-    });
+async function getMovementEntries(filters: MovementEntryQuery = {}): Promise<[MovementEntry[], number]> {
+    const { pageIndex, pageSize, sortBy, sortOrder, stockLocationId, supplierId, nfNumber, nfSerie, activeOnly = true } = filters;
+
+    const qb = movementEntryRepository.createQueryBuilder("entry")
+        .leftJoinAndSelect("entry.purchase", "purchase")
+        .leftJoinAndSelect("purchase.supplier", "supplier")
+        .leftJoinAndSelect("entry.movements", "movement")
+        .leftJoinAndSelect("movement.product", "product")
+        .leftJoinAndSelect("movement.stock_location", "stockLocation");
+
+    if (!activeOnly) {
+        qb.withDeleted();
+    }
+
+    if (stockLocationId) {
+        qb.andWhere("stockLocation.id = :stockLocationId", { stockLocationId });
+    }
+
+    if (supplierId) {
+        qb.andWhere("supplier.id = :supplierId", { supplierId });
+    }
+
+    if (nfNumber) {
+        qb.andWhere("purchase.nf_number LIKE :nfNumber", { nfNumber: `%${nfNumber}%` });
+    }
+
+    if (nfSerie) {
+        qb.andWhere("purchase.nf_serie LIKE :nfSerie", { nfSerie: `%${nfSerie}%` });
+    }
+
+    if (sortBy) {
+        qb.orderBy(`entry.${sortBy}`, sortOrder ?? "DESC");
+    } else {
+        qb.orderBy("entry.entryDate", "DESC");
+    }
+
+    if (pageIndex !== undefined && pageSize !== undefined) {
+        qb.take(pageSize).skip((pageIndex - 1) * pageSize);
+    }
+
+    return await qb.getManyAndCount();
 }
 
 async function getMovementEntryById(id: number): Promise<MovementEntry | null> {
     return await movementEntryRepository.findOne({
         where: { id },
-        relations: ["purchase", "movements", "movements.product", "movements.stock_location"]
+        relations: [
+            "purchase",
+            "purchase.supplier",
+            "purchase.items",
+            "purchase.items.product",
+            "movements",
+            "movements.product",
+            "movements.stock_location"
+        ]
     });
 }
 
