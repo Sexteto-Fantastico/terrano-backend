@@ -28,12 +28,14 @@ createRoute(router, {
             description: "The created product brand",
             content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
         }
-    }
+    },
+    permissions: { resource: "PRODUCT_BRAND", action: "CREATE" },
 }, createProductBrand);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.PRODUCT_BRANDS.GET_ALL,
+    permissions: { resource: "PRODUCT_BRAND", action: "READ" },
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Returns the list of all product brands",
@@ -63,12 +65,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
         },
         404: { description: "Product brand not found" }
-    }
+    },
+    permissions: { resource: "PRODUCT_BRAND", action: "READ" },
 }, getProductBrandById);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.PRODUCT_BRANDS.GET_LOGS,
+    permissions: { resource: "PRODUCT_BRAND", action: "READ" },
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Get logs for a product brand",
@@ -96,12 +100,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
         },
         404: { description: "Product brand not found" }
-    }
+    },
+    permissions: { resource: "PRODUCT_BRAND", action: "UPDATE" },
 }, updateProductBrand);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.PRODUCT_BRANDS.DELETE,
+    permissions: { resource: "PRODUCT_BRAND", action: "DELETE" },
     basePath: Endpoints.PRODUCT_BRANDS.BASE,
     tags: ["Product Brands"],
     summary: "Soft delete a product brand",
@@ -128,7 +134,8 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: ProductBrandResponseSchema } }
         },
         404: { description: "Product brand not found" }
-    }
+    },
+    permissions: { resource: "PRODUCT_BRAND", action: "UPDATE" },
 }, restoreProductBrand);
 
 export default router;

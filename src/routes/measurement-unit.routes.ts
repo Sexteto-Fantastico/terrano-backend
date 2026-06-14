@@ -29,11 +29,13 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(MeasurementUnitResponseSchema) } }
         }
     },
+    permissions: { resource: "MEASUREMENT_UNIT", action: "READ" },
 }, getAll);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.MEASUREMENT_UNITS.GET_BY_ID,
+    permissions: { resource: "MEASUREMENT_UNIT", action: "READ" },
     basePath: Endpoints.MEASUREMENT_UNITS.BASE,
     tags: ["Measurement Units"],
     summary: "Get a measurement unit by ID",
@@ -46,13 +48,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: MeasurementUnitResponseSchema } }
         },
         404: { description: "Measurement unit not found" }
-    }
+    },
 }, getById);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.MEASUREMENT_UNITS.GET_LOGS,
     basePath: Endpoints.MEASUREMENT_UNITS.BASE,
+    permissions: { resource: "MEASUREMENT_UNIT", action: "READ" },
     tags: ["Measurement Units"],
     summary: "Get logs for a measurement unit",
     request: {
@@ -66,6 +69,7 @@ createRoute(router, {
 createRoute(router, {
     method: HttpMethod.POST,
     path: Endpoints.MEASUREMENT_UNITS.CREATE,
+    permissions: { resource: "MEASUREMENT_UNIT", action: "CREATE" },
     basePath: Endpoints.MEASUREMENT_UNITS.BASE,
     tags: ["Measurement Units"],
     summary: "Create a new measurement unit",
@@ -98,12 +102,14 @@ createRoute(router, {
         },
         404: { description: "Measurement unit not found" },
         409: { description: "Measurement unit with the given name already exists" }
-    }
+    },
+    permissions: { resource: "MEASUREMENT_UNIT", action: "UPDATE" },
 }, update);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.MEASUREMENT_UNITS.DELETE,
+    permissions: { resource: "MEASUREMENT_UNIT", action: "DELETE" },
     basePath: Endpoints.MEASUREMENT_UNITS.BASE,
     tags: ["Measurement Units"],
     summary: "Deactivate a measurement unit (soft delete)",
@@ -133,7 +139,8 @@ createRoute(router, {
         },
         400: { description: "Measurement unit is not deactivated" },
         404: { description: "Measurement unit not found" }
-    }
+    },
+    permissions: { resource: "MEASUREMENT_UNIT", action: "UPDATE" },
 }, restore);
 
 export default router;

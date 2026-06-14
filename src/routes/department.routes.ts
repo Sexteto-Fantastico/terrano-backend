@@ -35,12 +35,14 @@ createRoute(router, {
             description: "The created department",
             content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
         }
-    }
+    },
+    permissions: { resource: "DEPARTMENT", action: "CREATE" },
 }, createDepartment);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.DEPARTMENTS.GET_ALL,
+    permissions: { resource: "DEPARTMENT", action: "READ" },
     basePath: Endpoints.DEPARTMENTS.BASE,
     tags: ["Departments"],
     summary: "Returns the list of all departments",
@@ -70,12 +72,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
         },
         404: { description: "Department not found" }
-    }
+    },
+    permissions: { resource: "DEPARTMENT", action: "READ" },
 }, getDepartmentById);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.DEPARTMENTS.GET_LOGS,
+    permissions: { resource: "DEPARTMENT", action: "READ" },
     basePath: Endpoints.DEPARTMENTS.BASE,
     tags: ["Departments"],
     summary: "Get logs for a department",
@@ -103,12 +107,14 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
         },
         404: { description: "Department not found" }
-    }
+    },
+    permissions: { resource: "DEPARTMENT", action: "UPDATE" },
 }, updateDepartment);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.DEPARTMENTS.DELETE,
+    permissions: { resource: "DEPARTMENT", action: "DELETE" },
     basePath: Endpoints.DEPARTMENTS.BASE,
     tags: ["Departments"],
     summary: "Soft delete a department",
@@ -135,7 +141,8 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: DepartmentResponseSchema } }
         },
         404: { description: "Department not found" }
-    }
+    },
+    permissions: { resource: "DEPARTMENT", action: "UPDATE" },
 }, restoreDepartment);
 
 export default router;

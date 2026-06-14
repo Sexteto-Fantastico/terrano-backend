@@ -20,6 +20,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Create a new product",
+    permissions: { resource: "PRODUCT", action: "CREATE" },
     request: {
         body: { content: { [ContentType.JSON]: { schema: CreateProductBodySchema } } }
     },
@@ -38,6 +39,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Returns the list of all products",
+    permissions: { resource: "PRODUCT", action: "READ" },
     request: {
         query: ProductQuerySchema.shape.query
     },
@@ -55,6 +57,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Get a product by id",
+    permissions: { resource: "PRODUCT", action: "READ" },
     request: {
         params: ProductIdSchema.shape.params
     },
@@ -73,6 +76,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Get logs for a product",
+    permissions: { resource: "PRODUCT", action: "READ" },
     request: {
         params: ProductIdSchema.shape.params
     },
@@ -87,6 +91,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Update a product",
+    permissions: { resource: "PRODUCT", action: "UPDATE" },
     request: {
         params: ProductIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateProductBodySchema } } }
@@ -106,6 +111,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Delete a product",
+    permissions: { resource: "PRODUCT", action: "DELETE" },
     request: {
         params: ProductIdSchema.shape.params
     },
@@ -121,6 +127,7 @@ createRoute(router, {
     basePath: Endpoints.PRODUCTS.BASE,
     tags: ["Products"],
     summary: "Restore a deleted product",
+    permissions: { resource: "PRODUCT", action: "UPDATE" },
     request: {
         params: ProductIdSchema.shape.params
     },

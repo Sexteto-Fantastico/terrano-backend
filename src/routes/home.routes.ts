@@ -12,6 +12,7 @@ createRoute(router, {
     basePath: Endpoints.HOME.BASE,
     tags: ["Home"],
     summary: "Returns the home page dashboard summary indicators",
+    permissions: { resource: "DASHBOARD", action: "READ" },
     responses: {
         200: {
             description: "Home page dashboard summary indicators",

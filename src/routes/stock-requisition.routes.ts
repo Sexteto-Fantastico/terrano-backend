@@ -52,12 +52,14 @@ createRoute(router, {
                 [ContentType.JSON]: { schema: StockRequisitionResponseSchema }
             }
         }
-    }
+    },
+    permissions: { resource: "MATERIAL_REQUESTER", action: "CREATE" },
 }, createStockRequisition);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.STOCK_REQUISITIONS.GET_ALL,
+    permissions: { resource: "MATERIAL_REQUESTER", action: "READ" },
     basePath: Endpoints.STOCK_REQUISITIONS.BASE,
     tags: ["Stock Requisitions"],
     summary: "Returns the list of stock requisitions",
@@ -93,11 +95,13 @@ createRoute(router, {
             }
         },
         404: { description: "Stock requisition not found" }
-    }
+    },
+    permissions: { resource: "MATERIAL_REQUESTER", action: "READ" },
 }, getStockRequisitionById);
 
 createRoute(router, {
     method: HttpMethod.PUT,
+    permissions: { resource: "MATERIAL_REQUESTER", action: "UPDATE" },
     path: Endpoints.STOCK_REQUISITIONS.UPDATE,
     basePath: Endpoints.STOCK_REQUISITIONS.BASE,
     tags: ["Stock Requisitions"],
@@ -147,11 +151,13 @@ createRoute(router, {
             }
         },
         404: { description: "Stock requisition not found" }
-    }
+    },
+    permissions: { resource: "MATERIAL_REQUESTS_MANAGEMENT", action: "UPDATE" },
 }, updateStockRequisitionStatus);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
+    permissions: { resource: "MATERIAL_REQUESTER", action: "DELETE" },
     path: Endpoints.STOCK_REQUISITIONS.DELETE,
     basePath: Endpoints.STOCK_REQUISITIONS.BASE,
     tags: ["Stock Requisitions"],
@@ -182,7 +188,8 @@ createRoute(router, {
             }
         },
         404: { description: "Stock requisition not found" }
-    }
+    },
+    permissions: { resource: "MATERIAL_REQUESTER", action: "UPDATE" },
 }, restoreStockRequisition);
 
 export default router;

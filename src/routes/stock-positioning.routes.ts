@@ -31,11 +31,13 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(StockPositioningResponseSchema) } }
         }
     },
+    permissions: { resource: "STOCK_POSITION", action: "READ" },
 }, getStockPositionings);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.STOCK_POSITIONINGS.METRICS,
+    permissions: { resource: "STOCK_POSITION", action: "READ" },
     basePath: Endpoints.STOCK_POSITIONINGS.BASE,
     tags: ["Stock Positioning"],
     summary: "Get stock positioning metrics",
@@ -63,7 +65,8 @@ createRoute(router, {
     },
     responses: {
         204: { description: "Report exported successfully" }
-    }
+    },
+    permissions: { resource: "STOCK_POSITION", action: "READ" },
 }, exportStockReport);
 
 export default router;

@@ -31,12 +31,13 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: UserPermissionsSchema } }
         },
         404: { description: "User or role not found" }
-    }
+    },
 }, getMyPermissions);
 
 createRoute(router, {
     method: HttpMethod.POST,
     path: Endpoints.USERS.CREATE,
+    permissions: { resource: "USER", action: "CREATE" },
     basePath: Endpoints.USERS.BASE,
     tags: ["Users"],
     summary: "Create a new user",
@@ -68,11 +69,13 @@ createRoute(router, {
             content: { [ContentType.JSON]: { schema: z.array(UserResponseSchema) } }
         }
     },
+    permissions: { resource: "USER", action: "READ" },
 }, getUsers);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.USERS.GET_BY_ID,
+    permissions: { resource: "USER", action: "READ" },
     basePath: Endpoints.USERS.BASE,
     tags: ["Users"],
     summary: "Get a user by ID",
@@ -99,12 +102,14 @@ createRoute(router, {
     },
     responses: {
         200: { description: "List of user logs" }
-    }
+    },
+    permissions: { resource: "USER", action: "READ" },
 }, getUserLogs);
 
 createRoute(router, {
     method: HttpMethod.PUT,
     path: Endpoints.USERS.CHANGE_PASSWORD,
+    permissions: { resource: "USER", action: "UPDATE" },
     basePath: Endpoints.USERS.BASE,
     tags: ["Users"],
     summary: "Change user password",
@@ -138,12 +143,14 @@ createRoute(router, {
         },
         404: { description: "User not found" },
         409: { description: "Username or email already exists" }
-    }
+    },
+    permissions: { resource: "USER", action: "UPDATE" },
 }, updateUser);
 
 createRoute(router, {
     method: HttpMethod.DELETE,
     path: Endpoints.USERS.DELETE,
+    permissions: { resource: "USER", action: "DELETE" },
     basePath: Endpoints.USERS.BASE,
     tags: ["Users"],
     summary: "Delete a user",
@@ -174,7 +181,8 @@ createRoute(router, {
         },
         400: { description: "User is not deleted" },
         404: { description: "User not found" }
-    }
+    },
+    permissions: { resource: "USER", action: "UPDATE" },
 }, restoreUser);
 
 createRoute(router, {

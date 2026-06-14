@@ -37,11 +37,13 @@ createRoute(router, {
             }
         },
     },
+    permissions: { resource: "SUPPLIER", action: "READ" },
 }, getAllSuppliers);
 
 createRoute(router, {
     method: HttpMethod.GET,
     path: Endpoints.SUPPLIERS.GET_BY_ID,
+    permissions: { resource: "SUPPLIER", action: "READ" },
     basePath: Endpoints.SUPPLIERS.BASE,
     tags: ["Suppliers"],
     summary: "Get a supplier by id",
@@ -69,10 +71,12 @@ createRoute(router, {
         }, 
         400: { description: "Validation error" } 
     },
+    permissions: { resource: "SUPPLIER", action: "CREATE" },
 }, createSupplier);
 
 createRoute(router, {
     method: HttpMethod.PUT,
+    permissions: { resource: "SUPPLIER", action: "UPDATE" },
     path: Endpoints.SUPPLIERS.UPDATE,
     basePath: Endpoints.SUPPLIERS.BASE,
     tags: ["Suppliers"],
@@ -101,11 +105,13 @@ createRoute(router, {
         204: { description: "Supplier deleted successfully" }, 
         404: { description: "Supplier not found" } 
     },
+    permissions: { resource: "SUPPLIER", action: "DELETE" },
 }, deleteSupplier);
 
 createRoute(router, {
     method: HttpMethod.POST,
     path: Endpoints.SUPPLIERS.RESTORE,
+    permissions: { resource: "SUPPLIER", action: "UPDATE" },
     basePath: Endpoints.SUPPLIERS.BASE,
     tags: ["Suppliers"],
     summary: "Restore a deleted supplier",
