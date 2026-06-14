@@ -11,6 +11,7 @@ export const stockRequisitionIdSchema = z.object({
 export const CreateStockRequisitionBodySchema = registry.register(
     "CreateStockRequisitionDto",
     z.object({
+        departmentId: z.number().int().positive().optional(), 
         requesterJustification: z.string().min(1),
         items: z.array(
             z.object({
