@@ -16,6 +16,7 @@ import { StockRequisitionStatusLog } from "../infra/entities/stock-requisition-s
 import { StockRequisitionItem } from "../infra/entities/stock-requisition-item.entity";
 import { RequisitionStatus } from "../infra/entities/stock-requisition.entity";
 import { StockRequisition } from "../infra/entities/stock-requisition.entity";
+import { Department } from "../infra/entities/department.entity";
 import * as ProductRepository from "../repositories/product.repository";
 
 const statusLogRepository =
@@ -44,19 +45,23 @@ async function getStockRequisitionById(id: number): Promise<StockRequisitionResp
     return toStockRequisitionResponseDto(requisition);
 }
 
-async function createStockRequisition(data: CreateStockRequisitionDto): Promise<StockRequisitionResponseDto> {
+async function createStockRequisition(data: CreateStockRequisitionDto) {
     const items: any[] = [];
     for (const item of data.items) {
         const product = await ProductRepository.getProductById(item.productId);
         if (!product) throw new NotFoundError(`Product ${item.productId} not found`);
         items.push({ product, quantity: item.quantity, delivered: false });
     }
+
     const saved = await StockRequisitionRepository.saveStockRequisition({
         requester_justification: data.requesterJustification,
         status: RequisitionStatus.PENDING,
+        department: data.departmentId ? { id: data.departmentId } as Department : undefined,
         items,
     });
-    return toStockRequisitionResponseDto(saved);
+
+    const requisition = await StockRequisitionRepository.getStockRequisitionById(saved.id);
+    return toStockRequisitionResponseDto(requisition!);
 }
 
 async function updateStockRequisition(id: number, data: UpdateStockRequisitionDto) {
@@ -121,16 +126,14 @@ async function updateStockRequisitionStatus(
 
     const log = new StockRequisitionStatusLog({} as any);
 
-    log.stock_requisition_id = requisition.id;
     log.previous_status = requisition.status;
     log.current_status = data.status;
     log.change_justification = data.changeJustification;
+    log.stock_requisition = requisition;
 
     await statusLogRepository.save(log);
 
-    requisition.status = data.status;
-
-    await StockRequisitionRepository.updateStockRequisition(requisition);
+    await StockRequisitionRepository.updateStockRequisitionStatus(id, data.status);
 
     const updated =
         await StockRequisitionRepository.getStockRequisitionById(id);

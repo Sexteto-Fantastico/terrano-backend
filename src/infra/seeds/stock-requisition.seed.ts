@@ -3,11 +3,18 @@ import {
     StockRequisition,
     RequisitionStatus,
 } from "../entities/stock-requisition.entity";
+import { Department } from "../entities/department.entity";
 
 export async function createStockRequisitionSeed(): Promise<void> {
+    const repository = AppDataSource.getRepository(StockRequisition);
+    const deptRepository = AppDataSource.getRepository(Department);
 
-    const repository =
-        AppDataSource.getRepository(StockRequisition);
+    const departments = await deptRepository.find();
+
+    if (departments.length === 0) {
+        console.log("Nenhum departamento encontrado. Execute primeiro o seed de departamentos.");
+        return;
+    }
 
     const statuses = [
         RequisitionStatus.PENDING,
@@ -17,30 +24,20 @@ export async function createStockRequisitionSeed(): Promise<void> {
     ];
 
     for (let i = 1; i <= 20; i++) {
+        const justification = `Material request ${i}`;
+        const exists = await repository.findOne({
+            where: { requester_justification: justification },
+        });
 
-        const justification =
-            `Material request ${i}`;
+        if (exists) continue;
 
-        const exists =
-            await repository.findOne({
-                where: {
-                    requester_justification: justification,
-                },
-            });
-
-        if (exists) {
-            continue;
-        }
+        const randomDept = departments[Math.floor(Math.random() * departments.length)];
 
         await repository.save(
             repository.create({
                 requester_justification: justification,
-                status:
-                    statuses[
-                        Math.floor(
-                            Math.random() * statuses.length
-                        )
-                    ],
+                status: statuses[Math.floor(Math.random() * statuses.length)],
+                department: randomDept,
             })
         );
     }
