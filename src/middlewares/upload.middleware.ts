@@ -4,7 +4,9 @@ import { createHash } from "crypto";
 import path from "path";
 import fs from "fs";
 
-const BASE_UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(__dirname, "../../uploads");
+const BASE_UPLOAD_DIR =
+  process.env.UPLOAD_DIR ||
+  path.resolve(process.cwd(), "data/uploads");
 
 const UPLOAD_DIR = path.join(BASE_UPLOAD_DIR, "profiles");
 
