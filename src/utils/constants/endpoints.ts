@@ -125,4 +125,9 @@ export const Endpoints = {
     BASE: `${API_PREFIX}/product-tracking`,
     GET_REPORT: "/",
 },
+    ALERTS: {
+        BASE: `${API_PREFIX}/alerts`,
+        ...CRUD_ROUTES,
+        CHECK_STOCK: "/check-low-stock",
+    },
 } as const;
