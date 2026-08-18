@@ -9,6 +9,7 @@ import {
 
 import { NotFoundError, BadRequestError } from "../errors/app-error";
 
+import * as AlertService from "./alert.service";
 import * as StockRequisitionRepository from "../repositories/stock-requisition.repository";
 
 import { AppDataSource } from "../infra/config/data-source";
@@ -61,6 +62,7 @@ async function createStockRequisition(data: CreateStockRequisitionDto) {
     });
 
     const requisition = await StockRequisitionRepository.getStockRequisitionById(saved.id);
+    await AlertService.notifyNewMaterialRequestAlert(saved.id);
     return toStockRequisitionResponseDto(requisition!);
 }
 

@@ -12,6 +12,7 @@ import { StockRequisition, RequisitionStatus } from "../infra/entities/stock-req
 import { ExitMovementCategory } from "../infra/entities/movement-exit.entity";
 import { IsNull } from "typeorm";
 import { getMovementEntries, getMovementEntryById, getMovementExitById, getMovementExits } from "../repositories/movement.repository";
+import * as AlertService from "./alert.service";
 
 async function createMovementExit(data: CreateMovementExitBody): Promise<MovementExit> {
     const { stockLocationId, category, internalNotes, stockRequisitionId, movementEntryId, nfNumber, nfSerie, items } = data;
@@ -89,6 +90,8 @@ async function createMovementExit(data: CreateMovementExitBody): Promise<Movemen
 
         return savedExit;
     });
+
+    await AlertService.checkLowStockAlerts();
 }
 
 async function listMovementExits(filters: MovementExitQuery = {}): Promise<[MovementExit[], number]> {
@@ -202,6 +205,8 @@ async function createMovementEntry(data: CreateMovementEntryBody): Promise<Movem
 
         return savedEntry;
     });
+
+    await AlertService.checkLowStockAlerts();
 }
 
 async function listMovementEntries(filters: MovementEntryQuery = {}): Promise<[MovementEntry[], number]> {
