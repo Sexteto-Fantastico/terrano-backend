@@ -71,6 +71,7 @@ export async function createPolicySeed(): Promise<void> {
         // ── REPORTS ───────────────────────────────────────────────────────────
         { name: "DASHBOARD_READ",       description: "Visualizar dashboard",               resource: "DASHBOARD",      module: "REPORTS",  action: "READ" },
         { name: "STOCK_POSITION_READ",  description: "Visualizar posição de estoque",      resource: "STOCK_POSITION", module: "REPORTS", action: "READ" },
+        { name: "STOCK_HEALTH_READ",    description: "Visualizar relatório de ruptura/saúde de estoque", resource: "STOCK_HEALTH", module: "REPORTS", action: "READ" },
         { name: "PRODUCT_TRACE_READ",   description: "Visualizar rastreamento de produto", resource: "PRODUCT_TRACE",   module: "REPORTS", action: "READ" },
 
         // ── ACCESS CONTROL ────────────────────────────────────────────────────
