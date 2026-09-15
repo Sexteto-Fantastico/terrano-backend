@@ -110,6 +110,11 @@ export const Endpoints = {
         METRICS: "/metrics",
         EXPORT: "/export",
     },
+    STOCK_HEALTH_REPORTS: {
+        BASE: `${API_PREFIX}/stock-health-reports`,
+        GET_ALL: "/",
+        SUMMARY: "/summary",
+    },
 
     ROLES: {
         BASE: `${API_PREFIX}/roles`,
