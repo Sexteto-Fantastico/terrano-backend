@@ -39,8 +39,6 @@ async function getCriticalStockItems(filters: StockHealthReportQuery = {}): Prom
         queryBuilder.andWhere(`${HEALTH_STATUS_CASE} = :status`, { status });
     }
 
-    // Rows are either ESGOTADO (quantity <= 0) or BAIXO (quantity > 0), so ordering
-    // by quantity alone already surfaces the most critical items first.
     queryBuilder.orderBy("slp.quantity", "ASC");
 
     if (pageIndex !== undefined && pageSize !== undefined) {
