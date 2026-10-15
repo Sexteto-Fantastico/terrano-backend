@@ -6,8 +6,7 @@ RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
 
-RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-    npm ci
+RUN npm ci
 
 COPY . .
 
