@@ -20,7 +20,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production \
     NODE_OPTIONS="--max-old-space-size=256 --no-warnings" \
-    NPM_CONFIG_LOGLEVEL=silent
+    NPM_CONFIG_LOGLEVEL=silent \
+    DB_PATH=/app/data/database.sqlite \
+    UPLOAD_DIR=/app/data/uploads
 
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
