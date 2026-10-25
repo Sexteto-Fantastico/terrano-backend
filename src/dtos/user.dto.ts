@@ -160,6 +160,7 @@ export const UserPermissionsSchema = registry.register(
             dashboard: z.array(z.string()).openapi({ example: ["read"] }),
             stockPosition: z.array(z.string()).openapi({ example: ["read"] }),
             productTrace: z.array(z.string()).openapi({ example: ["read"] }),
+            stockHealth: z.array(z.string()).openapi({ example: ["read"] }),
         })).optional(),
         accessControl: z.array(z.object({
             user: z.array(z.string()).openapi({ example: ["create_update", "read" ]})
@@ -241,6 +242,7 @@ export function toUserPermissionsResponse(policies: Policy[]): UserPermissionsRe
             dashboard:     a("DASHBOARD"),
             stockPosition: a("STOCK_POSITION"),
             productTrace:  a("PRODUCT_TRACE"),
+            stockHealth:   a("STOCK_HEALTH"),
         }],
         accessControl: [{
             user: a("USER"),
