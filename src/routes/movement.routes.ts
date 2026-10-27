@@ -29,6 +29,7 @@ createRoute(router, {
     method: HttpMethod.POST,
     path: Endpoints.MOVEMENTS.EXIT,
     basePath: Endpoints.MOVEMENTS.BASE,
+    permissions: { resource: "MOVEMENT_EXIT", action: "CREATE" },
     tags: ["Movements"],
     summary: "Create a direct stock exit movement (e.g. for defective/broken items or manual adjustment)",
     request: {
@@ -111,6 +112,7 @@ createRoute(router, {
     method: HttpMethod.POST,
     path: Endpoints.MOVEMENTS.ENTRY,
     basePath: Endpoints.MOVEMENTS.BASE,
+    permissions: { resource: "MOVEMENT_ENTRY", action: "CREATE" },
     tags: ["Movements"],
     summary: "Create a stock entry movement",
     request: {

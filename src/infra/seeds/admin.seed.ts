@@ -3,24 +3,14 @@ import { User } from "../entities/user.entity";
 import { Role } from "../entities/role.entity";
 import { hashPassword } from "../../utils/password.util";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export async function createAdminSeed(): Promise<void> {
     const userRepository = AppDataSource.getRepository(User);
     const roleRepository = AppDataSource.getRepository(Role);
 
-    const adminEmail = "admin@terrano.com";
-    const adminUsername = "admin";
-
-    const existingAdmin = await userRepository.findOne({
-        where: [
-            { email: adminEmail },
-            { username: adminUsername }
-        ]
-    });
-
-    if (existingAdmin) {
-        console.log("Admin user already exists");
-        return;
-    }
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@terrano.com";
+    const adminUsername = process.env.ADMIN_USERNAME || "admin";
 
     const adminRole = await roleRepository.findOne({
         where: {
@@ -32,14 +22,31 @@ export async function createAdminSeed(): Promise<void> {
         throw new Error("ADMIN role not found");
     }
 
-    const passwordHash = hashPassword("admin123")
+    const existingAdmin = await userRepository.findOne({
+        where: isProduction
+            ? [{ role: { id: adminRole.id } }]
+            : [{ email: adminEmail }, { username: adminUsername }],
+        withDeleted: true,
+    });
+
+    if (existingAdmin) {
+        console.log("Admin user already exists");
+        return;
+    }
+
+    // Production never gets a well-known password: it must be provided and is replaced on first login.
+    const adminPassword = process.env.ADMIN_PASSWORD || (isProduction ? undefined : "admin123");
+    if (!adminPassword) {
+        console.warn("ADMIN_PASSWORD is not set: skipping the initial admin creation.");
+        return;
+    }
 
     const admin = userRepository.create({
         name: "System Admin",
         email: adminEmail,
         username: adminUsername,
-        password: passwordHash,
-        requires_password_reset: false,
+        password: await hashPassword(adminPassword),
+        requires_password_reset: isProduction,
         role: adminRole,
     });
 

@@ -2,6 +2,7 @@ import { User } from "../infra/entities/user.entity";
 import { z, registry } from "../infra/config/openapi";
 import { paginationFields, activeOnlyField, idParamSchema } from "./common/pagination.dto";
 import { Policy } from "../infra/entities/policy.entity";
+import { PasswordSchema } from "./common/password.dto";
 
 // ============ Reusable Schemas ============
 
@@ -17,11 +18,10 @@ export const CreateUserBodySchema = registry.register(
         cpf: z.string().optional().openapi({ example: "123.456.789-00" }),
         email: z.email("Invalid email format").openapi({ example: "john@terrano.com" }),
         username: z.string().min(1, "Username is required").openapi({ example: "johndoe" }),
-        password: z.string().min(1, "Password is required").openapi({ example: "password123" }),
+        password: PasswordSchema.openapi({ example: "password123" }),
         roleId: z.number().int().positive("Role ID is required").openapi({ example: 1 }),
         departmentId: z.number().int().positive("Department ID is required").openapi({ example: 1 }),
         requiresPasswordReset: z.boolean().optional().openapi({ example: false }),
-        updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
     })
 );
 
@@ -38,7 +38,6 @@ export const UpdateUserBodySchema = registry.register(
         username: z.string().min(1, "Username cannot be empty").optional().openapi({ example: "johndoe" }),
         roleId: z.number().int().positive().optional().openapi({ example: 1 }),
         departmentId: z.number().int().positive().optional().openapi({ example: 1 }),
-        updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
     })
 );
 
@@ -51,8 +50,7 @@ export type UpdateUserBody = z.infer<typeof updateUserSchema>["body"];
 export const ChangePasswordBodySchema = registry.register(
     "ChangePasswordBody",
     z.object({
-        password: z.string().min(1, "Password is required").openapi({ example: "password123" }),
-        updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
+        password: PasswordSchema.openapi({ example: "password123" }),
     })
 );
 
@@ -65,7 +63,6 @@ export type ChangePasswordBody = z.infer<typeof changePasswordSchema>["body"];
 export const DeleteUserBodySchema = registry.register(
     "DeleteUserBody",
     z.object({
-        updatedBy: z.number().int().positive().optional().openapi({ example: 1 }),
     }).optional()
 );
 
@@ -90,7 +87,6 @@ export type UserQuery = z.infer<typeof UserQuerySchema>["query"];
 export const RestoreUserBodySchema = registry.register(
     "RestoreUserBody",
     z.object({
-        updatedBy: z.number().int().positive().optional(),
     }).optional()
 );
 

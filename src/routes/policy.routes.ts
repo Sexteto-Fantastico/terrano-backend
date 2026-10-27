@@ -13,7 +13,7 @@ createRoute(router, {
     basePath: Endpoints.POLICIES.BASE,
     tags: ["Policies"],
     summary: "List all available policies",
-    permissions: { resource: "USER", action: "READ" },
+    permissions: { resource: "ROLE", action: "READ" },
     responses: {
         200: {
             description: "The list of policies",

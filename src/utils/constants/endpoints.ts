@@ -32,6 +32,8 @@ export const Endpoints = {
     AUTH: {
         BASE: `${API_PREFIX}/auth`,
         LOGIN: "/login",
+        REFRESH: "/refresh",
+        LOGOUT: "/logout",
         FORGOT_PASSWORD: "/forgot-password",
         RESET_PASSWORD: "/reset-password",
         DEFINE_PASSWORD: "/define-password",

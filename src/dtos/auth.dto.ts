@@ -1,6 +1,7 @@
 import { User } from "../infra/entities/user.entity";
 import { z, registry } from "../infra/config/openapi";
 import { RoleResponseSchema, DepartmentResponseSchema } from "./user.dto";
+import { PasswordSchema } from "./common/password.dto";
 
 // ============ Auth Schemas ============
 
@@ -29,7 +30,7 @@ export const ResetPasswordBodySchema = registry.register(
     "ResetPasswordBody",
     z.object({
         token: z.string().min(1, "Token is required").openapi({ example: "token123" }),
-        password: z.string().min(1, "Password is required").openapi({ example: "newpassword123" }),
+        password: PasswordSchema.openapi({ example: "newpassword123" }),
     })
 );
 export const resetPasswordSchema = z.object({ body: ResetPasswordBodySchema });
@@ -38,7 +39,8 @@ export type ResetPasswordBody = z.infer<typeof resetPasswordSchema>["body"];
 export const DefinePasswordBodySchema = registry.register(
     "DefinePasswordBody",
     z.object({
-        password: z.string().min(1, "Password is required").openapi({ example: "newpassword123" }),
+        password: PasswordSchema.openapi({ example: "newpassword123" }),
+        currentPassword: z.string().min(1).optional().openapi({ example: "oldpassword123" }),
     })
 );
 export const definePasswordSchema = z.object({ body: DefinePasswordBodySchema });

@@ -2,6 +2,8 @@ import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import path from "path";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
@@ -30,18 +32,32 @@ import { requestContextMiddleware } from "./utils/request-context";
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// Needed for correct client IPs (rate limiting) when running behind a reverse proxy.
+if (process.env.TRUST_PROXY) {
+    app.set("trust proxy", /^\d+$/.test(process.env.TRUST_PROXY) ? Number(process.env.TRUST_PROXY) : process.env.TRUST_PROXY);
+}
+
+// This server only returns JSON/static files, so CSP is left to the web server; assets must stay embeddable cross-origin.
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
+
 app.use(cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
     exposedHeaders: ["X-Total-Count", "X-Total-Pages", "X-Page", "X-Limit"],
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 const BASE_UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(__dirname, "../../uploads");
 
 app.use(UPLOADS_PATH, express.static(BASE_UPLOAD_DIR));
 
-setupSwagger(app);
+if (process.env.NODE_ENV !== "production" || process.env.ENABLE_SWAGGER === "true") {
+    setupSwagger(app);
+}
 app.use(requestContextMiddleware);
 
 app.use(Endpoints.AUTH.BASE, authRoutes);
@@ -73,7 +89,6 @@ migrateDatabase()
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
-            console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
         });
     })
     .catch((error) => {

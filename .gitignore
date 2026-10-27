@@ -47,3 +47,5 @@ database.sqlite
 uploads/*
 !uploads/.gitkeep
 !uploads/profiles/.gitkeep
+# MailHog credentials (see mailhog.auth.txt.example)
+mailhog.auth.txt

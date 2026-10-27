@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { definePassword, forgotPassword, getMe, login, resetPassword } from "../controllers/auth.controller";
+import { definePassword, forgotPassword, getMe, login, logout, refresh, resetPassword } from "../controllers/auth.controller";
+import { requireTrustedOrigin } from "../middlewares/csrf-origin.middleware";
+import { forgotPasswordRateLimit, loginRateLimit, refreshRateLimit, resetPasswordRateLimit } from "../middlewares/rate-limit.middleware";
 import { Endpoints, HttpMethod, ContentType } from "../utils/constants/endpoints";
 import { createRoute } from "../utils/route-builder";
 import {
@@ -28,9 +30,39 @@ createRoute(router, {
             description: "Login response with bearer token",
             content: { [ContentType.JSON]: { schema: LoginResponseSchema } }
         },
-        401: { description: "Invalid credentials" }
-    }
+        401: { description: "Invalid credentials" },
+        429: { description: "Too many attempts" }
+    },
+    middlewares: [loginRateLimit]
 }, login);
+
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.AUTH.REFRESH,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Rotate the refresh token (httpOnly cookie) and issue a new access token",
+    responses: {
+        200: {
+            description: "New access token; the refresh cookie is rotated",
+            content: { [ContentType.JSON]: { schema: LoginResponseSchema } }
+        },
+        401: { description: "Missing, invalid or expired refresh token" }
+    },
+    middlewares: [refreshRateLimit, requireTrustedOrigin]
+}, refresh);
+
+createRoute(router, {
+    method: HttpMethod.POST,
+    path: Endpoints.AUTH.LOGOUT,
+    basePath: Endpoints.AUTH.BASE,
+    tags: ["Auth"],
+    summary: "Revoke the current refresh token and clear the cookie",
+    responses: {
+        204: { description: "Logged out" }
+    },
+    middlewares: [requireTrustedOrigin]
+}, logout);
 
 createRoute(router, {
     method: HttpMethod.POST,
@@ -42,8 +74,10 @@ createRoute(router, {
         body: { content: { [ContentType.JSON]: { schema: ForgotPasswordBodySchema } } }
     },
     responses: {
-        200: { description: "Password reset email queued or logged" }
-    }
+        200: { description: "Password reset email queued or logged" },
+        429: { description: "Too many attempts" }
+    },
+    middlewares: [forgotPasswordRateLimit]
 }, forgotPassword);
 
 createRoute(router, {
@@ -57,8 +91,10 @@ createRoute(router, {
     },
     responses: {
         200: { description: "Password reset successfully" },
-        400: { description: "Invalid or expired reset token" }
-    }
+        400: { description: "Invalid or expired reset token" },
+        429: { description: "Too many attempts" }
+    },
+    middlewares: [resetPasswordRateLimit]
 }, resetPassword);
 
 createRoute(router, {
@@ -66,7 +102,7 @@ createRoute(router, {
     path: Endpoints.AUTH.DEFINE_PASSWORD,
     basePath: Endpoints.AUTH.BASE,
     tags: ["Auth"],
-    summary: "Define or change password for the logged in user",
+    summary: "Define (first access) or change (requires currentPassword) the password of the logged in user",
     security: [{ bearerAuth: [] }],
     request: {
         body: { content: { [ContentType.JSON]: { schema: DefinePasswordBodySchema } } }

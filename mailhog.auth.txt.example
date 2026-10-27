@@ -1,0 +1,2 @@
+# Format: <user>:<bcrypt hash>. Generate with: docker run --rm mailhog/mailhog bcrypt <password>
+# Copy to mailhog.auth.txt (git-ignored) and never commit real credentials.

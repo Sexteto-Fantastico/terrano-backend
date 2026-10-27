@@ -10,10 +10,35 @@ import {
     toMeResponse,
 } from "../dtos/auth.dto";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { UnauthorizedError } from "../errors";
+import { clearRefreshCookie, readRefreshCookie, setRefreshCookie } from "../utils/auth-cookie.util";
 
 async function login(req: Request<{}, LoginResponse, LoginBody>, res: Response<LoginResponse>) {
-    const result = await AuthService.login(req.body.email, req.body.password);
-    res.json(result);
+    const session = await AuthService.login(req.body.email, req.body.password);
+    setRefreshCookie(res, session.refreshToken);
+    res.json(session.result);
+}
+
+async function refresh(req: Request, res: Response<LoginResponse>) {
+    const refreshToken = readRefreshCookie(req);
+    if (!refreshToken) {
+        throw new UnauthorizedError("Refresh token missing.");
+    }
+
+    try {
+        const session = await AuthService.refresh(refreshToken);
+        setRefreshCookie(res, session.refreshToken);
+        res.json(session.result);
+    } catch (error) {
+        clearRefreshCookie(res);
+        throw error;
+    }
+}
+
+async function logout(req: Request, res: Response) {
+    await AuthService.logout(readRefreshCookie(req));
+    clearRefreshCookie(res);
+    res.status(204).send();
 }
 
 async function forgotPassword(req: Request<{}, unknown, ForgotPasswordBody>, res: Response) {
@@ -32,8 +57,10 @@ async function definePassword(req: AuthenticatedRequest, res: Response) {
         throw new Error("Authenticated user not found");
     }
 
-    await AuthService.definePassword(user.id, req.body.password);
-    res.json({ message: "Password has been updated successfully." });
+    const body = req.body as DefinePasswordBody;
+    const session = await AuthService.definePassword(user.id, body.password, body.currentPassword);
+    setRefreshCookie(res, session.refreshToken);
+    res.json({ message: "Password has been updated successfully.", ...session.result });
 }
 
 async function getMe(req: AuthenticatedRequest, res: Response<MeResponse>) {
@@ -46,4 +73,4 @@ async function getMe(req: AuthenticatedRequest, res: Response<MeResponse>) {
     res.json(toMeResponse(result));
 }
 
-export { login, forgotPassword, resetPassword, definePassword, getMe };
+export { login, refresh, logout, forgotPassword, resetPassword, definePassword, getMe };

@@ -1,8 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import * as roleService from "../services/role.service";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { UnauthorizedError } from "../errors";
+
+function getActorId(req: Request): number {
+    const actorId = (req as AuthenticatedRequest).user?.id;
+    if (!actorId) {
+        throw new UnauthorizedError("User not authenticated.");
+    }
+    return actorId;
+}
 
 async function createRole(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const role = await roleService.createRole(req.body);
+    const role = await roleService.createRole(req.body, getActorId(req));
     res.status(201).json(role);
 }
 
@@ -17,12 +27,12 @@ async function getRoleById(req: Request, res: Response, next: NextFunction): Pro
 }
 
 async function updateRole(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const role = await roleService.updateRole(Number(req.params.id), req.body);
+    const role = await roleService.updateRole(Number(req.params.id), req.body, getActorId(req));
     res.status(200).json(role);
 }
 
 async function deleteRole(req: Request, res: Response, next: NextFunction): Promise<void> {
-    await roleService.deleteRole(Number(req.params.id));
+    await roleService.deleteRole(Number(req.params.id), getActorId(req));
     res.status(204).send();
 }
 
@@ -32,7 +42,7 @@ async function restoreRole(req: Request, res: Response, next: NextFunction): Pro
 }
 
 async function assignPolicies(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const role = await roleService.assignPolicies(Number(req.params.id), req.body);
+    const role = await roleService.assignPolicies(Number(req.params.id), req.body, getActorId(req));
     res.status(200).json(role);
 }
 

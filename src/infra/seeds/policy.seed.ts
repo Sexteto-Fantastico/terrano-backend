@@ -78,6 +78,12 @@ export async function createPolicySeed(): Promise<void> {
         { name: "USER_READ",            description: "Visualizar usuários",          resource: "USER",           module: "ACCESS_CONTROL", action: "READ"   },
         { name: "USER_UPDATE",          description: "Editar usuários",              resource: "USER",           module: "ACCESS_CONTROL", action: "UPDATE" },
         { name: "USER_DELETE",          description: "Excluir usuários",             resource: "USER",           module: "ACCESS_CONTROL", action: "DELETE" },
+        { name: "USER_RESET_PASSWORD",  description: "Redefinir a senha de outros usuários", resource: "USER",     module: "ACCESS_CONTROL", action: "RESET_PASSWORD" },
+
+        { name: "ROLE_CREATE",          description: "Criar perfis de acesso",       resource: "ROLE",           module: "ACCESS_CONTROL", action: "CREATE" },
+        { name: "ROLE_READ",            description: "Visualizar perfis de acesso",  resource: "ROLE",           module: "ACCESS_CONTROL", action: "READ"   },
+        { name: "ROLE_UPDATE",          description: "Editar perfis de acesso e suas permissões", resource: "ROLE", module: "ACCESS_CONTROL", action: "UPDATE" },
+        { name: "ROLE_DELETE",          description: "Excluir perfis de acesso",     resource: "ROLE",           module: "ACCESS_CONTROL", action: "DELETE" },
 
         // ── NOTIFICATIONS ─────────────────────────────────────────────────────
         { name: "ALERT_CREATE",         description: "Criar alertas",                resource: "ALERT",          module: "NOTIFICATIONS",  action: "CREATE" },

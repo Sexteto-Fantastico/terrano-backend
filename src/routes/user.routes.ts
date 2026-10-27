@@ -109,7 +109,7 @@ createRoute(router, {
 createRoute(router, {
     method: HttpMethod.PUT,
     path: Endpoints.USERS.CHANGE_PASSWORD,
-    permissions: { resource: "USER", action: "UPDATE" },
+    permissions: { resource: "USER", action: "RESET_PASSWORD" },
     basePath: Endpoints.USERS.BASE,
     tags: ["Users"],
     summary: "Change user password",

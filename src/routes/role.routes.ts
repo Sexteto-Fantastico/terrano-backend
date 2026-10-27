@@ -20,7 +20,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "Create a new role",
-    permissions: { resource: "USER", action: "CREATE" },
+    permissions: { resource: "ROLE", action: "CREATE" },
     request: {
         body: { content: { [ContentType.JSON]: { schema: CreateRoleBodySchema } } }
     },
@@ -39,7 +39,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "List all roles",
-    permissions: { resource: "USER", action: "READ" },
+    permissions: { resource: "ROLE", action: "READ" },
     request: {
         query: RoleQuerySchema.shape.query
     },
@@ -57,7 +57,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "Get a role by id",
-    permissions: { resource: "USER", action: "READ" },
+    permissions: { resource: "ROLE", action: "READ" },
     request: {
         params: RoleIdSchema.shape.params
     },
@@ -76,7 +76,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "Update a role",
-    permissions: { resource: "USER", action: "UPDATE" },
+    permissions: { resource: "ROLE", action: "UPDATE" },
     request: {
         params: RoleIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: UpdateRoleBodySchema } } }
@@ -96,7 +96,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "Delete a role",
-    permissions: { resource: "USER", action: "DELETE" },
+    permissions: { resource: "ROLE", action: "DELETE" },
     request: {
         params: RoleIdSchema.shape.params
     },
@@ -112,7 +112,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "Restore a deleted role",
-    permissions: { resource: "USER", action: "UPDATE" },
+    permissions: { resource: "ROLE", action: "UPDATE" },
     request: {
         params: RoleIdSchema.shape.params
     },
@@ -132,7 +132,7 @@ createRoute(router, {
     basePath: Endpoints.ROLES.BASE,
     tags: ["Roles"],
     summary: "Assign policies to a role",
-    permissions: { resource: "USER", action: "UPDATE" },
+    permissions: { resource: "ROLE", action: "UPDATE" },
     request: {
         params: RoleIdSchema.shape.params,
         body: { content: { [ContentType.JSON]: { schema: AssignPoliciesBodySchema } } }

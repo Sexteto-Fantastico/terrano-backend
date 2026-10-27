@@ -58,7 +58,8 @@ export async function createUserSeed(): Promise<void> {
         await userRepository.save(
             userRepository.create({
                 ...userData,
-                password: hashPassword("12345678"),
+                password: await hashPassword(process.env.SEED_DEFAULT_PASSWORD || "12345678"),
+                requires_password_reset: process.env.NODE_ENV === "production",
                 role: adminRole,
                 department: departments[i % departments.length],
             })

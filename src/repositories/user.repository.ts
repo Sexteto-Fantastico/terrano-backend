@@ -25,6 +25,13 @@ async function getUserByPasswordResetToken(
   });
 }
 
+async function getUserAuthState(id: number): Promise<User | null> {
+  return await userRepository.findOne({
+    where: { id },
+    select: { id: true, token_version: true, requires_password_reset: true },
+  });
+}
+
 async function getUserById(
   id: number,
   withDeleted: boolean = false,
@@ -86,6 +93,10 @@ async function recoverUser(user: User): Promise<User> {
   return await userRepository.recover(user);
 }
 
+async function countActiveUsersByRoleName(roleName: string): Promise<number> {
+  return await userRepository.count({ where: { role: { name: roleName } } });
+}
+
 async function getUserWithPermissions(userId: number): Promise<User | null> {
     return await userRepository.findOne({
         where: { id: userId },
@@ -98,10 +109,12 @@ export {
   getUserByUsername,
   getUserByEmail,
   getUserByPasswordResetToken,
+  getUserAuthState,
   getUserById,
   getAllUsers,
   updateUser,
   deleteUser,
   recoverUser,
   getUserWithPermissions,
+  countActiveUsersByRoleName,
 };

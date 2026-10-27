@@ -24,7 +24,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     }
 
     private async save(event: any, action: string) {
-        if (event.metadata.tableName === "system_log") return;
+        if (event.metadata.tableName === "system_log" || event.metadata.tableName === "refresh_token") return;
     
         const entity = event.entity || event.databaseEntity;
         if (!entity) return;

@@ -22,6 +22,8 @@ createRoute(
   {
     method: HttpMethod.GET,
 
+    permissions: { resource: "PRODUCT_TRACE", action: "READ" },
+
     path: Endpoints.PRODUCT_TRACKING.GET_REPORT,
 
     basePath: Endpoints.PRODUCT_TRACKING.BASE,

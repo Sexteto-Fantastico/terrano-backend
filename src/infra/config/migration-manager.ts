@@ -33,19 +33,25 @@ export async function migrateDatabase(): Promise<void> {
 
         console.log("Migrations executed successfully");
         
+        // Reference data and the initial administrator are required in every environment.
         await createRoleSeed();
-        await createAdminSeed();
-        await createRoleSeed()
-        await createAdminSeed();
-        await createPolicySeed()
+        await createPolicySeed();
         await createRolePoliciesSeed();
+        await createAdminSeed();
+
+        // Demo data (extra ADMIN accounts with a known password included) never runs in production by default.
+        const seedDemoData = process.env.NODE_ENV !== "production" || process.env.SEED_DEMO_DATA === "true";
+        if (!seedDemoData) {
+            console.log("Skipping demo data seeds");
+            return;
+        }
+
         await createProductCategorySeed()
         await createProductBrandSeed()
         await createMeasurementUnitSeed()
         await createStockLocationSeed()
         await createSupplierSeed()
         await createDepartmentSeed()
-        await createAdminSeed()
         await createUserSeed()
         await createProductSeed()
         await createStockLocationProductSeed()

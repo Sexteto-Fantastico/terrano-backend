@@ -9,11 +9,19 @@ import {
     UserResponse,
     UserPermissionsResponse,
 } from "../dtos/user.dto";
-import { BadRequestError } from "../errors";
+import { BadRequestError, UnauthorizedError } from "../errors";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
+function getActorId(req: Request<any, any, any, any>): number {
+    const actorId = (req as AuthenticatedRequest).user?.id;
+    if (!actorId) {
+        throw new UnauthorizedError("User not authenticated.");
+    }
+    return actorId;
+}
+
 async function createUser(req: Request<unknown, UserResponse, CreateUserBody>, res: Response<UserResponse>) {
-    const user = await UserService.createUser(req.body);
+    const user = await UserService.createUser(req.body, getActorId(req));
     res.status(201).json(user);
 }
 
@@ -31,25 +39,25 @@ async function getUserById(req: Request<{ id: string }, UserResponse>, res: Resp
 
 async function updateUser(req: Request<{ id: string }, UserResponse, UpdateUserBody>, res: Response<UserResponse>) {
     const id = Number(req.params.id);
-    const user = await UserService.updateUser(id, req.body);
+    const user = await UserService.updateUser(id, req.body, getActorId(req));
     res.json(user);
 }
 
 async function changePassword(req: Request<{ id: string }, UserResponse, ChangePasswordBody>, res: Response<UserResponse>) {
     const id = Number(req.params.id);
-    const user = await UserService.changePassword(id, req.body);
+    const user = await UserService.changePassword(id, req.body, getActorId(req));
     res.json(user);
 }
 
 async function deleteUser(req: Request<{ id: string }, void, DeleteUserBody>, res: Response<void>) {
     const id = Number(req.params.id);
-    await UserService.deleteUser(id, req.body?.updatedBy);
+    await UserService.deleteUser(id, getActorId(req));
     res.status(204).send();
 }
 
-async function restoreUser(req: Request<{ id: string }, UserResponse, { updatedBy?: number }>, res: Response<UserResponse>) {
+async function restoreUser(req: Request<{ id: string }, UserResponse>, res: Response<UserResponse>) {
     const id = Number(req.params.id);
-    const user = await UserService.restoreUser(id, req.body?.updatedBy);
+    const user = await UserService.restoreUser(id, getActorId(req));
     res.json(user);
 }
 
